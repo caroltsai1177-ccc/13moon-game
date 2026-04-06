@@ -61,6 +61,5 @@ redCards=[{id:'0101',type:'人生練習題',mark:'紅龍',text:'看待人事物�
 <strong>'+gameState.totalScore+'</strong></div>'+Object.entries(gameState.cardScores).map(([t,s])=>'<div class="score-item">'+t+': <strong>'+s+'</strong></div>').join('');document.getElementById('game-end').classList.add('show')}function
 
 restartGame(){gameState={currentKin:1,totalScore:0,diceHistory:[],cardScores:{'人生練習題':0,'天賦喚醒力':0,'發揮力量':0,'知與行':0}};document.getElementById('total-score').textContent='0';document.getElementById('dice-result').textContent='';document.getElementById('dice-history').textContent='';document.getElementById('card-display').innerHTML='';document.getElementById('score-response').innerHTML='';document.getElementById('card-title').textContent='等待抽卡...';document.getElementById('game-end').classList.remove('show');updateCurrentPosition()}function getColorEmoji(c){return{red:'🔴',white:'⚪',blue:'🔵',yellow:'🟡',green:'🟢'}[c]||'⚪'}initBoard();</script>
-</body>
+</body> 
 </html>
-
