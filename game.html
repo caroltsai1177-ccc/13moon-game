@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>13月亮共時旅程 - Carol 專業版</title>
+<title>13月亮共時旅程 - Carol 專業版 v0.4</title>
 <style>
 /* 🎲 骰子動畫 */
 @keyframes shake {
@@ -17,62 +17,55 @@
 /* 🎨 iPad 最佳化排版 */
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:#0d0d1a;color:#fff;padding:10px;overflow-x:hidden}
-h1{text-align:center;font-size:1.3em;margin-bottom:10px;color:#f8f8f8}
+h1{text-align:center;font-size:1.2em;margin-bottom:8px;color:#f8f8f8}
 
 .status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 10px; margin-bottom: 10px; font-size: 0.9em; }
 
-/* 🗺️ 卓爾金曆地圖：縮小以適應 iPad */
+/* 🗺️ 卓爾金曆地圖：精準對齊圖表 */
 .board-container {
     background: #1a1a2e;
     padding: 5px;
     border-radius: 8px;
     display: flex;
     justify-content: center;
+    width: 100%;
 }
 .tzolkin-grid {
     display: grid;
-    grid-template-columns: repeat(13, 26px); /* 縮小格子寬度 */
-    grid-template-rows: repeat(20, 26px);    /* 縮小格子高度 */
+    grid-template-columns: repeat(13, 1fr); /* 讓13列平分寬度 */
     gap: 1.5px;
+    width: 100%;
+    max-width: 600px; /* 限制寬度避免格子太大 */
 }
 .kin-cell {
-    width: 26px;
-    height: 26px;
+    aspect-ratio: 1; /* 保持正方形 */
     border-radius: 2px;
-    font-size: 0.55em;
+    font-size: 0.5em;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #000;
     font-weight: bold;
-    transition: 0.3s;
 }
-/* 顏色邏輯 */
+/* 根據 Carol 的圖表定義顏色 */
 .kin-red { background: #ff6b6b; }
 .kin-white { background: #f8f8f8; }
 .kin-blue { background: #4dabf7; }
 .kin-yellow { background: #ffd43b; }
-.kin-green { background: #69db7c; border: 1px solid #fff; } /* 綠色與紫色底 (抽綠卡) */
+.kin-green { background: #69db7c; box-shadow: inset 0 0 5px rgba(255,255,255,0.8); } /* 綠/紫區塊 */
 
 .kin-cell.current {
     background: #fff !important;
     color: #ff00ff !important;
-    transform: scale(1.3);
+    transform: scale(1.2);
     z-index: 10;
-    box-shadow: 0 0 15px #fff;
-    border-radius: 50%; /* 玩家顯示為圓形 */
+    box-shadow: 0 0 10px #fff;
+    border-radius: 50%;
 }
 
-/* 🃏 卡片區域佈局 */
+/* 🃏 卡片區域 */
 .card-area { margin-top: 15px; padding-bottom: 30px; }
-.card { 
-    background: #252545; 
-    padding: 15px; 
-    border-radius: 12px; 
-    border-top: 5px solid #ccc; 
-    min-height: 120px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
+.card { background: #252545; padding: 15px; border-radius: 12px; border-top: 5px solid #ccc; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 .card.red { border-color: #ff6b6b; }
 .card.white { border-color: #f8f8f8; }
 .card.blue { border-color: #4dabf7; }
@@ -80,7 +73,7 @@ h1{text-align:center;font-size:1.3em;margin-bottom:10px;color:#f8f8f8}
 .card.green { border-color: #69db7c; }
 
 .dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px; border-radius: 25px; width: 100%; margin-top: 10px; font-size: 1.1em; font-weight: bold; }
-.action-btn { background: #69db7c; color: #000; padding: 10px 20px; border-radius: 20px; border: none; margin-top: 10px; font-weight: bold; }
+.action-btn { background: #69db7c; color: #000; padding: 10px 20px; border-radius: 20px; border: none; margin-top: 10px; font-weight: bold; width: 100%; }
 </style>
 </head>
 <body>
@@ -96,7 +89,7 @@ h1{text-align:center;font-size:1.3em;margin-bottom:10px;color:#f8f8f8}
 
 <div class="dice-area">
     <button class="dice-btn" id="roll-btn" onclick="rollDice()">🎲 擲骰子前進</button>
-    <div id="dice-result" style="text-align:center; font-size: 1.2em; height: 30px; margin-top: 5px;"></div>
+    <div id="dice-result" style="text-align:center; font-size: 1.1em; height: 25px; margin-top: 5px; color:#888;"></div>
 </div>
 
 <div class="card-area">
@@ -106,20 +99,27 @@ h1{text-align:center;font-size:1.3em;margin-bottom:10px;color:#f8f8f8}
 
 <script>
 let gameState = { currentKin: 1, totalScore: 0 };
-// 📌 綠色/紫色區域 (抽綠卡) 的 KIN 編號
-const GREEN_KIN = [1,20,22,39,43,58,64,77,88,93,94,95,96,105,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,184,197,203,218,222,239,241,260];
 
-// 🎨 判定格子的抽牌類型
+// 📌 嚴格對齊 Carol 圖表的綠色 (GAP) 與紫色 (中柱) 區域
+const GREEN_KIN_LIST = [
+    1, 20, 22, 39, 43, 58, 64, 77, 88, 93, 
+    96, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115,
+    121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
+    146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 165, 168, 173, 184, 197, 203, 218, 222, 239, 241, 260
+];
+
 function getKinType(k) {
-    if (GREEN_KIN.includes(k)) return 'green';
-    const colorCycle = ['red', 'white', 'blue', 'yellow'];
-    return colorCycle[(k - 1) % 4];
+    if (GREEN_KIN_LIST.includes(k)) return 'green';
+    // 根據橫列判定底色
+    const row = (k - 1) % 20 + 1;
+    const colorIndex = (row - 1) % 4;
+    return ['red', 'white', 'blue', 'yellow'][colorIndex];
 }
 
 function initBoard() {
     const grid = document.getElementById('tzolkin-grid');
     grid.innerHTML = '';
-    // 卓爾金曆：13列 x 20行
+    // 卓爾金曆佈局：20 橫列，13 縱欄
     for (let row = 1; row <= 20; row++) {
         for (let col = 1; col <= 13; col++) {
             const k = (col - 1) * 20 + row;
@@ -147,20 +147,15 @@ function rollDice() {
     const res = document.getElementById('dice-result');
     btn.disabled = true;
     res.classList.add('dice-rolling');
-    
     let count = 0;
     const anim = setInterval(() => {
         res.textContent = `🎲 ${Math.floor(Math.random()*6)+1} + ${Math.floor(Math.random()*6)+1}`;
         if (++count > 10) {
             clearInterval(anim);
-            const d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1;
-            const total = d1 + d2;
+            const total = (Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1);
             res.classList.remove('dice-rolling');
-            res.textContent = `🎲 ${d1} + ${d2} = ${total}`;
-            
-            // 🔄 260 循環邏輯
+            res.textContent = `結果：${total}`;
             gameState.currentKin = ((gameState.currentKin + total - 1) % 260) + 1;
-            
             updateUI();
             setTimeout(drawCard, 500);
             btn.disabled = false;
@@ -168,27 +163,14 @@ function rollDice() {
     }, 60);
 }
 
-// 🃏 分類卡池 (Carol，我修正了這裡，現在靈魂拷問只在綠池)
 const cardPool = {
-    red: [
-        {type:'天賦喚醒力', text:'紅龍：擁有開創精神。', score:5},
-        {type:'人生練習題', text:'紅蛇：忽略身體訊息。', score:-5}
-    ],
-    white: [
-        {type:'天賦喚醒力', text:'白風：傳遞溫柔語言。', score:5},
-        {type:'人生練習題', text:'白狗：自我設限。', score:-5}
-    ],
-    blue: [
-        {type:'天賦喚醒力', text:'藍手：實踐的力量。', score:5},
-        {type:'人生練習題', text:'藍猴：過度嚴肅看待戲論。', score:-5}
-    ],
-    yellow: [
-        {type:'天賦喚醒力', text:'黃種子：綻放潛能。', score:5},
-        {type:'人生練習題', text:'黃太陽：過度傲慢。', score:-5}
-    ],
+    red: [{type:'天賦喚醒力', text:'紅龍：開創精神。', score:5}],
+    white: [{type:'天賦喚醒力', text:'白風：傳遞溫柔。', score:5}],
+    blue: [{type:'天賦喚醒力', text:'藍手：實踐力量。', score:5}],
+    yellow: [{type:'天賦喚醒力', text:'黃種子：綻放潛能。', score:5}],
     green: [
-        {type:'靈魂拷問', text:'白風：你是否覺察自己的語言？', action:'soul'},
-        {type:'成就顯化', text:'紅月：邁向成功之路。', action:'become'},
+        {type:'靈魂拷問', text:'白風：是否覺察語言？', action:'soul'},
+        {type:'成就顯化', text:'紅月：邁向成功。', action:'become'},
         {type:'奇蹟顯化', text:'白鏡：看見真實。', action:'magic'}
     ]
 };
@@ -197,24 +179,15 @@ function drawCard() {
     const type = getKinType(gameState.currentKin);
     const pool = cardPool[type];
     const card = pool[Math.floor(Math.random() * pool.length)];
-    
     const display = document.getElementById('card-display');
     const response = document.getElementById('score-response');
     
-    display.innerHTML = `
-        <div class="card ${type}">
-            <small>${type.toUpperCase()} 區域</small>
-            <h3>${card.type}</h3>
-            <p>${card.text}</p>
-        </div>
-    `;
-
+    display.innerHTML = `<div class="card ${type}"><small>${type.toUpperCase()} 區域</small><h3>${card.type}</h3><p>${card.text}</p></div>`;
     if (card.score) {
         gameState.totalScore += card.score;
-        response.innerHTML = `<p>結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
+        response.innerHTML = `<p>結算：+${card.score} 分</p>`;
         updateUI();
     } else {
-        // 處理綠卡特殊動作 (靈魂拷問等)
         response.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.action}')">🎲 進行特殊擲骰</button>`;
     }
 }
@@ -222,17 +195,16 @@ function drawCard() {
 function handleSpecial(action) {
     const d = Math.floor(Math.random() * 6) + 1;
     let msg = "";
-    if (action === 'soul') {
-        gameState.totalScore += d;
-        msg = `靈魂滿意度：🎲 ${d}，獲得 ${d} 分！`;
-    } else if (action === 'become') {
-        const move = d * 5;
-        msg = `成就位移：🎲 ${d} x 5，前進 ${move} 步！`;
-        gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1;
-    } else if (action === 'magic') {
-        const move = d * 10;
-        msg = `奇蹟位移：🎲 ${d} x 10，前進 ${move} 步！`;
-        gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1;
+    if (action === 'soul') { gameState.totalScore += d; msg = `滿意度：🎲 ${d}，獲得 ${d} 分！`; }
+    else if (action === 'become') { 
+        const move = d * 5; 
+        msg = `成就：前進 ${move} 步！`; 
+        gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1; 
+    }
+    else if (action === 'magic') { 
+        const move = d * 10; 
+        msg = `奇蹟：前進 ${move} 步！`; 
+        gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1; 
     }
     document.getElementById('score-response').innerHTML = `<p>${msg}</p>`;
     updateUI();
