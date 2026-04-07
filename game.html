@@ -452,9 +452,10 @@ const greenCards = [
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
-// 🏁 第七步：最終校準版 (物件取值法 - 支援跨循環、圖騰名稱、歷程紀錄)
+// -------------------------------------------------------------------------
+// 🏁 第七步：最終校準版 (歷程表順序優化：ID 緊鄰內容 + 跨循環精準停點)
 
-// 1. 合併五大池 (請確保妳之前的 redCards, whiteCards 等變數名稱正確)
+// 1. 合併五大池
 const masterCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...greenCards];
 
 // 2. 圖騰名稱對照表
@@ -465,12 +466,12 @@ const SEAL_NAMES = [
     "黃戰士", "紅地球", "白鏡", "藍風暴", "黃太陽"
 ];
 
-// 3. 遊戲狀態紀錄
+// 3. 遊戲狀態
 let gameState = {
     startKin: 1, currentKin: 1, targetKin: 260,
     totalDist: 0, movedDist: 0,
     scores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 },
-    currentCard: null // 🌟 用來儲存當前抽到的牌，避免按鈕傳字報錯
+    currentCard: null 
 };
 
 let currentPools = { red: [], white: [], blue: [], yellow: [], green: [] };
@@ -482,7 +483,7 @@ function getKinType(k) {
     return ['red', 'white', 'blue', 'yellow'][(row - 1) % 4];
 }
 
-// 4. 啟動遊戲
+// 4. 啟動旅程
 function startGame() {
     const start = parseInt(document.getElementById('start-kin').value) || 1;
     const target = parseInt(document.getElementById('end-kin').value) || 260;
@@ -491,7 +492,6 @@ function startGame() {
     gameState.targetKin = target;
     gameState.movedDist = 0;
     
-    // 計算跨循環總步數
     if (target >= start) { gameState.totalDist = target - start; } 
     else { gameState.totalDist = (260 - start) + target; }
     
@@ -500,7 +500,7 @@ function startGame() {
     document.getElementById('game-setup').style.display = 'none';
     document.getElementById('game-ui').style.display = 'block';
 
-    // 初始化歷程表
+    // 初始化歷程表介面 (順序優化：ID 移至內容前方)
     const cardArea = document.querySelector('.card-area');
     if (!document.getElementById('history-table')) {
         const tableDiv = document.createElement('div');
@@ -509,17 +509,17 @@ function startGame() {
             <h3 style="margin-top:30px; border-bottom:2px solid #667eea; padding-bottom:5px;">📊 旅程歷程回顧</h3>
             <table id="history-table" style="width:100%; margin-top:10px; border-collapse: collapse; font-size: 0.85em; text-align: left; background: #1a1a2e; color: #eee;">
                 <thead><tr style="background:#252545; color:#fff;">
-                    <th style="padding:8px; border:1px solid #444; width:12%;">KIN</th>
-                    <th style="padding:8px; border:1px solid #444; width:20%;">圖騰/類型</th>
+                    <th style="padding:8px; border:1px solid #444; width:8%;">KIN</th>
+                    <th style="padding:8px; border:1px solid #444; width:18%;">圖騰/類型</th>
+                    <th style="padding:8px; border:1px solid #444; width:10%;">ID</th>
                     <th style="padding:8px; border:1px solid #444;">牌卡內容</th>
-                    <th style="padding:8px; border:1px solid #444; width:12%;">分數</th>
+                    <th style="padding:8px; border:1px solid #444; width:10%;">分數</th>
                 </tr></thead>
                 <tbody id="history-body"></tbody>
             </table>`;
         cardArea.appendChild(tableDiv);
     } else { document.getElementById('history-body').innerHTML = ''; }
 
-    // 洗牌
     ['red', 'white', 'blue', 'yellow', 'green'].forEach(c => {
         currentPools[c] = masterCards.filter(m => m.color === c).sort(() => Math.random() - 0.5);
     });
@@ -553,7 +553,7 @@ function updateUI() {
     if (gameState.movedDist >= gameState.totalDist && gameState.totalDist > 0) {
         setTimeout(() => {
             let r = Math.max(0, gameState.scores.red), w = Math.max(0, gameState.scores.white), b = Math.max(0, gameState.scores.blue), y = Math.max(0, gameState.scores.yellow), g = Math.max(0, gameState.scores.green);
-            alert(`🏁 旅程結算！\n\n🔴紅:${r} ⚪白:${w} 🔵藍:${b} 🟡黃:${y} 🟢綠:${g}\n------------------\n🌟 總顯化得分：${r+w+b+y+g}`);
+            alert(`🏁 旅程結算！\n\n🔴紅:${r} ⚪白:${w} 🔵藍:${b} 🟡黃:${y} 🟢綠:${g}\n------------------\n🌟 總分：${r+w+b+y+g}`);
             document.getElementById('roll-btn').disabled = true;
         }, 800);
     }
@@ -571,10 +571,9 @@ function rollDice() {
         if (++count > 12) {
             clearInterval(anim);
             const d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1;
-            const roll = d1 + d2;
             res.className = 'dice-pop';
-            res.textContent = `🎲 ${roll}`;
-            moveStep(roll);
+            res.textContent = `🎲 ${d1+d2}`;
+            moveStep(d1 + d2);
             setTimeout(drawCard, 1000);
             btn.disabled = false;
         }
@@ -591,7 +590,6 @@ function moveStep(steps) {
     updateUI();
 }
 
-// 5. 抽牌核心
 function drawCard() {
     const type = getKinType(gameState.currentKin);
     let pool = currentPools[type];
@@ -600,18 +598,16 @@ function drawCard() {
         pool = currentPools[type];
     }
     const card = pool.pop();
-    gameState.currentCard = card; // 🌟 存起來，給後面的 function 抓
-    
+    gameState.currentCard = card; 
     const display = document.getElementById('card-display');
     display.innerHTML = `<div class="card ${type}"><small>ID: ${card.id}</small><h3>${card.type}</h3><p>${card.text}</p><div class="pool-info">池餘: ${pool.length} 張</div></div>`;
-    
     const res = document.getElementById('score-response');
     res.innerHTML = '';
     
     if (card.rule === 'direct') {
         applyScore(card.score, type);
         res.innerHTML = `<p>能量結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
-        addLog(gameState.currentKin, type, card.type, card.text, card.score);
+        addLog(card.id, gameState.currentKin, type, card.type, card.text, card.score);
     } else if (card.rule === 'power') {
         res.innerHTML = `<button class="action-btn" onclick="rollPower1()">🎲 判定發揮力量</button>`;
     } else if (card.rule === 'knowledge') {
@@ -623,8 +619,8 @@ function drawCard() {
 
 function applyScore(s, color) { gameState.scores[color] += s; updateUI(); }
 
-// 📜 歷程表紀錄
-function addLog(kin, color, type, content, score) {
+// 📜 歷程表紀錄 (調整欄位顯示順序)
+function addLog(id, kin, color, type, content, score) {
     const body = document.getElementById('history-body');
     const row = document.createElement('tr');
     const sealName = SEAL_NAMES[(kin - 1) % 20]; 
@@ -633,34 +629,31 @@ function addLog(kin, color, type, content, score) {
     row.innerHTML = `
         <td style="padding:8px; border:1px solid #444;">${kin}</td>
         <td style="padding:8px; border:1px solid #444;">${sealName}<br><small>${colorEmoji}${type}</small></td>
+        <td style="padding:8px; border:1px solid #444; font-family: monospace;">${id}</td>
         <td style="padding:8px; border:1px solid #444; line-height:1.4;">${content}</td>
         <td style="padding:8px; border:1px solid #444; font-weight:bold; color:${score >= 0 ? '#1dd1a1' : '#ee5253'}">${score > 0 ? '+' : ''}${score}</td>
     `;
     body.insertBefore(row, body.firstChild);
 }
 
-// 6. 判定邏輯 (統一從 gameState.currentCard 取值，超安全！)
 function rollPower1() {
     const card = gameState.currentCard;
     const d = Math.floor(Math.random() * 6) + 1;
     const res = document.getElementById('score-response');
     if (d % 2 !== 0) { 
-        applyScore(5, card.color); 
-        addLog(gameState.currentKin, card.color, card.type, card.text, 5);
-        res.innerHTML = `<p>結果：🎲 ${d} (單數) -> ✅ +5分</p>`; 
+        applyScore(5, card.color); addLog(card.id, gameState.currentKin, card.color, card.type, card.text, 5);
+        res.innerHTML = `<p>結果：🎲 ${d} -> ✅ +5分</p>`; 
     } else { 
-        res.innerHTML = `<p>結果：🎲 ${d} (雙數) -> ❌ No! <button class="action-btn" onclick="rollPower2()">🎲 再次判定</button></p>`; 
+        res.innerHTML = `<p>結果：🎲 ${d} -> ❌ No! <button class="action-btn" onclick="rollPower2()">🎲 再次判定</button></p>`; 
     }
 }
 function rollPower2() {
     const card = gameState.currentCard;
     const d = Math.floor(Math.random() * 6) + 1;
     const s = (d % 2 !== 0) ? -3 : -5;
-    applyScore(s, card.color); 
-    addLog(gameState.currentKin, card.color, card.type, card.text, s);
+    applyScore(s, card.color); addLog(card.id, gameState.currentKin, card.color, card.type, card.text, s);
     document.getElementById('score-response').innerHTML = `<p>結果：🎲 ${d} -> 結算 ${s} 分</p>`;
 }
-
 function rollKnowledgeDice() {
     const card = gameState.currentCard;
     const d = Math.floor(Math.random() * 6) + 1;
@@ -668,24 +661,17 @@ function rollKnowledgeDice() {
     if (d === 1 || d === 6) { label = "實踐"; s = 5; }
     else if (d === 2 || d === 5) { label = "領悟"; s = 3; }
     else { label = "知道"; s = 0; }
-    applyScore(s, card.color); 
-    addLog(gameState.currentKin, card.color, `${card.type}(${label})`, card.text, s);
+    applyScore(s, card.color); addLog(card.id, gameState.currentKin, card.color, `${card.type}(${label})`, card.text, s);
     document.getElementById('score-response').innerHTML = `<p>結果：🎲 ${d} -> ${label} (+${s}分)</p>`;
 }
-
 function rollManifestDice() {
     const card = gameState.currentCard;
     const d = Math.floor(Math.random() * 6) + 1;
-    const rule = card.rule;
-    let s = (rule === 'magic') ? 10 : 5;
-    let steps = d * (rule === 'magic' ? 10 : 5);
-    applyScore(s, card.color); 
-    addLog(gameState.currentKin, card.color, `${card.type}(位移${steps}步)`, card.text, s);
+    let s = (card.rule === 'magic') ? 10 : 5;
+    let steps = d * (card.rule === 'magic' ? 10 : 5);
+    applyScore(s, card.color); addLog(card.id, gameState.currentKin, card.color, `${card.type}(位移${steps}步)`, card.text, s);
     document.getElementById('score-response').innerHTML = `<p>🎲 ${d} -> 前進 ${steps} 步！</p>`;
     moveStep(steps);
 }
 
 initBoard();
-</script>
-</body>
-</html>
