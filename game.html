@@ -3,100 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>13月亮共時旅程 - Carol 專業正式版</title>
+<title>13月亮共時旅程 - Carol 完備正式版</title>
 <style>
-/* 🎲 骰子動畫 */
-@keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
+/* 🎲 動畫與基礎排版 */
+@keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
 .dice-rolling { animation: shake 0.1s infinite; color: #ffd43b; }
-
-/* 🎨 iPad 螢幕最佳化 */
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,sans-serif;background:#0d0d1a;color:#fff;padding:10px;text-align:center;overflow-x:hidden}
-.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 10px; margin-bottom: 10px; font-size: 0.9em; }
-
-/* 🗺️ 卓爾金曆地圖：13x20 */
-.board-container { background: #1a1a2e; padding: 5px; border-radius: 8px; width: 100%; max-width: 650px; margin: 0 auto; }
+body{font-family:-apple-system,sans-serif;background:#0d0d1a;color:#fff;padding:10px;text-align:center}
+.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 10px; margin-bottom: 10px; }
+.board-container { background: #1a1a2e; padding: 5px; border-radius: 8px; display: inline-block; width: 100%; max-width: 600px; }
 .tzolkin-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 1.5px; width: 100%; }
 .kin-cell { aspect-ratio: 1; border-radius: 2px; font-size: 0.5em; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; }
-
-/* 🔴⚪🔵🟡🟢 顏色精確定義 */
-.kin-red { background: #ff6b6b; } .kin-white { background: #f8f8f8; } .kin-blue { background: #4dabf7; } .kin-yellow { background: #ffd43b; }
-.kin-green { background: #69db7c; border: 1px solid #fff; } 
-
-.kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.15); z-index: 10; box-shadow: 0 0 12px #fff; border-radius: 50%; }
-
-/* 🃏 卡片區域 */
-.card-area { margin-top: 15px; text-align: left; max-width: 500px; margin: 0 auto; padding-bottom: 40px; }
-.card { background: #252545; padding: 15px; border-radius: 12px; border-top: 8px solid #ccc; min-height: 140px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.kin-red { background: #ff6b6b; } .kin-white { background: #f8f8f8; } .kin-blue { background: #4dabf7; } .kin-yellow { background: #ffd43b; } .kin-green { background: #69db7c; border: 1px solid #fff; }
+.kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.2); box-shadow: 0 0 10px #fff; border-radius: 50%; z-index: 10; }
+.card-area { margin-top: 15px; text-align: left; max-width: 500px; margin: 0 auto; padding-bottom: 50px; }
+.card { background: #252545; padding: 15px; border-radius: 12px; border-top: 8px solid #ccc; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 .card.red { border-color: #ff6b6b; } .card.white { border-color: #f8f8f8; } .card.blue { border-color: #4dabf7; } .card.yellow { border-color: #ffd43b; } .card.green { border-color: #69db7c; }
-
-.dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 15px; border-radius: 30px; width: 100%; margin-top: 10px; font-size: 1.2em; font-weight: bold; cursor: pointer; }
+.dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 15px; border-radius: 30px; width: 100%; font-size: 1.2em; font-weight: bold; cursor: pointer; }
 .action-btn { background: #69db7c; color: #000; padding: 12px; border-radius: 20px; border: none; margin-top: 10px; font-weight: bold; width: 100%; cursor: pointer; }
 </style>
 </head>
 <body>
-
 <h1>🌙 13月亮共時旅程</h1>
-
-<div class="status-bar">
-    <div>📍 KIN <span id="current-kin">1</span></div>
-    <div>🏆 分數: <span id="total-score">0</span></div>
-</div>
-
-<div class="board-container">
-    <div class="tzolkin-grid" id="tzolkin-grid"></div>
-</div>
-
+<div class="status-bar"><div>📍 KIN <span id="current-kin">1</span></div><div>🏆 分數: <span id="total-score">0</span></div></div>
+<div class="board-container"><div class="tzolkin-grid" id="tzolkin-grid"></div></div>
 <button class="dice-btn" id="roll-btn" onclick="rollDice()">🎲 擲骰子前進</button>
-<div id="dice-result" style="height: 30px; margin-top: 5px; color:#aaa; font-size: 1.1em;"></div>
-
-<div class="card-area">
-    <div id="card-display"></div>
-    <div id="score-response"></div>
-</div>
+<div id="dice-result" style="height: 30px; margin-top: 5px; color:#aaa;"></div>
+<div class="card-area"><div id="card-display"></div><div id="score-response"></div></div>
 
 <script>
 let gameState = { currentKin: 1, totalScore: 0 };
-
-// 📌 嚴格遵照 Carol 的綠筆與紅筆校正名單
-const GREEN_KIN = [
-    1, 20, 22, 39, 43, 50, 51, 58, 64, 69, 72, 77, 85, 88, 93, 96, 
-    106, 107, 108, 109, 110, 111, 112, 113, 114, 115,
-    121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
-    146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 165, 168, 169, 172, 173, 175, 176, 184, 189, 191, 192, 193, 197, 203, 210, 211, 218, 222, 239, 241, 260
-];
+// 📌 嚴格根據 Carol 綠筆校正的綠色 KIN
+const GREEN_KIN = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,94,95,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,155,165,168,169,172,173,175,176,184,189,191,192,193,197,203,210,211,218,222,239,241,260];
 
 function getKinType(k) {
     if (GREEN_KIN.includes(k)) return 'green';
     const row = (k - 1) % 20 + 1;
-    const colorCycle = ['red', 'white', 'blue', 'yellow'];
-    return colorCycle[(row - 1) % 4];
+    const colors = ['red', 'white', 'blue', 'yellow'];
+    return colors[(row - 1) % 4];
 }
 
-// 🎴 正式卡片庫 (根據 Carol 提供的 Excel 內容)
-const library = {
-    red: [
-        { id: '0101', type: '人生練習題', mark: '紅龍', text: '看待人事物過度嚴肅太過認真，導致內在情緒張力較大。', score: -5, rule: 'direct' },
-        { id: '0104', type: '天賦喚醒力', mark: '紅龍', text: '讚讚讚！擁有初生之犢不畏虎的開創精神。', score: 5, rule: 'direct' },
-        { id: '0107', type: '發揮力量', mark: '紅龍', text: '我鬆綁原生家庭舊有模式的DNA?', score: 5, rule: 'power' },
-        { id: '0501', type: '人生練習題', mark: '紅蛇', text: '切斷自我與身體的連結，忽略身體帶給我們的訊息。', score: -5, rule: 'direct' }
-    ],
-    white: [
-        { id: '2101', type: '人生練習題', mark: '白風', text: '自我感覺良好，導致對外在有高傲傲慢之嫌。', score: -5, rule: 'direct' },
-        { id: '2104', type: '天賦喚醒力', mark: '白風', text: '擁有優越的表達能力，且能夠同理他人。', score: 5, rule: 'direct' }
-    ],
-    blue: [
-        { id: '4101', type: '人生練習題', mark: '藍手', text: '眼高手低，只想不做，累死身邊愛我的人。', score: -5, rule: 'direct' },
-        { id: '4104', type: '天賦喚醒力', mark: '藍手', text: '擁有一雙巧手，樂於分享手作樂趣。', score: 5, rule: 'direct' }
-    ],
-    yellow: [
-        { id: '6101', type: '人生練習題', mark: '黃種子', text: '自我設限，畫地自限，導致無法接受新的可能。', score: -5, rule: 'direct' },
-        { id: '6107', type: '發揮力量', mark: '黃種子', text: '我能夠看見自己的潛力，且懂得愛惜身體？', score: 5, rule: 'power' }
-    ],
-    green: [
-        { id: '2107', type: '靈魂拷問', mark: '白風', text: '我能夠覺察我的言語，且多用溫柔肯定智慧的言語？', score: 5, rule: 'soul' },
-        { id: '8107', type: '成就顯化', mark: '紅月', text: '我鬆綁原生家庭舊有模式的DNA，邁向成就？', score: 5, rule: 'become' },
-        { id: '8507', type: '奇蹟顯化', mark: '白風', text: '我能夠覺察我的言語，且懂得清理不再適合的人事物。', score: 10, rule: 'magic' }
+// 🎴 根據 Excel 截圖錄入的真實卡片資料
+const cardLibrary = {
+    "01": { // 紅龍系列
+        normal: [
+            { id: '0101', type: '人生練習題', text: '看待人事物過度嚴肅，導致內在情緒張力較大。', score: -5, rule: 'direct' },
+            { id: '0104', type: '天賦喚醒力', text: '擁有初生之犢不畏虎的開創精神。', score: 5, rule: 'direct' },
+            { id: '0107', type: '發揮力量', text: '我鬆綁原生家庭舊有模式的DNA?', score: 5, rule: 'power' }
+        ],
+        green: [
+            { id: '0114', type: '成就顯化', text: '星際聯盟連結創新家', score: 5, rule: 'become' },
+            { id: '0115', type: '奇蹟顯化', text: '重建失落的古文明，揭開人類神秘起源', score: 10, rule: 'magic' },
+            { id: '0116', type: '宇宙訊息', text: '你可以安心回到宇宙的懷抱，一切都被接住', score: 5, rule: 'direct' }
+        ]
+    },
+    "02": { // 白風系列
+        normal: [
+            { id: '0201', type: '人生練習題', text: '人生處於沒有明確的方向，一下向右走，一下向左走。', score: -5, rule: 'direct' },
+            { id: '0204', type: '天賦喚醒力', text: '成功學習瑜伽呼吸法，有意識地感受身體內外變化。', score: 5, rule: 'direct' },
+            { id: '0207', type: '發揮力量', text: '我能在人際互動中，專注傾聽且好好說話？', score: 5, rule: 'power' }
+        ],
+        green: [
+            { id: '0214', type: '成就顯化', text: '星際聯盟靈魂療癒整樂家', score: 5, rule: 'become' },
+            { id: '0215', type: '奇蹟顯化', text: '有能力瞬間學會任何語言', score: 10, rule: 'magic' }
+        ]
+    },
+    "03": { // 藍夜系列
+        normal: [
+            { id: '0301', type: '人生練習題', text: '汲汲營營在名與利的價值觀，忽略生活與心靈的豐盛。', score: -5, rule: 'direct' },
+            { id: '0304', type: '天賦喚醒力', text: '我擁有豐富的想像力與創造力。', score: 5, rule: 'direct' }
+        ]
+    },
+    "04": { // 黃種子系列
+        normal: [
+            { id: '0401', type: '人生練習題', text: '同時追求多目標，造成專注力與資源的分散。', score: -5, rule: 'direct' },
+            { id: '0404', type: '天賦喚醒力', text: '我耐心耕耘，並樂觀正向的期待豐收。', score: 5, rule: 'direct' }
+        ]
+    },
+    "T": [ // 靈魂拷問專用池
+        { id: 'T01', type: '靈魂拷問', text: '我當下的人生目標是？', rule: 'soul' },
+        { id: 'T02', type: '靈魂拷問', text: '我當下最大的黑暗面是什麼？', rule: 'soul' }
     ]
 };
 
@@ -134,7 +120,7 @@ function rollDice() {
         if (++count > 10) {
             clearInterval(anim);
             const total = (Math.floor(Math.random()*6)+1) + (Math.floor(Math.random()*6)+1);
-            document.getElementById('dice-result').textContent = `前進步數：${total}`;
+            document.getElementById('dice-result').textContent = `結果：${total}`;
             gameState.currentKin = ((gameState.currentKin + total - 1) % 260) + 1;
             updateUI();
             setTimeout(drawCard, 500);
@@ -144,20 +130,31 @@ function rollDice() {
 }
 
 function drawCard() {
-    const type = getKinType(gameState.currentKin);
-    const pool = library[type];
+    const k = gameState.currentKin;
+    const type = getKinType(k);
+    const rowStr = String((k - 1) % 20 + 1).padStart(2, '0');
+    
+    let pool = [];
+    if (type === 'green') {
+        // 綠色格：抽該橫列的綠色牌，或是靈魂拷問
+        pool = (cardLibrary[rowStr] && cardLibrary[rowStr].green) ? [...cardLibrary[rowStr].green, ...cardLibrary.T] : cardLibrary.T;
+    } else {
+        // 一般色格：抽該橫列的一般牌
+        pool = (cardLibrary[rowStr] && cardLibrary[rowStr].normal) ? cardLibrary[rowStr].normal : cardLibrary["01"].normal;
+    }
+    
     const card = pool[Math.floor(Math.random() * pool.length)];
+    const display = document.getElementById('card-display');
+    const response = document.getElementById('score-response');
     
-    document.getElementById('card-display').innerHTML = `
-        <div class="card ${type}"><small>${card.id} | ${type.toUpperCase()}</small><h3>${card.type}</h3><p>${card.text}</p></div>`;
+    display.innerHTML = `<div class="card ${type}"><small>ID: ${card.id}</small><h3>${card.type}</h3><p>${card.text}</p></div>`;
     
-    const res = document.getElementById('score-response');
     if (card.rule === 'direct') {
         gameState.totalScore += card.score;
-        res.innerHTML = `<p>結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
+        response.innerHTML = `<p>結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
         updateUI();
     } else {
-        res.innerHTML = `<button class="action-btn" onclick="handleAction('${card.rule}')">🎲 進行規則擲骰</button>`;
+        response.innerHTML = `<button class="action-btn" onclick="handleAction('${card.rule}')">🎲 進行特殊擲骰</button>`;
     }
 }
 
@@ -165,18 +162,18 @@ function handleAction(rule) {
     const d = Math.floor(Math.random() * 6) + 1;
     let msg = "";
     if (rule === 'power') {
-        if (d % 2 !== 0) { gameState.totalScore += 5; msg = `🎲 ${d} (單數) -> ✅ Yes (+5分)`; }
-        else { gameState.totalScore -= 5; msg = `🎲 ${d} (雙數) -> ❌ No (系統判定第二次扣5分)`; }
+        if (d % 2 !== 0) { gameState.totalScore += 5; msg = `🎲 ${d} (單數) -> ✅ Yes! +5分`; }
+        else { gameState.totalScore -= 5; msg = `🎲 ${d} (雙數) -> ❌ No! 系統判定扣5分`; }
     } else if (rule === 'soul') {
         gameState.totalScore += d;
-        msg = `靈魂滿意度：🎲 ${d} 分！`;
+        msg = `靈魂點數：🎲 ${d}，獲得 ${d} 分！`;
     } else if (rule === 'become') {
         const move = d * 5;
         msg = `成就位移：前進 ${move} 步！`;
         gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1;
     } else if (rule === 'magic') {
         const move = d * 10;
-        msg = `奇蹟位移：大跳躍 ${move} 步！`;
+        msg = `奇蹟跳躍：前進 ${move} 步！`;
         gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1;
     }
     document.getElementById('score-response').innerHTML = `<p>${msg}</p>`;
