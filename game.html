@@ -3,41 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>13月亮共時旅程 - Carol 專業版 v1.1</title>
+<title>13月亮共時旅程 - Carol 專業正式版 v1.3</title>
 <style>
-/* 🎲 動畫與佈局 -Carol版- */
+/* 🎲 Carol 專屬微縮介面設計 */
 @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-2px, 0px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
 .dice-rolling { animation: shake 0.1s infinite; color: #ffd43b; }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:#0d0d1a;color:#fff;padding:8px;text-align:center;overflow-x:hidden;font-size:14px;}
-h1{font-size:1.1em;margin-bottom:6px;color:#f8f8f8}
+body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:#0d0d1a;color:#fff;padding:5px;text-align:center;overflow-x:hidden;font-size:12px;}
+h1{font-size:1em;margin-bottom:4px;color:#f8f8f8}
+.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 4px; border-radius: 6px; margin-bottom: 6px; font-size: 0.8em; }
 
-.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 6px; border-radius: 8px; margin-bottom: 8px; font-size: 0.8em; }
-
-/* 🗺️ 卓爾金曆地圖 -縮小版- */
-.board-container { background: #1a1a2e; padding: 4px; border-radius: 8px; display: inline-block; width: 100%; max-width: 550px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+/* 🗺️ 地圖微縮佈局 */
+.board-container { background: #1a1a2e; padding: 2px; border-radius: 6px; display: inline-block; width: 100%; max-width: 480px; margin: 0 auto; }
 .tzolkin-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 1px; width: 100%; }
-.kin-cell { aspect-ratio: 1; border-radius: 1px; font-size: 0.5em; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; position: relative; transition: all 0.2s; }
+.kin-cell { aspect-ratio: 1; border-radius: 1px; font-size: 0.5em; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; }
 
-/* 🔴⚪🔵🟡🟢 顏色精確定義 -Carol校正版- */
+/* 🔴⚪🔵🟡🟢 精確顏色定義 */
 .kin-red { background: #ee5253; } .kin-white { background: #f1f2f6; } .kin-blue { background: #2e86de; color: #fff; } .kin-yellow { background: #feca57; }
-.kin-green { background: #1dd1a1; border: 1.2px solid #fff; color: #fff; box-shadow: inset 0 0 4px rgba(0,0,0,0.3); } 
-.kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.1); box-shadow: 0 0 10px #fff; border-radius: 50%; z-index: 10; font-weight: 900; }
+.kin-green { background: #1dd1a1; border: 1px solid #fff; color: #fff; box-shadow: inset 0 0 3px rgba(0,0,0,0.2); } 
+.kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.1); box-shadow: 0 0 8px #fff; border-radius: 50%; z-index: 10; }
 
-/* 🃏 卡片區域 -縮小版- */
-.card-area { margin-top: 10px; text-align: left; max-width: 480px; margin: 0 auto; padding-bottom: 40px; }
-.card { background: #252545; padding: 12px; border-radius: 10px; border-top: 6px solid #ccc; box-shadow: 0 4px 12px rgba(0,0,0,0.3); min-height: 110px; transition: all 0.3s; }
-.card small { font-size: 0.75em; color: #aaa; }
-.card h3 { font-size: 1.1em; margin: 4px 0; }
-.card p { font-size: 0.95em; line-height: 1.4; color: #eee; }
+/* 🃏 卡片與按鈕微縮 */
+.card-area { margin-top: 6px; text-align: left; max-width: 420px; margin: 0 auto; padding-bottom: 30px; }
+.card { background: #252545; padding: 8px; border-radius: 8px; border-top: 5px solid #ccc; min-height: 90px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.card small { font-size: 0.7em; color: #aaa; }
+.card h3 { font-size: 0.95em; margin: 2px 0; }
+.card p { font-size: 0.9em; line-height: 1.3; color: #eee; }
 .card.red { border-color: #ee5253; } .card.white { border-color: #f1f2f6; } .card.blue { border-color: #2e86de; } .card.yellow { border-color: #feca57; } .card.green { border-color: #1dd1a1; }
 
-.dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px; border-radius: 25px; width: 100%; margin-top: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
-.dice-btn:active { transform: scale(0.98); opacity: 0.9; }
-.dice-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-.action-btn { background: #1dd1a1; color: #000; padding: 10px; border-radius: 18px; border: none; margin-top: 8px; font-weight: bold; width: 100%; cursor: pointer; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
-.action-btn:active { transform: scale(0.98); }
+.dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 8px; border-radius: 20px; width: 100%; margin-top: 4px; font-size: 1em; font-weight: bold; cursor: pointer; }
+.action-btn { background: #1dd1a1; color: #000; padding: 6px; border-radius: 12px; border: none; margin-top: 5px; font-weight: bold; width: 100%; cursor: pointer; font-size: 0.9em; }
 </style>
 </head>
 <body>
@@ -49,7 +44,7 @@ h1{font-size:1.1em;margin-bottom:6px;color:#f8f8f8}
 </div>
 
 <button class="dice-btn" id="roll-btn" onclick="rollDice()">🎲 擲骰子前進</button>
-<div id="dice-result" style="height: 25px; margin-top: 4px; color:#aaa; font-size: 1em;"></div>
+<div id="dice-result" style="height: 18px; margin-top: 2px; color:#aaa; font-size: 0.8em;"></div>
 
 <div class="card-area">
     <div id="card-display"></div>
@@ -57,85 +52,70 @@ h1{font-size:1.1em;margin-bottom:6px;color:#f8f8f8}
 </div>
 
 <script>
-// 📌 Carol 的正式卡片資料庫
+// 📌 Carol 的正式卡片庫 (根據 15 張截圖整理)
 const masterCards = [
-    // 🔴 紅色區域卡 (0101-0113 pattern)
-    { id: '0101', color: 'red', type: '人生練習題', text: '看待人事物過度嚴肅太過認真，導致內在情緒張力較大。', score: -5, rule: 'direct' },
-    { id: '0104', color: 'red', type: '天賦喚醒力', text: '讚讚讚！擁有初生之犢不畏虎的開創精神。', score: 5, rule: 'direct' },
-    { id: '0107', color: 'red', type: '發揮力量', text: '我鬆綁原生家庭舊有模式的DNA?', score: 5, rule: 'power' },
-    { id: '0108', color: 'red', type: '發揮力量', text: '身體是靈魂的神聖殿堂，懂得用健康食物滋養他？', score: 5, rule: 'power' },
-    { id: '0111', color: 'red', type: '知與行', text: '我知道，當我喚醒我是誰，我更會知道我的生命價值。', score: 5, rule: 'knowledge' },
+    // 🔴 紅 (01, 05, 09, 13, 17)
+    { id: '0101', prefix: '01', type: '人生練習題', text: '看待人事物過度嚴肅，導致情緒張力較大。', score: -5, rule: 'direct' },
+    { id: '0104', prefix: '01', type: '天賦喚醒力', text: '擁有初生之犢不畏虎的開創精神。', score: 5, rule: 'direct' },
+    { id: '0107', prefix: '01', type: '發揮力量', text: '我鬆綁原生家庭舊有模式的DNA?', score: 5, rule: 'power' },
+    { id: '0501', prefix: '05', type: '人生練習題', text: '切斷自我與身體連結，忽略身體帶來的訊息。', score: -5, rule: 'direct' },
     
-    // ⚪ 白色區域卡 (0201-0213 pattern)
-    { id: '0201', color: 'white', type: '人生練習題', text: '人生處於沒有明確方向，一下向右一下向左走。', score: -5, rule: 'direct' },
-    { id: '0204', color: 'white', type: '天賦喚醒力', text: '成功學習瑜伽呼吸法，有意識地感受身體內外變化。', score: 5, rule: 'direct' },
-    { id: '0207', color: 'white', type: '發揮力量', text: '我能在人際互動中，專注傾聽且好好說話？', score: 5, rule: 'power' },
-    { id: '0211', color: 'white', type: '知與行', text: '我知道，愛自己是終身浪漫的開始。', score: 5, rule: 'knowledge' },
+    // ⚪ 白 (02, 06, 10, 14, 18)
+    { id: '0201', prefix: '02', type: '人生練習題', text: '人生長處於沒有明確的方向，一下向右、一下向左走。', score: -5, rule: 'direct' },
+    { id: '0204', prefix: '02', type: '天賦喚醒力', text: '成功學習瑜伽呼吸法，有意識地感受身體變化。', score: 5, rule: 'direct' },
+    { id: '0211', prefix: '02', type: '知與行', text: '我知道，真正的溝通是達到彼此的共識而非僅是說服。', score: 5, rule: 'knowledge' },
+    { id: '0601', prefix: '06', type: '人生練習題', text: '人生最大的遺憾，就是太早放棄。', score: -5, rule: 'direct' },
+    { id: '0604', prefix: '06', type: '天賦喚醒力', text: '我擅長梳理及彙整大家的資訊，是最佳整合者。', score: 5, rule: 'direct' },
+    { id: '1401', prefix: '14', type: '人生練習題', text: '太專注在自身，而忽略他人的需要。', score: -5, rule: 'direct' },
+    { id: '1811', prefix: '18', type: '知與行', text: '我知道，魔鬼藏在細節裡。', score: 5, rule: 'knowledge' },
     
-    // 🔵 藍色區域卡 (0301-0313 pattern)
-    { id: '0301', color: 'blue', type: '人生練習題', text: '汲汲營營在名與利的價值觀，忽略生活與心靈的豐盛。', score: -5, rule: 'direct' },
-    { id: '0304', color: 'blue', type: '天賦喚醒力', text: '我擁有豐富的想像力與創造力。', score: 5, rule: 'direct' },
-    { id: '0307', color: 'blue', type: '發揮力量', text: '我敢於做夢，並相信夢想有實現的可能？', score: 5, rule: 'power' },
+    // 🔵 藍 (03, 07, 11, 15, 19)
+    { id: '0301', prefix: '03', type: '人生練習題', text: '汲汲營營在名與利的價值觀，忽略心靈豐盛。', score: -5, rule: 'direct' },
+    { id: '0311', prefix: '03', type: '知與行', text: '我知道，夢想一定要有的，萬一實現了呢！', score: 5, rule: 'knowledge' },
     
-    // 🟡 黃色區域卡 (0401-0413 pattern)
-    { id: '0401', color: 'yellow', type: '人生練習題', text: '同時追求多目標，造成專注力與資源的分散。', score: -5, rule: 'direct' },
-    { id: '0404', color: 'yellow', type: '天賦喚醒力', text: '我耐心耕耘，並樂觀正向地期待豐收。', score: 5, rule: 'direct' },
-    { id: '0407', color: 'yellow', type: '發揮力量', text: '我懂得善用時間與資源，高效完成任務？', score: 5, rule: 'power' },
+    // 🟡 黃 (04, 08, 12, 16, 20)
+    { id: '0401', prefix: '04', type: '人生練習題', text: '同時追求多目標，造成專注力與資源的分散。', score: -5, rule: 'direct' },
+    { id: '1201', prefix: '12', type: '人生練習題', text: '說話太一針見血，過度犀利，讓人容易受傷。', score: -5, rule: 'direct' },
     
-    // 🟢 綠色區域卡 (尾數 14, 15, 16 或 T 開頭)
-    { id: '0114', color: 'green', type: '成就顯化', text: '星際聯盟連結創新家', score: 5, rule: 'become' },
-    { id: '0214', color: 'green', type: '成就顯化', text: '星際聯盟靈魂療癒整樂家', score: 5, rule: 'become' },
-    { id: '0314', color: 'green', type: '成就顯化', text: '星際聯盟豐盛顯化家', score: 5, rule: 'become' },
-    { id: '0115', color: 'green', type: '奇蹟顯化', text: '重建失落的古文明，揭開人類神秘起源', score: 10, rule: 'magic' },
-    { id: '0215', color: 'green', type: '奇蹟顯化', text: '有能力瞬間學會任何語言', score: 10, rule: 'magic' },
-    { id: '0116', color: 'green', type: '宇宙訊息', text: '你可以安心回到宇宙的懷抱，一切都被接住。', score: 5, rule: 'direct' },
-    { id: 'T01', color: 'green', type: '靈魂拷問', text: '我當下的人生目標是？', rule: 'soul' },
-    { id: 'T02', color: 'green', type: '靈魂拷問', text: '我當下最大的黑暗面是什麼？', rule: 'soul' },
-    { id: 'T03', color: 'green', type: '靈魂拷問', text: '我目前的關係中，最需要清理的是？', rule: 'soul' }
+    // 🟢 綠 (尾數 14-16 或 T)
+    { id: '0114', prefix: 'green', type: '成就顯化', text: '星際聯盟連結創新家', score: 5, rule: 'become' },
+    { id: '0214', prefix: 'green', type: '成就顯化', text: '星際聯盟靈魂療癒整樂家', score: 5, rule: 'become' },
+    { id: '0115', prefix: 'green', type: '奇蹟顯化', text: '重建失落的古文明，揭開人類神秘起源', score: 10, rule: 'magic' },
+    { id: '0116', prefix: 'green', type: '宇宙訊息', text: '你可以安心回到宇宙的懷抱，一切都被接住。', score: 5, rule: 'direct' },
+    { id: 'T01', prefix: 'green', type: '靈魂拷問', text: '我當下的人生目標是？', rule: 'soul' },
+    { id: 'T02', prefix: 'green', type: '靈魂拷問', text: '我當下最大的黑暗面是什麼？', rule: 'soul' }
 ];
 
-// 📌 核心狀態
 let gameState = { currentKin: 1, totalScore: 0 };
-// 📌 牌池計數器 (Carol: 這裏實現抽過不重複)
-let availablePools = { red: [], white: [], blue: [], yellow: [], green: [] };
+let pools = { red: [], white: [], blue: [], yellow: [], green: [] };
 
-// 📌 Carol 的精確校正地圖 (紅筆X/綠筆勾 完美同步版)
+// 📌 Carol 的精確校正地圖 (211 綠, 169/193 紅)
 const GREEN_KIN_MAP = [
-    // --- GAP 天 ---
     1, 20, 22, 39, 43, 50, 51, 58, 64, 69, 72, 77, 85, 88, 93, 96, 
-    106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 
-    146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 
+    106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 
     165, 168, 173, 176, 184, 189, 192, 197, 203, 210, 
-    211, // <-- Carol 勾選: 變綠色
+    211, // 校正：綠色
     218, 222, 239, 241, 260,
-    // --- 中柱 20 天 ---
     121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140
-    // --- 排除項目 (紅叉) ---
-    // 94, 95, 105, 169 ( Row 9 太陽), 171, 172, 175, 181, 191, 193 ( Row 13), 211
-    // Carol修正: 169, 193 是 Row1 / Row13 預設紅色，非綠色。已從上表排除。
 ];
 
 function getKinType(k) {
     if (GREEN_KIN_MAP.includes(k)) return 'green';
     const row = (k - 1) % 20 + 1;
-    const colors = ['red', 'white', 'blue', 'yellow'];
-    return colors[(row - 1) % 4];
+    return ['red', 'white', 'blue', 'yellow'][(row - 1) % 4];
 }
 
-// 📌 初始化/洗牌功能
+// 📌 洗牌機制：確保不重複
 function shufflePools() {
-    console.log("🧩 正在洗牌，重置所有牌池...");
-    availablePools.green = masterCards.filter(c => c.id.startsWith('T') || parseInt(c.id.slice(-2)) >= 14);
-    
-    const prefixMap = { red: '01', white: '02', blue: '03', yellow: '04' };
+    pools.green = masterCards.filter(c => c.prefix === 'green').sort(() => Math.random() - 0.5);
+    const map = { red: ['01','05','09','13','17'], white: ['02','06','10','14','18'], blue: ['03','07','11','15','19'], yellow: ['04','08','12','16','20'] };
     ['red', 'white', 'blue', 'yellow'].forEach(color => {
-        const prefix = prefixMap[color];
-        availablePools[color] = masterCards.filter(c => c.id.startsWith(prefix) && parseInt(c.id.slice(-2)) <= 13);
+        pools[color] = masterCards.filter(c => map[color].includes(c.prefix) && !c.id.startsWith('T') && parseInt(c.id.slice(-2)) <= 13).sort(() => Math.random() - 0.5);
     });
 }
 
 function initBoard() {
-    shufflePools(); // 遊戲開始先洗牌
+    shufflePools();
     const grid = document.getElementById('tzolkin-grid');
     grid.innerHTML = '';
     for (let row = 1; row <= 20; row++) {
@@ -172,7 +152,7 @@ function rollDice() {
             document.getElementById('dice-result').textContent = `前進 ${total} 步`;
             gameState.currentKin = ((gameState.currentKin + total - 1) % 260) + 1;
             updateUI();
-            setTimeout(drawCard, 400); // 縮短等待時間
+            setTimeout(drawCard, 400);
             btn.disabled = false;
         }
     }, 60);
@@ -180,51 +160,69 @@ function rollDice() {
 
 function drawCard() {
     const type = getKinType(gameState.currentKin);
-    let pool = availablePools[type];
+    let pool = pools[type];
+    if (pool.length === 0) { shufflePools(); pool = pools[type]; }
     
-    // 🔍 Carol: 如果牌抽完了，自動洗牌 (防呆)
-    if (pool.length === 0) {
-        alert(`${type.toUpperCase()} 池牌已抽完，將重新洗牌！`);
-        shufflePools();
-        pool = availablePools[type];
-    }
+    // 抽出一張 (不重複)
+    const card = pool.pop();
     
-    // 🔍 Carol: 隨機選一張，並從池子裡移除它 (實現不重複)
-    const randomIndex = Math.floor(Math.random() * pool.length);
-    const card = pool.splice(randomIndex, 1)[0]; // splice 會改變原陣列
-    
-    console.log(`🃏 抽出 KIN ${gameState.currentKin} (${type}): ID ${card.id}，該池剩餘 ${pool.length} 張`);
-
     const display = document.getElementById('card-display');
     display.innerHTML = `<div class="card ${type}"><small>ID: ${card.id} | ${type.toUpperCase()}</small><h3>${card.type}</h3><p>${card.text}</p></div>`;
     
     const res = document.getElementById('score-response');
     if (card.rule === 'direct') {
-        gameState.totalScore += card.score;
+        applyScore(card.score);
         res.innerHTML = `<p>結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
-        updateUI();
+    } else if (card.rule === 'power') {
+        res.innerHTML = `<p>發揮力量判定：</p><button class="action-btn" onclick="rollPower1()">🎲 第一次擲骰 (Yes/No)</button>`;
+    } else if (card.rule === 'knowledge') {
+        res.innerHTML = `<button class="action-btn" onclick="handleKnowledge()">🎲 智慧層次擲骰</button>`;
     } else {
-        res.innerHTML = `<button class="action-btn" onclick="handleAction('${card.rule}')">🎲 進行規則擲骰</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.rule}')">🎲 執行規則擲骰</button>`;
     }
 }
 
-function handleAction(rule) {
+// 📏 發揮力量 兩階段判定
+function rollPower1() {
+    const d = Math.floor(Math.random() * 6) + 1;
+    const res = document.getElementById('score-response');
+    if (d % 2 !== 0) {
+        applyScore(5);
+        res.innerHTML = `<p>第一骰：🎲 ${d} (單數) -> <strong>✅ Yes! 獲得 +5分</strong></p>`;
+    } else {
+        res.innerHTML = `<p>第一骰：🎲 ${d} (雙數) -> <strong>❌ No! 請進行第二次判定：</strong></p>
+        <button class="action-btn" onclick="rollPower2()" style="background:#ee5253; color:#fff;">🎲 第二次擲骰判定扣分</button>`;
+    }
+}
+
+function rollPower2() {
+    const d = Math.floor(Math.random() * 6) + 1;
+    const s = (d % 2 !== 0) ? -3 : -5;
+    applyScore(s);
+    document.getElementById('score-response').innerHTML = `<p>第二骰：🎲 ${d} (${d%2!==0?'單數':'雙數'}) -> <strong>結算 ${s} 分</strong></p>`;
+}
+
+function handleKnowledge() {
+    const d = Math.floor(Math.random() * 6) + 1;
+    let s = (d===1||d===6)?5 : (d===2||d===5)?3 : 0;
+    let label = (d===1||d===6)?"🌟 實踐" : (d===2||d===5)?"💡 領悟" : "📖 知道";
+    applyScore(s);
+    document.getElementById('score-response').innerHTML = `<p>結果：🎲 ${d} -> ${label} (<strong>+${s}分</strong>)</p>`;
+}
+
+function handleSpecial(rule) {
     const d = Math.floor(Math.random() * 6) + 1;
     let msg = "";
-    if (rule === 'power') {
-        if (d % 2 !== 0) { gameState.totalScore += 5; msg = `🎲 ${d} (單數) -> ✅ Yes (+5分)`; }
-        else { gameState.totalScore -= 5; msg = `🎲 ${d} (雙數) -> ❌ No (判定扣5分)`; }
-    } else if (rule === 'soul') {
-        gameState.totalScore += d; msg = `靈魂點數：🎲 ${d} 分！`;
-    } else if (rule === 'become') {
-        const move = d * 5; msg = `成就位移：前進 ${move} 步！`;
-        gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1;
-    } else if (rule === 'magic') {
-        const move = d * 10; msg = `奇蹟跳躍：前進 ${move} 步！`;
-        gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1;
-    }
+    if (rule === 'soul') { applyScore(d); msg = `靈魂滿意度：🎲 ${d}，獲得 ${d} 分！`; }
+    else if (rule === 'become') { const move = d * 5; msg = `成就位移：前進 ${move} 步！`; gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1; }
+    else if (rule === 'magic') { const move = d * 10; msg = `奇蹟跳躍：大前進 ${move} 步！`; gameState.currentKin = ((gameState.currentKin + move - 1) % 260) + 1; }
     document.getElementById('score-response').innerHTML = `<p>${msg}</p>`;
     updateUI();
+}
+
+function applyScore(s) {
+    gameState.totalScore += s;
+    document.getElementById('total-score').textContent = gameState.totalScore;
 }
 
 initBoard();
