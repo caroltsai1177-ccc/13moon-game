@@ -3,234 +3,196 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>13月亮共時旅程 - 測試版</title>
+<title>13月亮共時旅程 - 卓爾金曆版</title>
 <style>
-/* 🎲 骰子滾動動畫 */
+/* 🎲 骰子與基礎動畫 */
 @keyframes shake {
     0% { transform: translate(1px, 1px) rotate(0deg); }
     10% { transform: translate(-1px, -2px) rotate(-1deg); }
     20% { transform: translate(-3px, 0px) rotate(1deg); }
     30% { transform: translate(3px, 2px) rotate(0deg); }
     40% { transform: translate(1px, -1px) rotate(1deg); }
-    50% { transform: translate(-1px, 2px) rotate(-1deg); }
-    60% { transform: translate(-3px, 1px) rotate(0deg); }
-    70% { transform: translate(3px, 1px) rotate(-1deg); }
-    80% { transform: translate(-1px, -1px) rotate(1deg); }
-    90% { transform: translate(1px, 2px) rotate(0deg); }
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 .dice-rolling { animation: shake 0.1s infinite; color: #ffd43b; }
 
 /* 🎨 基礎排版 */
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);min-height:100vh;color:#fff;padding:20px}h1{text-align:center;margin-bottom:10px;font-size:1.8em}.subtitle{text-align:center;color:#888;margin-bottom:20px}.player-status{display:flex;justify-content:center;gap:30px;margin-bottom:20px;flex-wrap:wrap}.status-box{background:rgba(255,255,255,0.1);border-radius:12px;padding:15px 25px;text-align:center;min-width:120px}.status-label{font-size:0.85em;color:#888;margin-bottom:5px}.status-value{font-size:1.5em;font-weight:bold}.status-value.red{color:#ff6b6b}.status-value.white{color:#f8f8f8}.status-value.blue{color:#4dabf7}.status-value.yellow{color:#ffd43b}.status-value.green{color:#69db7c}.dice-area{text-align:center;margin:20px 0}.dice-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none;color:white;padding:15px 40px;font-size:1.2em;border-radius:30px;cursor:pointer;transition:transform .2s,box-shadow .2s}.dice-btn:hover{transform:scale(1.05);box-shadow:0 5px 20px rgba(102,126,234,0.4)}.dice-btn:disabled{opacity:0.5;cursor:not-allowed}.dice-result{font-size:3em;margin:15px 0;min-height:60px}.dice-history{color:#888;font-size:0.9em}.board{background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;margin-bottom:20px;overflow-x:auto}.castle{margin-bottom:15px}.castle-name{font-size:0.9em;font-weight:bold;margin-bottom:8px;padding-left:5px}.kin-grid{display:flex;flex-wrap:wrap;gap:4px;min-width:600px}.kin-cell{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.65em;cursor:pointer;transition:all .2s}.kin-cell.red{background:rgba(255,107,107,0.3);border:1px solid #ff6b6b}.kin-cell.white{background:rgba(248,248,248,0.3);border:1px solid #ccc;color:#ccc}.kin-cell.blue{background:rgba(77,171,247,0.3);border:1px solid #4dabf7}.kin-cell.yellow{background:rgba(255,212,59,0.3);border:1px solid #ffd43b;color:#ccc}.kin-cell.green{background:rgba(105,219,124,0.3);border:1px solid #69db7c}.kin-cell.current{transform:scale(1.3);box-shadow:0 0 15px rgba(255,255,255,1);z-index:10;background:#fff !important;color:#000 !important;font-weight:bold}.card-area{background:rgba(255,255,255,0.1);border-radius:15px;padding:20px;margin-bottom:20px;min-height:200px}.card-title{text-align:center;font-size:1.1em;margin-bottom:15px;color:#888}.card{background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,rgba(255,255,255,0.05) 100%);border-radius:12px;padding:20px;max-width:500px;margin:0 auto}.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px}.card-type{padding:5px 15px;border-radius:20px;font-size:0.85em}.card-type.red{background:rgba(255,107,107,0.3);color:#ff6b6b}.card-text{font-size:1.1em;line-height:1.6;margin-bottom:15px}.score-response{text-align:center;margin-top:15px;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px}.score-input{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap}.score-btn{padding:10px 25px;border:none;border-radius:20px;cursor:pointer;font-size:1em;transition:transform.2s}.score-btn.yes{background:#69db7c;color:#1a1a2e}.score-btn.no{background:#ff6b6b;color:#fff}.score-btn.jump{background:#74c0fc;color:#1a1a2e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:#111;color:#fff;padding:10px}
+h1{text-align:center;font-size:1.5em;margin-bottom:10px}
+
+/* 🗺️ 卓爾金曆地圖佈局 */
+.board-container {
+    background: #222;
+    padding: 10px;
+    border-radius: 10px;
+    overflow-x: auto; /* iPad 橫向滑動 */
+    margin-bottom: 20px;
+}
+.tzolkin-grid {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr); /* 13 列 */
+    grid-template-rows: repeat(20, 1fr);    /* 20 行 */
+    gap: 2px;
+    min-width: 500px;
+    margin: 0 auto;
+}
+.kin-cell {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    font-size: 0.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    position: relative;
+    font-weight: bold;
+}
+/* 顏色類別 */
+.kin-red { background: #ff6b6b; }
+.kin-white { background: #f8f8f8; }
+.kin-blue { background: #4dabf7; }
+.kin-yellow { background: #ffd43b; }
+.kin-gap { background: #69db7c; border: 1px solid #fff; } /* 綠色/紫色底統一為綠卡區 */
+.kin-mystic { background: #b197fc; border: 1px solid #fff; } /* 核心中柱 */
+
+.kin-cell.current {
+    transform: scale(1.2);
+    z-index: 10;
+    box-shadow: 0 0 10px #fff;
+    outline: 2px solid #fff;
+}
+
+/* 🃏 卡片區域 */
+.card-area { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; min-height: 180px; }
+.card { background: #333; padding: 15px; border-radius: 10px; border-left: 8px solid #ccc; }
+.card.red { border-color: #ff6b6b; }
+.card.white { border-color: #f8f8f8; }
+.card.blue { border-color: #4dabf7; }
+.card.yellow { border-color: #ffd43b; }
+.card.green { border-color: #69db7c; }
+
+.status-bar { display: flex; justify-content: space-around; background: #222; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+.dice-btn { background: #667eea; border: none; color: white; padding: 12px 30px; border-radius: 25px; cursor: pointer; width: 100%; margin: 10px 0; font-size: 1.1em; }
+.score-btn { padding: 8px 15px; border-radius: 15px; border: none; cursor: pointer; margin-top: 5px; background: #69db7c; }
 </style>
 </head>
 <body>
-<h1>🌙 13月亮共時旅程</h1>
-<p class="subtitle">測試版 v0.3 — 靈魂拷問與顯化移動修復</p>
-<div class="player-status">
-    <div class="status-box"><div class="status-label">目前位置</div><div class="status-value" id="current-kin">—</div></div>
-    <div class="status-box"><div class="status-label">擲骰結果</div><div class="status-value" id="dice-total">—</div></div>
-    <div class="status-box"><div class="status-label">總分</div><div class="status-value" id="total-score">0</div></div>
+
+<h1>🌙 卓爾金曆共時旅程</h1>
+
+<div class="status-bar">
+    <div>位置: <span id="current-kin">1</span></div>
+    <div>總分: <span id="total-score">0</span></div>
 </div>
-<div class="dice-area">
-    <button class="dice-btn" id="main-roll-btn" onclick="rollDice()">🎲 擲骰子前進</button>
-    <div class="dice-result" id="dice-result"></div>
-    <div class="dice-history" id="dice-history"></div>
+
+<div class="board-container">
+    <div class="tzolkin-grid" id="tzolkin-grid"></div>
 </div>
-<div class="board">
-    <div class="castle"><div class="castle-name" style="color:#ff6b6b">🔴 紅色城堡 (1-52)</div><div class="kin-grid" id="castle-red"></div></div>
-    <div class="castle"><div class="castle-name" style="color:#f8f8f8">⚪ 白色城堡 (53-104)</div><div class="kin-grid" id="castle-white"></div></div>
-    <div class="castle"><div class="castle-name" style="color:#4dabf7">🔵 藍色城堡 (105-156)</div><div class="kin-grid" id="castle-blue"></div></div>
-    <div class="castle"><div class="castle-name" style="color:#ffd43b">🟡 黃色城堡 (157-208)</div><div class="kin-grid" id="castle-yellow"></div></div>
-    <div class="castle"><div class="castle-name" style="color:#69db7c">🟢 綠色城堡 (209-260)</div><div class="kin-grid" id="castle-green"></div></div>
+
+<div class="dice-area" style="text-align: center;">
+    <button class="dice-btn" id="roll-btn" onclick="rollDice()">🎲 擲骰子前進</button>
+    <div id="dice-result" style="font-size: 1.5em; margin: 5px 0;"></div>
 </div>
+
 <div class="card-area">
-    <div class="card-title" id="card-title">等待抽卡...</div>
     <div id="card-display"></div>
     <div id="score-response"></div>
 </div>
-<div style="text-align:center;margin:20px 0;"><button class="dice-btn" onclick="endGame()" style="background:#f5576c;">結束遊戲</button></div>
-<div class="game-end-overlay" id="game-end" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:100;justify-content:center;align-items:center;">
-    <div style="text-align:center;padding:30px;background:rgba(255,255,255,0.1);border-radius:20px;">
-        <h2>🏆 旅程結算</h2>
-        <div id="score-breakdown" style="margin:20px 0;"></div>
-        <button class="dice-btn" onclick="location.reload()">重新開始</button>
-    </div>
-</div>
 
 <script>
-// 🎴 完整牌卡資料 (根據截圖整理)
-const redCards = [
-    // 紅
-    {id:'0101',type:'人生練習題',mark:'紅龍',text:'看待人事物過度嚴肅太過認真，導致情緒張力較大。',score:-5,rule:'直接計分'},
-    {id:'0107',type:'發揮力量',mark:'紅龍',text:'我鬆綁原生家庭舊有模式的DNA?',score:5,rule:'擲骰判定'},
-    {id:'0111',type:'知與行',mark:'紅龍',text:'我知道，我的價值來自活出自己。',score:5,rule:'擲骰判定'},
-    // 白
-    {id:'2107',type:'靈魂拷問',mark:'白風',text:'我能夠覺察我的言語，且多用溫柔智慧的言語？',score:5,rule:'靈魂拷問'},
-    {id:'2507',type:'靈魂拷問',mark:'白世界橋',text:'我懂得斷捨離，清理不再適合我的人事物？',score:5,rule:'靈魂拷問'},
-    // 藍
-    {id:'4107',type:'靈魂拷問',mark:'藍手',text:'我懂得愛惜身體，且給予適度的休息？',score:5,rule:'靈魂拷問'},
-    // 黃
-    {id:'6107',type:'發揮力量',mark:'黃種子',text:'我能夠看見自己的潛力？',score:5,rule:'擲骰判定'},
-    // 綠
-    {id:'8107',type:'成就顯化',mark:'紅月',text:'我鬆綁原生家庭舊有模式，邁向成就。',score:5,rule:'成就顯化'},
-    {id:'8507',type:'奇蹟顯化',mark:'白風',text:'我能夠覺察言語，創造生命奇蹟。',score:10,rule:'奇蹟顯化'}
-];
+// 📌 核心資料與變數
+let gameState = { currentKin: 1, totalScore: 0 };
+const GAP_DAYS = [1, 20, 22, 39, 43, 58, 64, 77, 88, 93, 96, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 165, 168, 173, 184, 197, 203, 218, 222, 239, 241, 260];
 
-let gameState={currentKin:1,totalScore:0,diceHistory:[],cardScores:{'人生練習題':0,'發揮力量':0,'知與行':0,'靈魂拷問':0,'成就顯化':0,'奇蹟顯化':0}};
-let soulScoreTemp = 0; // 用於儲存靈魂拷問第一次點數
-
-function getCastleColor(k){if(k<=52)return'red';if(k<=104)return'white';if(k<=156)return'blue';if(k<=208)return'yellow';return'green'}
-
-function updateCurrentPosition(){
-    document.querySelectorAll('.kin-cell').forEach(c => {
-        c.classList.remove('current');
-        if(parseInt(c.textContent) === gameState.currentKin) c.classList.add('current');
-    });
-    document.getElementById('current-kin').textContent = gameState.currentKin;
+// 🎨 判定格子顏色與牌組
+function getKinType(k) {
+    if (GAP_DAYS.includes(k) || (k >= 121 && k <= 140)) return 'green'; // 綠色底與紫色底 (中柱)
+    const seal = (k - 1) % 4;
+    if (seal === 0) return 'red';
+    if (seal === 1) return 'white';
+    if (seal === 2) return 'blue';
+    return 'yellow';
 }
 
+// 🗺️ 初始化卓爾金曆地圖 (20行 x 13列)
+function initBoard() {
+    const grid = document.getElementById('tzolkin-grid');
+    grid.innerHTML = '';
+    // 卓爾金曆排列：由上而下，由左而右
+    for (let row = 1; row <= 20; row++) {
+        for (let col = 1; col <= 13; col++) {
+            const k = (col - 1) * 20 + row;
+            const cell = document.createElement('div');
+            const type = getKinType(k);
+            cell.className = `kin-cell kin-${type === 'green' ? (k >= 121 && k <= 140 ? 'mystic' : 'gap') : type}`;
+            cell.id = `kin-${k}`;
+            cell.textContent = k;
+            grid.appendChild(cell);
+        }
+    }
+    updateUI();
+}
+
+function updateUI() {
+    document.querySelectorAll('.kin-cell').forEach(c => c.classList.remove('current'));
+    const currentCell = document.getElementById(`kin-${gameState.currentKin}`);
+    if (currentCell) currentCell.classList.add('current');
+    document.getElementById('current-kin').textContent = gameState.currentKin;
+    document.getElementById('total-score').textContent = gameState.totalScore;
+}
+
+// 🎲 擲骰子與循環邏輯
 function rollDice() {
-    const btn = document.getElementById('main-roll-btn');
-    const resultDisplay = document.getElementById('dice-result');
+    const btn = document.getElementById('roll-btn');
+    const res = document.getElementById('dice-result');
     btn.disabled = true;
-    resultDisplay.classList.add('dice-rolling');
-    let counter = 0;
-    const interval = setInterval(() => {
-        resultDisplay.textContent = `🎲 ${Math.floor(Math.random()*6)+1} + ${Math.floor(Math.random()*6)+1}`;
-        if (++counter > 10) {
-            clearInterval(interval);
-            const d1=Math.floor(Math.random()*6)+1, d2=Math.floor(Math.random()*6)+1, total=d1+d2;
-            resultDisplay.classList.remove('dice-rolling');
-            resultDisplay.textContent = `🎲 ${d1} + ${d2} = ${total}`;
-            document.getElementById('dice-total').textContent = total;
-            gameState.diceHistory.push(total);
-            document.getElementById('dice-history').textContent = '歷史: ' + gameState.diceHistory.join(', ');
-            gameState.currentKin = Math.min(gameState.currentKin + total, 260);
-            updateCurrentPosition();
-            setTimeout(() => { drawCard(); btn.disabled = false; }, 500);
+    res.classList.add('dice-rolling');
+    
+    let count = 0;
+    const anim = setInterval(() => {
+        res.textContent = `🎲 ${Math.floor(Math.random()*6)+1} + ${Math.floor(Math.random()*6)+1}`;
+        if (++count > 10) {
+            clearInterval(anim);
+            const d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1;
+            const total = d1 + d2;
+            res.classList.remove('dice-rolling');
+            res.textContent = `🎲 ${d1} + ${d2} = ${total}`;
+            
+            // 🔄 循環邏輯：超過 260 回到 1
+            gameState.currentKin = ((gameState.currentKin + total - 1) % 260) + 1;
+            
+            updateUI();
+            setTimeout(drawCard, 600);
+            btn.disabled = false;
         }
     }, 60);
 }
 
-function drawCard(){
-    const k = gameState.currentKin;
-    document.getElementById('card-title').textContent = `抵達 KIN ${k}，抽卡中...`;
-    let card = redCards.find(c => k.toString().includes(c.id.substring(0,2))) || redCards[k % redCards.length]; 
-    displayCard(card);
-}
+// 🃏 抽牌邏輯 (根據顏色隨機抽)
+const cardPool = {
+    red: [{type:'發揮力量', text:'紅龍：我鬆綁原生家庭舊有模式的DNA?'}, {type:'知與行', text:'紅蛇：善用金錢與賺取同樣重要。'}],
+    white: [{type:'靈魂拷問', text:'白風：我多用溫柔肯定智慧的言語？'}],
+    blue: [{type:'靈魂拷問', text:'藍手：我懂得愛惜身體，給予休息？'}],
+    yellow: [{type:'發揮力量', text:'黃種子：我能看見自己的潛力？'}],
+    green: [{type:'成就顯化', text:'邁向成就：我鬆綁原生家庭舊有模式。'}, {type:'奇蹟顯化', text:'白風：創造生命奇蹟。'}]
+};
 
-function displayCard(card){
-    document.getElementById('card-display').innerHTML = `
-        <div class="card">
-            <div class="card-header"><span class="card-type red">${card.type}</span> <span>${card.mark}</span></div>
-            <p class="card-text">${card.text}</p>
-        </div>`;
-    showScoreResponse(card);
-}
-
-// ⚖️ 核心計分反應
-function showScoreResponse(card) {
-    const c = document.getElementById('score-response');
-    c.innerHTML = '';
+function drawCard() {
+    const type = getKinType(gameState.currentKin);
+    const pool = cardPool[type] || cardPool.red;
+    const card = pool[Math.floor(Math.random() * pool.length)];
     
-    if (card.rule === '直接計分') {
-        applyScore(card.type, card.score);
-        c.innerHTML = `<div class="score-response">直接結算：<strong>${card.score > 0 ? '+' : ''}${card.score} 分</strong></div>`;
-    } else if (card.type === '發揮力量') {
-        c.innerHTML = `<div class="score-response"><p>請回答卡片問題後擲骰：</p><button class="score-btn yes" onclick="rollPower1()">🎲 第一次擲骰</button></div>`;
-    } else if (card.type === '知與行') {
-        c.innerHTML = `<div class="score-response"><p>請擲骰判定智慧層次：</p><button class="score-btn yes" style="background:#ffd43b" onclick="rollKnowledge()">🎲 擲骰判定</button></div>`;
-    } else if (card.type === '靈魂拷問') {
-        c.innerHTML = `<div class="score-response"><p>請回答問題後擲骰 (決定分數)：</p><button class="score-btn jump" onclick="rollSoul1()">🎲 第一次擲骰 (滿意度)</button></div>`;
-    } else if (card.type === '成就顯化') {
-        applyScore('成就顯化', 5);
-        c.innerHTML = `<div class="score-response"><p>獲得 +5 分！請擲骰決定顯化位移：</p><button class="score-btn jump" onclick="rollMove(5, '成就')">🎲 擲骰前進 (點數x5)</button></div>`;
-    } else if (card.type === '奇蹟顯化') {
-        applyScore('奇蹟顯化', 10);
-        c.innerHTML = `<div class="score-response"><p>獲得 +10 分！請擲骰決定奇蹟位移：</p><button class="score-btn jump" onclick="rollMove(10, '奇蹟')">🎲 擲骰前進 (點數x10)</button></div>`;
-    }
-}
-
-// 📏 靈魂拷問邏輯
-function rollSoul1(){
-    const d = Math.floor(Math.random()*6)+1;
-    soulScoreTemp = d;
-    applyScore('靈魂拷問', d);
-    document.getElementById('score-response').innerHTML = `
-        <div class="score-response">
-            <p>第一骰滿意度：🎲 ${d} -> <strong>獲得 +${d} 分</strong></p>
-            <p>請進行第二骰決定移動距離：</p>
-            <button class="score-btn jump" onclick="rollSoul2()">🎲 第二次擲骰 (移動)</button>
-        </div>`;
-}
-function rollSoul2(){
-    const d = Math.floor(Math.random()*6)+1;
-    const steps = d * soulScoreTemp;
-    movePlayer(steps, `靈魂導引 (${d}x${soulScoreTemp})`);
-}
-
-// 📏 顯化移動邏輯 (成就 x5, 奇蹟 x10)
-function rollMove(multiplier, name){
-    const d = Math.floor(Math.random()*6)+1;
-    const steps = d * multiplier;
-    movePlayer(steps, `${name}位移 (🎲${d} x ${multiplier})`);
-}
-
-function movePlayer(steps, reason){
-    const res = document.getElementById('score-response');
-    res.innerHTML = `<div class="score-response">🎲 擲骰結果 -> <strong>${reason}，前進 ${steps} 步！</strong></div>`;
-    gameState.currentKin = Math.min(gameState.currentKin + steps, 260);
-    setTimeout(() => {
-        updateCurrentPosition();
-        drawCard(); // 移動後自動觸發新位置的抽卡
-    }, 1000);
-}
-
-// 📏 其他計分邏輯
-function rollPower1(){
-    const d = Math.floor(Math.random()*6)+1;
-    if(d%2!==0){ applyScore('發揮力量', 5); document.getElementById('score-response').innerHTML = `<div class="score-response">🎲 ${d} (單數) -> <strong>✅ Yes (+5分)</strong></div>`; }
-    else { document.getElementById('score-response').innerHTML = `<div class="score-response"><p>🎲 ${d} (雙數) -> ❌ No</p><button class="score-btn no" onclick="rollPower2()">🎲 第二次擲骰</button></div>`; }
-}
-function rollPower2(){
-    const d = Math.floor(Math.random()*6)+1;
-    const s = (d%2!==0)?-3:-5;
-    applyScore('發揮力量', s);
-    document.getElementById('score-response').innerHTML = `<div class="score-response">第二次擲骰：🎲 ${d} -> <strong>結算 ${s} 分</strong></div>`;
-}
-function rollKnowledge(){
-    const d = Math.floor(Math.random()*6)+1;
-    let s=0, txt="";
-    if(d===1||d===6){s=5; txt="🌟 實踐 (+5)";}
-    else if(d===2||d===5){s=3; txt="💡 領悟 (+3)";}
-    else {s=0; txt="📖 知道 (+0)";}
-    applyScore('知與行', s);
-    document.getElementById('score-response').innerHTML = `<div class="score-response">擲骰判定：🎲 ${d} -> <strong>${txt}</strong></div>`;
-}
-
-function applyScore(type, s){
-    gameState.totalScore += s;
-    gameState.cardScores[type] = (gameState.cardScores[type] || 0) + s;
-    document.getElementById('total-score').textContent = gameState.totalScore;
-}
-
-function initBoard(){
-    ['red','white','blue','yellow','green'].forEach(c=>document.getElementById('castle-'+c).innerHTML='');
-    for(let k=1;k<=260;k++){
-        const cell = document.createElement('div');
-        cell.className = `kin-cell ${getCastleColor(k)}`;
-        cell.textContent = k;
-        document.getElementById(`castle-${getCastleColor(k)}`).appendChild(cell);
-    }
-    updateCurrentPosition();
-}
-
-function endGame(){
-    const b = document.getElementById('score-breakdown');
-    b.innerHTML = Object.entries(gameState.cardScores).map(([t,s])=>`<div>${t}: ${s}</div>`).join('') + `<h3 style="margin-top:10px">總結算: ${gameState.totalScore} 分</h3>`;
-    document.getElementById('game-end').style.display = 'flex';
+    const display = document.getElementById('card-display');
+    display.innerHTML = `
+        <div class="card ${type}">
+            <div style="font-weight:bold; color:#888">${type.toUpperCase()} 區域</div>
+            <h3>${card.type}</h3>
+            <p>${card.text}</p>
+        </div>
+    `;
+    // 清除舊的反應
+    document.getElementById('score-response').innerHTML = '<p>已自動記錄旅程...</p>';
 }
 
 initBoard();
