@@ -3,39 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>13月亮共時旅程 - 333全量顯化版</title>
+<title>13月亮共時旅程 - 視覺強化版</title>
 <style>
-/* 🎲 骰子 Pop 放大與回彈動畫 */
+/* 🎲 骰子 Pop 動畫 */
 @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-2px, 0px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
 @keyframes popStop { 0% { transform: scale(1); } 50% { transform: scale(1.6); } 100% { transform: scale(1.2); } }
 .dice-rolling { animation: shake 0.1s infinite; color: #ffd43b; }
-.dice-pop { animation: popStop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; color: #fff; font-size: 1.5em !important; font-weight: 900; }
+.dice-pop { animation: popStop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; color: #fff; font-size: 2.2em !important; font-weight: 900; }
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-touch-callout:none;user-select:none;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:#0d0d1a;color:#fff;padding:4px;text-align:center;overflow-x:hidden;font-size:12px;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:#0d0d1a;color:#fff;padding:4px;text-align:center;overflow-x:hidden;font-size:14px;}
 
 /* 🛠️ 介面設計 */
-#game-setup { background: rgba(102,126,234,0.1); padding: 12px; border-radius: 12px; margin: 10px auto; max-width: 320px; border: 1px dashed #667eea; }
-.setup-input { background: #1a1a2e; border: 1px solid #444; color: #fff; width: 45px; padding: 4px; border-radius: 4px; text-align: center; }
-.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 8px; margin-bottom: 5px; font-size: 0.85em; }
-.board-container { background: #1a1a2e; padding: 2px; border-radius: 6px; display: inline-block; width: 100%; max-width: 450px; }
-.tzolkin-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 1px; width: 100%; }
-.kin-cell { aspect-ratio: 1; border-radius: 1px; font-size: 0.4em; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; }
+#game-setup { background: rgba(102,126,234,0.12); padding: 15px; border-radius: 12px; margin: 10px auto; max-width: 320px; border: 1px dashed #667eea; }
+.setup-input { background: #1a1a2e; border: 1px solid #444; color: #fff; width: 55px; padding: 6px; border-radius: 4px; text-align: center; font-size: 1.3em; }
+.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 8px; border-radius: 8px; margin-bottom: 5px; font-size: 1em; }
 
-/* 🔴⚪🔵🟡🟢 顏色校準 */
+/* 🗺️ 卓爾金曆地圖：數字變大 3 倍 */
+.board-container { background: #1a1a2e; padding: 3px; border-radius: 8px; display: inline-block; width: 100%; max-width: 480px; }
+.tzolkin-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 1.5px; width: 100%; }
+.kin-cell { aspect-ratio: 1; border-radius: 2px; font-size: 1.2em; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 900; }
+
 .kin-red { background: #ee5253; } .kin-white { background: #f1f2f6; } .kin-blue { background: #2e86de; color: #fff; } .kin-yellow { background: #feca57; }
 .kin-green { background: #1dd1a1; border: 1px solid #fff; color: #fff; } 
-.kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.1); box-shadow: 0 0 10px #fff; border-radius: 50%; z-index: 10; font-weight: 900; }
+.kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.15); box-shadow: 0 0 15px #fff; border-radius: 50%; z-index: 10; border: 2px solid #ff00ff; }
 
-/* 🃏 卡片區域：文字完整呈現 */
-.card-area { margin-top: 5px; text-align: left; max-width: 410px; margin: 0 auto; padding-bottom: 40px; }
-.card { background: #252545; padding: 14px; border-radius: 10px; border-top: 8px solid #ccc; min-height: 100px; height: auto; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-.card h3 { font-size: 1.1em; margin-bottom: 4px; }
-.card p { font-size: 1.05em; line-height: 1.4; color: #eee; word-break: break-all; }
-.pool-info { font-size: 0.65em; color: #777; text-align: right; margin-top: 8px; font-weight: bold; }
+/* 🃏 卡片與抽牌結果：字體加大 */
+.card-area { margin-top: 10px; text-align: left; max-width: 420px; margin: 0 auto; padding-bottom: 50px; }
+.card { background: #252545; padding: 16px; border-radius: 12px; border-top: 8px solid #ccc; min-height: 120px; position: relative; box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+.card h3 { font-size: 1.3em; margin-bottom: 6px; color: #fff; }
+.card p { font-size: 1.2em; line-height: 1.5; color: #eee; word-break: break-all; }
+.pool-info { font-size: 0.8em; color: #999; text-align: right; margin-top: 10px; font-weight: bold; }
 
-.dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px; border-radius: 25px; width: 100%; margin-top: 4px; font-size: 1.2em; font-weight: bold; cursor: pointer; }
-.action-btn { background: #1dd1a1; color: #000; padding: 10px; border-radius: 18px; border: none; margin-top: 8px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1em; }
+/* 💡 抽牌判定結果顯示區 */
+#score-response { margin-top: 15px; font-size: 1.4em; font-weight: bold; line-height: 1.6; text-align: center; color: #ffd43b; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+
+.dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 16px; border-radius: 35px; width: 100%; margin-top: 10px; font-size: 1.4em; font-weight: bold; cursor: pointer; }
+.action-btn { background: #1dd1a1; color: #000; padding: 14px; border-radius: 25px; border: none; margin-top: 10px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.2em; }
 </style>
 </head>
 <body>
@@ -442,26 +446,16 @@ const greenCards = [
 ];
 // -------------------------------------------------------------------------// -------------------------------------------------------------------------
 // -------------------------------------------------------------------------// -------------------------------------------------------------------------
-// 🏁 第七步：核心運行邏輯整合 (動畫放大 + 隨機顯化位移 + 知與行判定修正)
+// -------------------------------------------------------------------------
+// 🏁 第七步：核心運行邏輯整合 (最終手感優化版)
 
 const masterCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...greenCards];
 
-let gameState = {
-    currentKin: 1,
-    targetKin: 260,
-    lastRoll: 0,
-    scores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 }
-};
-
+let gameState = { currentKin: 1, targetKin: 260, lastRoll: 0, scores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 } };
 let currentPools = { red: [], white: [], blue: [], yellow: [], green: [] };
-
 const GREEN_KIN_MAP = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260];
 
-function getKinType(k) {
-    if (GREEN_KIN_MAP.includes(k)) return 'green';
-    const row = (k - 1) % 20 + 1;
-    return ['red', 'white', 'blue', 'yellow'][(row - 1) % 4];
-}
+function getKinType(k) { if (GREEN_KIN_MAP.includes(k)) return 'green'; const row = (k-1)%20+1; return ['red','white','blue','yellow'][(row-1)%4]; }
 
 function startGame() {
     gameState.currentKin = parseInt(document.getElementById('start-kin').value) || 1;
@@ -470,15 +464,14 @@ function startGame() {
     document.getElementById('display-target').textContent = gameState.targetKin;
     document.getElementById('game-setup').style.display = 'none';
     document.getElementById('game-ui').style.display = 'block';
-    ['red', 'white', 'blue', 'yellow', 'green'].forEach(c => {
+    ['red','white','blue','yellow','green'].forEach(c => {
         currentPools[c] = masterCards.filter(m => m.color === c).sort(() => Math.random() - 0.5);
     });
     initBoard();
 }
 
 function initBoard() {
-    const grid = document.getElementById('tzolkin-grid');
-    grid.innerHTML = '';
+    const grid = document.getElementById('tzolkin-grid'); grid.innerHTML = '';
     for (let row = 1; row <= 20; row++) {
         for (let col = 1; col <= 13; col++) {
             const k = (col - 1) * 20 + row;
@@ -498,9 +491,7 @@ function updateUI() {
     if (cur) cur.classList.add('current');
     document.getElementById('display-kin').textContent = gameState.currentKin;
     let total = 0;
-    Object.keys(gameState.scores).forEach(key => {
-        total += Math.max(0, gameState.scores[key]);
-    });
+    Object.keys(gameState.scores).forEach(key => { total += Math.max(0, gameState.scores[key]); });
     document.getElementById('total-score').textContent = total;
     if (gameState.currentKin === gameState.targetKin) {
         setTimeout(() => {
@@ -516,7 +507,7 @@ function rollDice() {
     const res = document.getElementById('dice-result');
     btn.disabled = true;
     res.className = 'dice-rolling';
-    res.style.fontSize = "1.8em"; // 移動時骰子變大
+    res.style.fontSize = "2.2em"; 
     let count = 0;
     const anim = setInterval(() => {
         res.textContent = `🎲 ${Math.floor(Math.random()*6)+1} + ${Math.floor(Math.random()*6)+1}`;
@@ -525,12 +516,11 @@ function rollDice() {
             const d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1;
             gameState.lastRoll = d1 + d2;
             res.className = 'dice-pop';
-            res.style.fontSize = "2.5em"; // 停止時超巨大化
             res.textContent = `🎲 ${d1+d2}`;
             let nextPos = gameState.currentKin + gameState.lastRoll;
             gameState.currentKin = (nextPos >= gameState.targetKin) ? gameState.targetKin : nextPos;
             updateUI();
-            setTimeout(drawCard, 800);
+            setTimeout(drawCard, 1000);
             btn.disabled = false;
         }
     }, 60);
@@ -554,16 +544,13 @@ function drawCard() {
     } else if (card.rule === 'power') {
         res.innerHTML = `<button class="action-btn" onclick="rollPower1('${type}')">🎲 擲 1 顆骰判定發揮力量</button>`;
     } else if (card.rule === 'knowledge') {
-        res.innerHTML = `<button class="action-btn" onclick="handleKnowledge('${type}')">🎲 擲 1 顆骰判定知與行</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="rollKnowledgeDice('${type}')">🎲 擲 1 顆骰判定知與行</button>`;
     } else {
-        res.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.rule}', '${type}')">🎲 擲 1 顆骰進行顯化判定</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="rollManifestDice('${card.rule}', '${type}')">🎲 擲 1 顆骰進行顯化位移</button>`;
     }
 }
 
-function applyScore(s, color) {
-    gameState.scores[color] += s;
-    updateUI();
-}
+function applyScore(s, color) { gameState.scores[color] += s; updateUI(); }
 
 function rollPower1(color) {
     const d = Math.floor(Math.random() * 6) + 1;
@@ -571,7 +558,6 @@ function rollPower1(color) {
     if (d % 2 !== 0) { applyScore(5, color); res.innerHTML = `<p>結果：🎲 ${d} (單數) -> ✅ <strong>Yes! +5分</strong></p>`; }
     else { res.innerHTML = `<p>結果：🎲 ${d} (雙數) -> ❌ <strong>No! 需再次判定：</strong></p><button class="action-btn" onclick="rollPower2('${color}')">🎲 擲 1 顆骰判定扣分</button>`; }
 }
-
 function rollPower2(color) {
     const d = Math.floor(Math.random() * 6) + 1;
     const s = (d % 2 !== 0) ? -3 : -5;
@@ -579,34 +565,33 @@ function rollPower2(color) {
     document.getElementById('score-response').innerHTML = `<p>第二骰結果：🎲 ${d} -> <strong>結算 ${s} 分</strong></p>`;
 }
 
-function handleKnowledge(color) {
+function rollKnowledgeDice(color) {
     const d = Math.floor(Math.random() * 6) + 1;
     let label = "", s = 0;
     if (d === 1 || d === 6) { label = "實踐"; s = 5; }
     else if (d === 2 || d === 5) { label = "領悟"; s = 3; }
     else { label = "知道"; s = 0; }
     applyScore(s, color);
-    document.getElementById('score-response').innerHTML = `<p>知與行判定：🎲 ${d} -> <strong>${label} (+${s}分)</strong></p>`;
+    document.getElementById('score-response').innerHTML = `<p>結果：🎲 ${d} -> <strong>${label} (+${s}分)</strong></p>`;
 }
 
-function handleSpecial(rule, color) {
+function rollManifestDice(rule, color) {
     const d = Math.floor(Math.random() * 6) + 1;
-    let msg = "";
+    const res = document.getElementById('score-response');
+    let msg = "", steps = 0;
     if (rule === 'soul') { applyScore(d, color); msg = `靈魂評分：🎲 ${d} 分！`; }
     else if (rule === 'become') { 
-        applyScore(5, color); 
-        const steps = d * 5;
+        applyScore(5, color); steps = d * 5;
         msg = `<strong>成就顯化！(+5分)</strong> 位移判定為 🎲 ${d}，前進 $${d} \times 5 = ${steps}$ 步！`;
         let nextPos = gameState.currentKin + steps;
         gameState.currentKin = (nextPos >= gameState.targetKin) ? gameState.targetKin : nextPos;
     } else if (rule === 'magic') { 
-        applyScore(10, color); 
-        const steps = d * 10;
-        msg = `<strong>奇蹟顯化！(+10分)</strong> 位移判定為 🎲 ${d}，跳躍 $${d} \times 10 = ${steps}$ 步！`;
+        applyScore(10, color); steps = d * 10;
+        msg = `<strong>奇蹟顯化！(+10分)</strong> 位移判定為 🎲 ${d}，前進 $${d} \times 10 = ${steps}$ 步！`;
         let nextPos = gameState.currentKin + steps;
         gameState.currentKin = (nextPos >= gameState.targetKin) ? gameState.targetKin : nextPos;
     }
-    document.getElementById('score-response').innerHTML = `<p>${msg}</p>`;
+    res.innerHTML = `<p>${msg}</p>`;
     updateUI();
 }
 
