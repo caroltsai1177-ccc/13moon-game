@@ -449,21 +449,27 @@ const greenCards = [
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
 // -------------------------------------------------------------------------
-// 🏁 第七步：核心運行邏輯整合 (跨循環精準停點版)
+// -------------------------------------------------------------------------
+// 🏁 第七步：最終校準版 (圖騰名稱對應 + 歷程表 + 跨循環精準停點)
 
 const masterCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...greenCards];
 
+// 🎨 根據妳提供的圖騰表，建立對應名稱
+const SEAL_NAMES = [
+    "紅龍", "白風", "藍夜", "黃種子", "紅蛇", 
+    "白世界橋", "藍手", "黃星星", "紅月", "白狗", 
+    "藍猴", "黃人", "紅天行者", "白巫師", "藍鷹", 
+    "黃戰士", "紅地球", "白鏡", "藍風暴", "黃太陽"
+];
+
 let gameState = {
-    startKin: 1,
-    currentKin: 1,
-    targetKin: 260,
-    totalDist: 0,   // 這趟旅程總共要走的步數
-    movedDist: 0,   // 已經累計走過的步數
-    scores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 }
+    startKin: 1, currentKin: 1, targetKin: 260,
+    totalDist: 0, movedDist: 0,
+    scores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 },
+    history: []
 };
 
 let currentPools = { red: [], white: [], blue: [], yellow: [], green: [] };
-
 const GREEN_KIN_MAP = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260];
 
 function getKinType(k) {
@@ -472,28 +478,40 @@ function getKinType(k) {
     return ['red', 'white', 'blue', 'yellow'][(row - 1) % 4];
 }
 
-// 4. 遊戲啟動控制
 function startGame() {
     const start = parseInt(document.getElementById('start-kin').value) || 1;
     const target = parseInt(document.getElementById('end-kin').value) || 260;
-    
     gameState.startKin = start;
     gameState.currentKin = start;
     gameState.targetKin = target;
     gameState.movedDist = 0;
     
-    // 🛑 重要：計算跨循環總距離
-    // 如果 201 走到 46，距離是 (260-201) + 46 = 105 步
-    if (target >= start) {
-        gameState.totalDist = target - start;
-    } else {
-        gameState.totalDist = (260 - start) + target;
-    }
+    if (target >= start) { gameState.totalDist = target - start; } 
+    else { gameState.totalDist = (260 - start) + target; }
     
     gameState.scores = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
     document.getElementById('display-target').textContent = gameState.targetKin;
     document.getElementById('game-setup').style.display = 'none';
     document.getElementById('game-ui').style.display = 'block';
+
+    // 初始化歷程表介面
+    const cardArea = document.querySelector('.card-area');
+    if (!document.getElementById('history-table')) {
+        const tableDiv = document.createElement('div');
+        tableDiv.id = 'history-log-container';
+        tableDiv.innerHTML = `
+            <h3 style="margin-top:30px; border-bottom:2px solid #667eea; padding-bottom:5px;">📊 旅程歷程回顧</h3>
+            <table id="history-table" style="width:100%; margin-top:10px; border-collapse: collapse; font-size: 1.1em; text-align: left;">
+                <thead><tr style="background:#252545;">
+                    <th style="padding:8px; border:1px solid #444;">KIN</th>
+                    <th style="padding:8px; border:1px solid #444;">圖騰</th>
+                    <th style="padding:8px; border:1px solid #444;">內容</th>
+                    <th style="padding:8px; border:1px solid #444;">分數</th>
+                </tr></thead>
+                <tbody id="history-body"></tbody>
+            </table>`;
+        cardArea.appendChild(tableDiv);
+    } else { document.getElementById('history-body').innerHTML = ''; }
 
     ['red', 'white', 'blue', 'yellow', 'green'].forEach(c => {
         currentPools[c] = masterCards.filter(m => m.color === c).sort(() => Math.random() - 0.5);
@@ -502,8 +520,7 @@ function startGame() {
 }
 
 function initBoard() {
-    const grid = document.getElementById('tzolkin-grid');
-    grid.innerHTML = '';
+    const grid = document.getElementById('tzolkin-grid'); grid.innerHTML = '';
     for (let row = 1; row <= 20; row++) {
         for (let col = 1; col <= 13; col++) {
             const k = (col - 1) * 20 + row;
@@ -522,25 +539,19 @@ function updateUI() {
     const cur = document.getElementById(`kin-${gameState.currentKin}`);
     if (cur) cur.classList.add('current');
     document.getElementById('display-kin').textContent = gameState.currentKin;
-    
-    // 計算總分 (最低 0 分)
     let total = 0;
-    Object.keys(gameState.scores).forEach(key => {
-        total += Math.max(0, gameState.scores[key]);
-    });
+    Object.keys(gameState.scores).forEach(key => { total += Math.max(0, gameState.scores[key]); });
     document.getElementById('total-score').textContent = total;
 
-    // 🏆 抵達終點判定 (步數走完)
     if (gameState.movedDist >= gameState.totalDist && gameState.totalDist > 0) {
         setTimeout(() => {
             let r = Math.max(0, gameState.scores.red), w = Math.max(0, gameState.scores.white), b = Math.max(0, gameState.scores.blue), y = Math.max(0, gameState.scores.yellow), g = Math.max(0, gameState.scores.green);
-            alert(`🏁 抵達終點 KIN ${gameState.targetKin}！\n\n能量結算(負分以0計)：\n🔴 紅色：${r}\n⚪ 白色：${w}\n🔵 藍色：${b}\n🟡 黃色：${y}\n🟢 綠色：${g}\n------------------\n🌟 總顯化得分：${r+w+b+y+g}`);
+            alert(`🏁 旅程結算！\n\n🔴紅:${r} ⚪白:${w} 🔵藍:${b} 🟡黃:${y} 🟢綠:${g}\n------------------\n🌟 總顯化得分：${r+w+b+y+g}`);
             document.getElementById('roll-btn').disabled = true;
         }, 800);
     }
 }
 
-// 7. 擲骰子功能
 function rollDice() {
     const btn = document.getElementById('roll-btn');
     const res = document.getElementById('dice-result');
@@ -553,27 +564,21 @@ function rollDice() {
         if (++count > 12) {
             clearInterval(anim);
             const d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1;
-            const roll = d1 + d2;
             res.className = 'dice-pop';
-            res.textContent = `🎲 ${roll}`;
-            
-            moveStep(roll);
+            res.textContent = `🎲 ${d1+d2}`;
+            moveStep(d1 + d2);
             setTimeout(drawCard, 1000);
             btn.disabled = false;
         }
     }, 60);
 }
 
-// 🛑 核心移動邏輯：處理步數與跨循環
 function moveStep(steps) {
     const remaining = gameState.totalDist - gameState.movedDist;
-    const actualMove = Math.min(steps, remaining); // 不能走超過終點
-    
+    const actualMove = Math.min(steps, remaining);
     gameState.movedDist += actualMove;
-    // 使用累積步數算出正確的 KIN ID (1-260)
     let newKin = (gameState.startKin + gameState.movedDist);
     while (newKin > 260) newKin -= 260; 
-    
     gameState.currentKin = newKin;
     updateUI();
 }
@@ -593,63 +598,67 @@ function drawCard() {
     if (card.rule === 'direct') {
         applyScore(card.score, type);
         res.innerHTML = `<p>能量結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
+        addLog(gameState.currentKin, type, card.type, card.score);
     } else if (card.rule === 'power') {
-        res.innerHTML = `<button class="action-btn" onclick="rollPower1('${type}')">🎲 擲 1 顆骰判定發揮力量</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="rollPower1('${type}', '${card.type}')">🎲 判定發揮力量</button>`;
     } else if (card.rule === 'knowledge') {
-        res.innerHTML = `<button class="action-btn" onclick="rollKnowledgeDice('${type}')">🎲 擲 1 顆骰判定知與行</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="rollKnowledgeDice('${type}', '${card.type}')">🎲 判定知與行</button>`;
     } else {
-        res.innerHTML = `<button class="action-btn" onclick="rollManifestDice('${card.rule}', '${type}')">🎲 擲 1 顆骰進行顯化判定</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="rollManifestDice('${card.rule}', '${type}', '${card.type}')">🎲 進行顯化判定</button>`;
     }
 }
 
 function applyScore(s, color) { gameState.scores[color] += s; updateUI(); }
 
-function rollPower1(color) {
-    const d = Math.floor(Math.random() * 6) + 1;
-    const res = document.getElementById('score-response');
-    if (d % 2 !== 0) { applyScore(5, color); res.innerHTML = `<p>結果：🎲 ${d} (單數) -> ✅ <strong>Yes! +5分</strong></p>`; }
-    else { res.innerHTML = `<p>結果：🎲 ${d} (雙數) -> ❌ <strong>No! 需再次判定：</strong></p><button class="action-btn" onclick="rollPower2('${color}')">🎲 擲 1 顆骰判定扣分</button>`; }
-}
-function rollPower2(color) {
-    const d = Math.floor(Math.random() * 6) + 1;
-    const s = (d % 2 !== 0) ? -3 : -5;
-    applyScore(s, color);
-    document.getElementById('score-response').innerHTML = `<p>第二骰結果：🎲 ${d} -> <strong>結算 ${s} 分</strong></p>`;
+// 📜 核心優化：將圖騰名稱加入歷程表
+function addLog(kin, color, type, score) {
+    const body = document.getElementById('history-body');
+    const row = document.createElement('tr');
+    // 從表格對應圖騰名稱 (KIN 1 -> SEAL_NAMES[0])
+    const sealName = SEAL_NAMES[(kin - 1) % 20]; 
+    const colorEmoji = {red:'🔴', white:'⚪', blue:'🔵', yellow:'🟡', green:'🟢'}[color];
+    
+    row.innerHTML = `
+        <td style="padding:8px; border:1px solid #444; font-weight:bold;">${kin}</td>
+        <td style="padding:8px; border:1px solid #444;">${sealName}</td>
+        <td style="padding:8px; border:1px solid #444;">${colorEmoji} ${type}</td>
+        <td style="padding:8px; border:1px solid #444; font-weight:bold; color:${score >= 0 ? '#1dd1a1' : '#ee5253'}">${score > 0 ? '+' : ''}${score}</td>
+    `;
+    body.insertBefore(row, body.firstChild);
 }
 
-function rollKnowledgeDice(color) {
+function rollPower1(color, cardType) {
+    const d = Math.floor(Math.random() * 6) + 1;
+    const res = document.getElementById('score-response');
+    if (d % 2 !== 0) { 
+        applyScore(5, color); addLog(gameState.currentKin, color, cardType, 5);
+        res.innerHTML = `<p>結果：🎲 ${d} -> ✅ +5分</p>`; 
+    } else { res.innerHTML = `<p>結果：🎲 ${d} -> ❌ No! <button class="action-btn" onclick="rollPower2('${color}', '${cardType}')">🎲 再次判定</button></p>`; }
+}
+function rollPower2(color, cardType) {
+    const d = Math.floor(Math.random() * 6) + 1;
+    const s = (d % 2 !== 0) ? -3 : -5;
+    applyScore(s, color); addLog(gameState.currentKin, color, cardType, s);
+    document.getElementById('score-response').innerHTML = `<p>結果：🎲 ${d} -> 結算 ${s} 分</p>`;
+}
+function rollKnowledgeDice(color, cardType) {
     const d = Math.floor(Math.random() * 6) + 1;
     let label = "", s = 0;
     if (d === 1 || d === 6) { label = "實踐"; s = 5; }
     else if (d === 2 || d === 5) { label = "領悟"; s = 3; }
     else { label = "知道"; s = 0; }
-    applyScore(s, color);
-    document.getElementById('score-response').innerHTML = `<p>結果：🎲 ${d} -> <strong>${label} (+${s}分)</strong></p>`;
+    applyScore(s, color); addLog(gameState.currentKin, color, `${cardType}(${label})`, s);
+    document.getElementById('score-response').innerHTML = `<p>結果：🎲 ${d} -> ${label} (+${s}分)</p>`;
 }
-
-function rollManifestDice(rule, color) {
+function rollManifestDice(rule, color, cardType) {
     const d = Math.floor(Math.random() * 6) + 1;
-    const res = document.getElementById('score-response');
-    let msg = "", steps = 0;
-    if (rule === 'soul') { 
-        applyScore(d, color); 
-        msg = `靈魂評分：🎲 ${d} 分！`; 
-    }
-    else if (rule === 'become') { 
-        applyScore(5, color); 
-        steps = d * 5;
-        msg = `<strong>成就顯化！(+5分)</strong> 判定為 🎲 ${d}，前進 ${steps} 步！`;
-        moveStep(steps); // 這裡也要檢查是否超過終點
-    } else if (rule === 'magic') { 
-        applyScore(10, color); 
-        steps = d * 10;
-        msg = `<strong>奇蹟顯化！(+10分)</strong> 判定為 🎲 ${d}，前進 ${steps} 步！`;
-        moveStep(steps);
-    }
-    res.innerHTML = `<p>${msg}</p>`;
+    let s = (rule === 'magic') ? 10 : 5;
+    let steps = d * (rule === 'magic' ? 10 : 5);
+    applyScore(s, color); 
+    addLog(gameState.currentKin, color, `${cardType}(位移${steps}步)`, s);
+    document.getElementById('score-response').innerHTML = `<p>🎲 ${d} -> 前進 ${steps} 步！</p>`;
+    moveStep(steps);
 }
 
 initBoard();
 </script>
-</body>
-</html>
