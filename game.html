@@ -441,22 +441,21 @@ const greenCards = [
     { id:'T13', color:'green', type:'靈魂拷問', text:'我真的準備好迎接全新的生命轉化了嗎？', rule:'soul' }
 ];
 // -------------------------------------------------------------------------// -------------------------------------------------------------------------
-// 🏁 第七步：核心運行邏輯整合 (修正：抽牌後判定統一使用 1 顆骰子)
+// -------------------------------------------------------------------------
+// 🏁 第七步：核心運行邏輯整合 (精準停點 + 分類計分版)
 
-// 1. 合併所有錄入的 333 張牌卡
 const masterCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...greenCards];
 
-// 2. 初始化遊戲運行狀態
 let gameState = {
     currentKin: 1,
     targetKin: 260,
-    totalScore: 0,
-    lastRoll: 0
+    lastRoll: 0,
+    // 📊 分類計分
+    scores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 }
 };
 
 let currentPools = { red: [], white: [], blue: [], yellow: [], green: [] };
 
-// 3. 地圖顏色定義
 const GREEN_KIN_MAP = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260];
 
 function getKinType(k) {
@@ -465,10 +464,10 @@ function getKinType(k) {
     return ['red', 'white', 'blue', 'yellow'][(row - 1) % 4];
 }
 
-// 4. 遊戲啟動控制
 function startGame() {
     gameState.currentKin = parseInt(document.getElementById('start-kin').value) || 1;
     gameState.targetKin = parseInt(document.getElementById('end-kin').value) || 260;
+    gameState.scores = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 }; // 重置分數
     document.getElementById('display-target').textContent = gameState.targetKin;
     document.getElementById('game-setup').style.display = 'none';
     document.getElementById('game-ui').style.display = 'block';
@@ -479,7 +478,6 @@ function startGame() {
     initBoard();
 }
 
-// 5. 渲染地圖
 function initBoard() {
     const grid = document.getElementById('tzolkin-grid');
     grid.innerHTML = '';
@@ -496,23 +494,35 @@ function initBoard() {
     updateUI();
 }
 
-// 6. 更新 UI
 function updateUI() {
     document.querySelectorAll('.kin-cell').forEach(c => c.classList.remove('current'));
     const cur = document.getElementById(`kin-${gameState.currentKin}`);
     if (cur) cur.classList.add('current');
     document.getElementById('display-kin').textContent = gameState.currentKin;
-    document.getElementById('total-score').textContent = gameState.totalScore;
+    
+    // 計算總分 (每項最低 0 分)
+    let total = 0;
+    Object.keys(gameState.scores).forEach(key => {
+        total += Math.max(0, gameState.scores[key]);
+    });
+    document.getElementById('total-score').textContent = total;
 
-    if (gameState.currentKin >= gameState.targetKin && gameState.targetKin !== 1) {
+    // 🏆 終點停下並計分結算
+    if (gameState.currentKin === gameState.targetKin) {
         setTimeout(() => {
-            alert(`🏁 旅程結算！\n抵達目標 KIN ${gameState.targetKin}。\n最終總分：${gameState.totalScore}。`);
+            let r = Math.max(0, gameState.scores.red);
+            let w = Math.max(0, gameState.scores.white);
+            let b = Math.max(0, gameState.scores.blue);
+            let y = Math.max(0, gameState.scores.yellow);
+            let g = Math.max(0, gameState.scores.green);
+            let finalSum = r + w + b + y + g;
+
+            alert(`🏁 抵達終點 KIN ${gameState.targetKin}！\n\n各色能量結算(最低0分)：\n🔴 紅色：${r} 分\n⚪ 白色：${w} 分\n🔵 藍色：${b} 分\n🟡 黃色：${y} 分\n🟢 綠色：${g} 分\n------------------\n🌟 總顯化得分：${finalSum}`);
             document.getElementById('roll-btn').disabled = true;
-        }, 600);
+        }, 800);
     }
 }
 
-// 7. 移動骰子 (維持 2 顆骰子前進)
 function rollDice() {
     const btn = document.getElementById('roll-btn');
     const res = document.getElementById('dice-result');
@@ -527,7 +537,15 @@ function rollDice() {
             gameState.lastRoll = d1 + d2;
             res.className = 'dice-pop';
             res.textContent = `結果：${gameState.lastRoll}`;
-            gameState.currentKin = ((gameState.currentKin + gameState.lastRoll - 1) % 260) + 1;
+            
+            // 🛑 修正：如果移動會超過終點，就強制停在終點
+            let nextPos = gameState.currentKin + gameState.lastRoll;
+            if (nextPos >= gameState.targetKin) {
+                gameState.currentKin = gameState.targetKin;
+            } else {
+                gameState.currentKin = nextPos;
+            }
+
             updateUI();
             setTimeout(drawCard, 600);
             btn.disabled = false;
@@ -535,7 +553,6 @@ function rollDice() {
     }, 60);
 }
 
-// 8. 抽牌 (不重複)
 function drawCard() {
     const type = getKinType(gameState.currentKin);
     let pool = currentPools[type];
@@ -556,63 +573,71 @@ function drawCard() {
     res.innerHTML = '';
 
     if (card.rule === 'direct') {
-        applyScore(card.score);
+        applyScore(card.score, type); // 傳入顏色進行分類計分
         res.innerHTML = `<p>能量結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
     } else if (card.rule === 'power') {
-        res.innerHTML = `<button class="action-btn" onclick="rollPower1()">🎲 擲 1 顆骰判定 (Yes/No)</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="rollPower1('${type}')">🎲 擲 1 顆骰判定 (Yes/No)</button>`;
     } else if (card.rule === 'knowledge') {
-        res.innerHTML = `<button class="action-btn" onclick="handleKnowledge()">🎲 擲 1 顆骰判定智慧</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="handleKnowledge('${type}')">🎲 擲 1 顆骰判定智慧</button>`;
     } else {
-        res.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.rule}')">🎲 擲 1 顆骰進行顯化</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.rule}', '${type}')">🎲 擲 1 顆骰進行顯化</button>`;
     }
 }
 
-// 9. 判定功能 (統一使用 1 顆骰子)
-function rollPower1() {
-    const d = Math.floor(Math.random() * 6) + 1;
-    const res = document.getElementById('score-response');
-    if (d % 2 !== 0) { applyScore(5); res.innerHTML = `<p>判定結果：🎲 ${d} (單數) -> ✅ <strong>Yes! +5分</strong></p>`; }
-    else { res.innerHTML = `<p>判定結果：🎲 ${d} (雙數) -> ❌ <strong>No! 請再擲骰判定扣分：</strong></p><button class="action-btn" onclick="rollPower2()" style="background:#ee5253; color:#fff;">🎲 擲 1 顆骰判定扣分</button>`; }
-}
-function rollPower2() {
-    const d = Math.floor(Math.random() * 6) + 1;
-    const s = (d % 2 !== 0) ? -3 : -5;
-    applyScore(s);
-    document.getElementById('score-response').innerHTML = `<p>第二骰結果：🎲 ${d} -> <strong>結算 ${s} 分</strong></p>`;
-}
-
-function handleKnowledge() {
-    const d = Math.floor(Math.random() * 6) + 1;
-    let s = (d === 1 || d === 6) ? 5 : (d === 2 || d === 5) ? 3 : 0;
-    applyScore(s);
-    document.getElementById('score-response').innerHTML = `<p>智慧判定：🎲 ${d} -> <strong>增加 ${s} 分能量</strong></p>`;
-}
-
-function handleSpecial(rule) {
-    const d = Math.floor(Math.random() * 6) + 1; // 這裡改為新擲的一顆骰子
-    let msg = "";
-    if (rule === 'soul') { 
-        applyScore(d); 
-        msg = `靈魂評分：🎲 ${d} 分！`; 
-    }
-    else if (rule === 'become') { 
-        applyScore(5); 
-        const steps = d * 5; // 用剛擲出的這顆 d 乘以 5
-        msg = `<strong>成就顯化！</strong> 分數+5，位移判定為 🎲 ${d}，前進 $${d} \times 5 = ${steps}$ 步！`;
-        gameState.currentKin = ((gameState.currentKin + steps - 1) % 260) + 1;
-    } else if (rule === 'magic') { 
-        applyScore(10); 
-        const steps = d * 10; // 用剛擲出的這顆 d 乘以 10
-        msg = `<strong>奇蹟顯化！</strong> 分數+10，位移判定為 🎲 ${d}，跳躍 $${d} \times 10 = ${steps}$ 步！`;
-        gameState.currentKin = ((gameState.currentKin + steps - 1) % 260) + 1;
-    }
-    document.getElementById('score-response').innerHTML = `<p>${msg}</p>`;
+function applyScore(s, color) {
+    gameState.scores[color] += s;
     updateUI();
 }
 
-function applyScore(s) {
-    gameState.totalScore += s;
-    document.getElementById('total-score').textContent = gameState.totalScore;
+// --- 判定功能 (全數傳入 color 變數) ---
+
+function rollPower1(color) {
+    const d = Math.floor(Math.random() * 6) + 1;
+    const res = document.getElementById('score-response');
+    if (d % 2 !== 0) { 
+        applyScore(5, color); 
+        res.innerHTML = `<p>判定結果：🎲 ${d} (單數) -> ✅ <strong>Yes! +5分</strong></p>`; 
+    } else { 
+        res.innerHTML = `<p>判定結果：🎲 ${d} (雙數) -> ❌ <strong>No! 需再次判定：</strong></p><button class="action-btn" onclick="rollPower2('${color}')">🎲 擲 1 顆骰判定扣分</button>`; 
+    }
+}
+
+function rollPower2(color) {
+    const d = Math.floor(Math.random() * 6) + 1;
+    const s = (d % 2 !== 0) ? -3 : -5;
+    applyScore(s, color);
+    document.getElementById('score-response').innerHTML = `<p>第二骰結果：🎲 ${d} -> <strong>結算 ${s} 分</strong></p>`;
+}
+
+function handleKnowledge(color) {
+    const d = Math.floor(Math.random() * 6) + 1;
+    let s = (d === 1 || d === 6) ? 5 : (d === 2 || d === 5) ? 3 : 0;
+    applyScore(s, color);
+    document.getElementById('score-response').innerHTML = `<p>智慧判定：🎲 ${d} -> <strong>增加 ${s} 分能量</strong></p>`;
+}
+
+function handleSpecial(rule, color) {
+    const d = Math.floor(Math.random() * 6) + 1;
+    let msg = "";
+    if (rule === 'soul') { 
+        applyScore(d, color); 
+        msg = `靈魂評分：🎲 ${d} 分！`; 
+    }
+    else if (rule === 'become') { 
+        applyScore(5, color); 
+        const steps = d * 5;
+        msg = `<strong>成就顯化！</strong> 分數+5，位移判定為 🎲 ${d}，前進 $${d} \times 5 = ${steps}$ 步！`;
+        let nextPos = gameState.currentKin + steps;
+        gameState.currentKin = (nextPos >= gameState.targetKin) ? gameState.targetKin : nextPos;
+    } else if (rule === 'magic') { 
+        applyScore(10, color); 
+        const steps = d * 10;
+        msg = `<strong>奇蹟顯化！</strong> 分數+10，位移判定為 🎲 ${d}，跳躍 $${d} \times 10 = ${steps}$ 步！`;
+        let nextPos = gameState.currentKin + steps;
+        gameState.currentKin = (nextPos >= gameState.targetKin) ? gameState.targetKin : nextPos;
+    }
+    document.getElementById('score-response').innerHTML = `<p>${msg}</p>`;
+    updateUI();
 }
 
 initBoard();
