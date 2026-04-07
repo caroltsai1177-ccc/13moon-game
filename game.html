@@ -22,12 +22,12 @@
 .dice-rolling { animation: shake 0.1s infinite; color: #ffd43b; }
 
 /* 🎨 基礎排版 */
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);min-height:100vh;color:#fff;padding:20px}h1{text-align:center;margin-bottom:10px;font-size:1.8em}.subtitle{text-align:center;color:#888;margin-bottom:20px}.player-status{display:flex;justify-content:center;gap:30px;margin-bottom:20px;flex-wrap:wrap}.status-box{background:rgba(255,255,255,0.1);border-radius:12px;padding:15px 25px;text-align:center;min-width:120px}.status-label{font-size:0.85em;color:#888;margin-bottom:5px}.status-value{font-size:1.5em;font-weight:bold}.status-value.red{color:#ff6b6b}.status-value.white{color:#f8f8f8}.status-value.blue{color:#4dabf7}.status-value.yellow{color:#ffd43b}.status-value.green{color:#69db7c}.dice-area{text-align:center;margin:20px 0}.dice-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none;color:white;padding:15px 40px;font-size:1.2em;border-radius:30px;cursor:pointer;transition:transform .2s,box-shadow .2s}.dice-btn:hover{transform:scale(1.05);box-shadow:0 5px 20px rgba(102,126,234,0.4)}.dice-result{font-size:3em;margin:15px 0;min-height:60px}.dice-history{color:#888;font-size:0.9em}.board{background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;margin-bottom:20px;overflow-x:auto}.castle{margin-bottom:15px}.castle-name{font-size:0.9em;font-weight:bold;margin-bottom:8px;padding-left:5px}.kin-grid{display:flex;flex-wrap:wrap;gap:4px;min-width:600px}.kin-cell{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.65em;cursor:pointer;transition:all .2s}.kin-cell.red{background:rgba(255,107,107,0.3);border:1px solid #ff6b6b}.kin-cell.white{background:rgba(248,248,248,0.3);border:1px solid #ccc;color:#333}.kin-cell.blue{background:rgba(77,171,247,0.3);border:1px solid #4dabf7}.kin-cell.yellow{background:rgba(255,212,59,0.3);border:1px solid #ffd43b;color:#333}.kin-cell.green{background:rgba(105,219,124,0.3);border:1px solid #69db7c}.kin-cell.current{transform:scale(1.3);box-shadow:0 0 15px rgba(255,255,255,0.5);z-index:10}.card-area{background:rgba(255,255,255,0.1);border-radius:15px;padding:20px;margin-bottom:20px;min-height:200px}.card-title{text-align:center;font-size:1.1em;margin-bottom:15px;color:#888}.card{background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,rgba(255,255,255,0.05) 100%);border-radius:12px;padding:20px;max-width:500px;margin:0 auto}.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px}.card-type{padding:5px 15px;border-radius:20px;font-size:0.85em}.card-type.red{background:rgba(255,107,107,0.3);color:#ff6b6b}.card-text{font-size:1.1em;line-height:1.6;margin-bottom:15px}.card-score{text-align:center;font-size:1.5em;padding:10px;background:rgba(255,255,255,0.1);border-radius:8px}.score-response{text-align:center;margin-top:15px;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px}.score-input{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap}.score-btn{padding:10px 25px;border:none;border-radius:20px;cursor:pointer;font-size:1em;transition:transform.2s}.score-btn.yes{background:#69db7c;color:#1a1a2e}.score-btn.no{background:#ff6b6b;color:#fff}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);min-height:100vh;color:#fff;padding:20px}h1{text-align:center;margin-bottom:10px;font-size:1.8em}.subtitle{text-align:center;color:#888;margin-bottom:20px}.player-status{display:flex;justify-content:center;gap:30px;margin-bottom:20px;flex-wrap:wrap}.status-box{background:rgba(255,255,255,0.1);border-radius:12px;padding:15px 25px;text-align:center;min-width:120px}.status-label{font-size:0.85em;color:#888;margin-bottom:5px}.status-value{font-size:1.5em;font-weight:bold}.status-value.red{color:#ff6b6b}.status-value.white{color:#f8f8f8}.status-value.blue{color:#4dabf7}.status-value.yellow{color:#ffd43b}.status-value.green{color:#69db7c}.dice-area{text-align:center;margin:20px 0}.dice-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border:none;color:white;padding:15px 40px;font-size:1.2em;border-radius:30px;cursor:pointer;transition:transform .2s,box-shadow .2s}.dice-btn:hover{transform:scale(1.05);box-shadow:0 5px 20px rgba(102,126,234,0.4)}.dice-btn:disabled{opacity:0.5;cursor:not-allowed}.dice-result{font-size:3em;margin:15px 0;min-height:60px}.dice-history{color:#888;font-size:0.9em}.board{background:rgba(255,255,255,0.05);border-radius:15px;padding:20px;margin-bottom:20px;overflow-x:auto}.castle{margin-bottom:15px}.castle-name{font-size:0.9em;font-weight:bold;margin-bottom:8px;padding-left:5px}.kin-grid{display:flex;flex-wrap:wrap;gap:4px;min-width:600px}.kin-cell{width:28px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.65em;cursor:pointer;transition:all .2s}.kin-cell.red{background:rgba(255,107,107,0.3);border:1px solid #ff6b6b}.kin-cell.white{background:rgba(248,248,248,0.3);border:1px solid #ccc;color:#ccc}.kin-cell.blue{background:rgba(77,171,247,0.3);border:1px solid #4dabf7}.kin-cell.yellow{background:rgba(255,212,59,0.3);border:1px solid #ffd43b;color:#ccc}.kin-cell.green{background:rgba(105,219,124,0.3);border:1px solid #69db7c}.kin-cell.current{transform:scale(1.3);box-shadow:0 0 15px rgba(255,255,255,1);z-index:10;background:#fff !important;color:#000 !important;font-weight:bold}.card-area{background:rgba(255,255,255,0.1);border-radius:15px;padding:20px;margin-bottom:20px;min-height:200px}.card-title{text-align:center;font-size:1.1em;margin-bottom:15px;color:#888}.card{background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,rgba(255,255,255,0.05) 100%);border-radius:12px;padding:20px;max-width:500px;margin:0 auto}.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px}.card-type{padding:5px 15px;border-radius:20px;font-size:0.85em}.card-type.red{background:rgba(255,107,107,0.3);color:#ff6b6b}.card-text{font-size:1.1em;line-height:1.6;margin-bottom:15px}.score-response{text-align:center;margin-top:15px;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px}.score-input{display:flex;justify-content:center;gap:10px;margin-top:10px;flex-wrap:wrap}.score-btn{padding:10px 25px;border:none;border-radius:20px;cursor:pointer;font-size:1em;transition:transform.2s}.score-btn.yes{background:#69db7c;color:#1a1a2e}.score-btn.no{background:#ff6b6b;color:#fff}.score-btn.jump{background:#74c0fc;color:#1a1a2e}
 </style>
 </head>
 <body>
 <h1>🌙 13月亮共時旅程</h1>
-<p class="subtitle">測試版 v0.2 — 遵循實體計分規則</p>
+<p class="subtitle">測試版 v0.3 — 靈魂拷問與顯化移動修復</p>
 <div class="player-status">
     <div class="status-box"><div class="status-label">目前位置</div><div class="status-value" id="current-kin">—</div></div>
     <div class="status-box"><div class="status-label">擲骰結果</div><div class="status-value" id="dice-total">—</div></div>
@@ -60,59 +60,37 @@
 </div>
 
 <script>
-// 🎴 牌卡資料 (已修復紅天行者換行問題)
+// 🎴 完整牌卡資料 (根據截圖整理)
 const redCards = [
-    // 🔴 紅色城堡 (1-52)
-    { id: '0101', type: '人生練習題', mark: '紅龍', text: '看待人事物過度嚴肅太過認真，導致內在情緒張力較大。', score: -5, rule: '直接計分' },
-    { id: '0104', type: '天賦喚醒力', mark: '紅龍', text: '讚讚讚！擁有初生之犢不畏虎的開創精神。', score: 5, rule: '直接計分' },
-    { id: '0107', type: '發揮力量', mark: '紅龍', text: '我鬆綁原生家庭舊有模式的DNA?', score: 5, rule: '擲骰判定' },
-    { id: '0111', type: '知與行', mark: '紅龍', text: '我知道，當我喚醒我是誰，我更會知道我的天賦與生命價值。', score: 5, rule: '擲骰判定' },
-    { id: '0501', type: '人生練習題', mark: '紅蛇', text: '切斷自我與身體的連結，忽略身體帶給我們的訊息。', score: -5, rule: '直接計分' },
-    { id: '0504', type: '天賦喚醒力', mark: '紅蛇', text: '我信任身體的五種感官，去探索認識並學習新事物。', score: 5, rule: '直接計分' },
-    { id: '0507', type: '發揮力量', mark: '紅蛇', text: '我擁有充足的睡眠品質及適度運動的健康生活？', score: 5, rule: '擲骰判定' },
-    { id: '0511', type: '知與行', mark: '紅蛇', text: '我知道，善用金錢與樂於賺取金錢同樣重要。', score: 5, rule: '擲骰判定' },
-    { id: '0901', type: '人生練習題', mark: '紅月', text: '過度沉溺在負向感受之中，成為受害者的角色。', score: -5, rule: '直接計分' },
-    { id: '0904', type: '天賦喚醒力', mark: '紅月', text: '我能夠協助他人情緒流動，釋放內在混濁的堵塞。', score: 5, rule: '直接計分' },
-    { id: '0907', type: '發揮力量', mark: '紅月', text: '我能夠讀懂我的情緒與感受，做好我的情緒管理？', score: 5, rule: '擲骰判定' },
-    { id: '0911', type: '知與行', mark: '紅月', text: '我知道，別人無法情緒勒索我，除非我願意把頭伸進繩索。', score: 5, rule: '擲骰判定' },
-    { id: '1301', type: '人生練習題', mark: '紅天行者', text: '躲在網路世界的框框裡，忘記身體力行去打開通往世界的任意門。', score: -5, rule: '直接計分' },
-    { id: '1304', type: '天賦喚醒力', mark: '紅天行者', text: '我能夠天馬形空想像與創意，在我的世界裡，沒有限制。', score: 5, rule: '直接計分' },
-    { id: '1307', type: '發揮力量', mark: '紅天行者', text: '我能夠不受空間與預算限制，來安排我的旅遊計劃？', score: 5, rule: '擲骰判定' },
-    { id: '1311', type: '知與行', mark: '紅天行者', text: '我知道，預言有自我實現性，所以我樂於大膽創造無限可能。', score: 5, rule: '擲骰判定' },
-    { id: '1701', type: '人生練習題', mark: '紅地球', text: '在循規蹈矩的人生旅途裡，嘗試各種可能的途徑。', score: -5, rule: '直接計分' },
-    { id: '1704', type: '天賦喚醒力', mark: '紅地球', text: '深耕在我的領域中，成為專業的職業達人。', score: 5, rule: '直接計分' },
-    { id: '1707', type: '發揮力量', mark: '紅地球', text: '條條大路通羅馬，懂得變通，不鑽牛角尖？', score: 5, rule: '擲骰判定' },
-    { id: '1711', type: '知與行', mark: '紅地球', text: '我知道，有時候慢或許才是快。', score: 5, rule: '擲骰判定' },
-
-    // ⚪ 白色城堡 (53-104)
-    { id: '2101', type: '人生練習題', mark: '白風', text: '自我感覺良好，導致對外在有高傲傲慢之嫌。', score: -5, rule: '直接計分' },
-    { id: '2104', type: '天賦喚醒力', mark: '白風', text: '擁有優越的表達能力，且能夠同理他人，超給力。', score: 5, rule: '直接計分' },
-    { id: '2107', type: '靈魂拷問', mark: '白風', text: '我能夠覺察我的言語，且多用溫柔肯定智慧的言語？', score: 5, rule: '靈魂拷問' },
-    { id: '2501', type: '人生練習題', mark: '白世界橋', text: '過度執著已逝去的人事物，而無法與新的機會連結。', score: -5, rule: '直接計分' },
-    { id: '2504', type: '天賦喚醒力', mark: '白世界橋', text: '我真棒！勇於嘗試各種可能，且善於連結多元文化。', score: 5, rule: '直接計分' },
-    { id: '2507', type: '靈魂拷問', mark: '白世界橋', text: '我懂得斷捨離，清理不再適合我的人事物？', score: 5, rule: '靈魂拷問' },
-
-    // 🔵 藍色城堡 (105-156)
-    { id: '4101', type: '人生練習題', mark: '藍手', text: '眼高手低，只想不做，累死身邊愛我的人。', score: -5, rule: '直接計分' },
-    { id: '4104', type: '天賦喚醒力', mark: '藍手', text: '擁有一雙巧手，樂於分享手作樂趣，溫暖他人。', score: 5, rule: '直接計分' },
-    { id: '4107', type: '靈魂拷問', mark: '藍手', text: '我懂得愛惜身體，且給予適度的休息與保養？', score: 5, rule: '靈魂拷問' },
-
-    // 🟡 黃色城堡 (157-208)
-    { id: '6107', type: '發揮力量', mark: '黃種子', text: '我能夠看見自己的潛力，且懂得愛惜身體？', score: 5, rule: '擲骰判定' },
-    { id: '6111', type: '知與行', mark: '黃種子', text: '我知道，每個人都有無限可能，樂於分享愛與關懷。', score: 5, rule: '擲骰判定' },
-
-    // 🟢 綠色城堡 (209-260)
-    { id: '8107', type: '成就顯化', mark: '紅月', text: '我鬆綁原生家庭舊有模式的DNA?', score: 5, rule: '顯化判定' },
-    { id: '8507', type: '奇蹟顯化', mark: '白風', text: '我能夠覺察我的言語，且懂得清理不再適合我的人事物。', score: 10, rule: '顯化判定' }
+    // 紅
+    {id:'0101',type:'人生練習題',mark:'紅龍',text:'看待人事物過度嚴肅太過認真，導致情緒張力較大。',score:-5,rule:'直接計分'},
+    {id:'0107',type:'發揮力量',mark:'紅龍',text:'我鬆綁原生家庭舊有模式的DNA?',score:5,rule:'擲骰判定'},
+    {id:'0111',type:'知與行',mark:'紅龍',text:'我知道，我的價值來自活出自己。',score:5,rule:'擲骰判定'},
+    // 白
+    {id:'2107',type:'靈魂拷問',mark:'白風',text:'我能夠覺察我的言語，且多用溫柔智慧的言語？',score:5,rule:'靈魂拷問'},
+    {id:'2507',type:'靈魂拷問',mark:'白世界橋',text:'我懂得斷捨離，清理不再適合我的人事物？',score:5,rule:'靈魂拷問'},
+    // 藍
+    {id:'4107',type:'靈魂拷問',mark:'藍手',text:'我懂得愛惜身體，且給予適度的休息？',score:5,rule:'靈魂拷問'},
+    // 黃
+    {id:'6107',type:'發揮力量',mark:'黃種子',text:'我能夠看見自己的潛力？',score:5,rule:'擲骰判定'},
+    // 綠
+    {id:'8107',type:'成就顯化',mark:'紅月',text:'我鬆綁原生家庭舊有模式，邁向成就。',score:5,rule:'成就顯化'},
+    {id:'8507',type:'奇蹟顯化',mark:'白風',text:'我能夠覺察言語，創造生命奇蹟。',score:10,rule:'奇蹟顯化'}
 ];
 
+let gameState={currentKin:1,totalScore:0,diceHistory:[],cardScores:{'人生練習題':0,'發揮力量':0,'知與行':0,'靈魂拷問':0,'成就顯化':0,'奇蹟顯化':0}};
+let soulScoreTemp = 0; // 用於儲存靈魂拷問第一次點數
 
-let gameState={currentKin:1,totalScore:0,diceHistory:[],cardScores:{'人生練習題':0,'天賦喚醒力':0,'發揮力量':0,'知與行':0}};
-
-// 🏰 城堡顏色判定
 function getCastleColor(k){if(k<=52)return'red';if(k<=104)return'white';if(k<=156)return'blue';if(k<=208)return'yellow';return'green'}
 
-// 🎲 主骰子：移動位置
+function updateCurrentPosition(){
+    document.querySelectorAll('.kin-cell').forEach(c => {
+        c.classList.remove('current');
+        if(parseInt(c.textContent) === gameState.currentKin) c.classList.add('current');
+    });
+    document.getElementById('current-kin').textContent = gameState.currentKin;
+}
+
 function rollDice() {
     const btn = document.getElementById('main-roll-btn');
     const resultDisplay = document.getElementById('dice-result');
@@ -136,17 +114,14 @@ function rollDice() {
     }, 60);
 }
 
-// 🃏 抽卡邏輯
 function drawCard(){
     const k = gameState.currentKin;
     document.getElementById('card-title').textContent = `抵達 KIN ${k}，抽卡中...`;
-    // 簡單模擬抽對應圖騰的卡
-    let card = redCards[k % redCards.length]; 
+    let card = redCards.find(c => k.toString().includes(c.id.substring(0,2))) || redCards[k % redCards.length]; 
     displayCard(card);
 }
 
 function displayCard(card){
-    const color = getCastleColor(gameState.currentKin);
     document.getElementById('card-display').innerHTML = `
         <div class="card">
             <div class="card-header"><span class="card-type red">${card.type}</span> <span>${card.mark}</span></div>
@@ -155,42 +130,76 @@ function displayCard(card){
     showScoreResponse(card);
 }
 
-// ⚖️ 核心計分反應 (根據說明卡修正)
+// ⚖️ 核心計分反應
 function showScoreResponse(card) {
     const c = document.getElementById('score-response');
+    c.innerHTML = '';
+    
     if (card.rule === '直接計分') {
         applyScore(card.type, card.score);
         c.innerHTML = `<div class="score-response">直接結算：<strong>${card.score > 0 ? '+' : ''}${card.score} 分</strong></div>`;
     } else if (card.type === '發揮力量') {
-        c.innerHTML = `<div class="score-response"><p>請擲骰決定力量判定：</p>
-            <button class="score-btn yes" onclick="rollPower1()">🎲 第一次擲骰 (Yes/No)</button></div>`;
+        c.innerHTML = `<div class="score-response"><p>請回答卡片問題後擲骰：</p><button class="score-btn yes" onclick="rollPower1()">🎲 第一次擲骰</button></div>`;
     } else if (card.type === '知與行') {
-        c.innerHTML = `<div class="score-response"><p>請擲骰判定智慧層次：</p>
-            <button class="score-btn yes" style="background:#ffd43b" onclick="rollKnowledge()">🎲 擲骰判定</button></div>`;
+        c.innerHTML = `<div class="score-response"><p>請擲骰判定智慧層次：</p><button class="score-btn yes" style="background:#ffd43b" onclick="rollKnowledge()">🎲 擲骰判定</button></div>`;
+    } else if (card.type === '靈魂拷問') {
+        c.innerHTML = `<div class="score-response"><p>請回答問題後擲骰 (決定分數)：</p><button class="score-btn jump" onclick="rollSoul1()">🎲 第一次擲骰 (滿意度)</button></div>`;
+    } else if (card.type === '成就顯化') {
+        applyScore('成就顯化', 5);
+        c.innerHTML = `<div class="score-response"><p>獲得 +5 分！請擲骰決定顯化位移：</p><button class="score-btn jump" onclick="rollMove(5, '成就')">🎲 擲骰前進 (點數x5)</button></div>`;
+    } else if (card.type === '奇蹟顯化') {
+        applyScore('奇蹟顯化', 10);
+        c.innerHTML = `<div class="score-response"><p>獲得 +10 分！請擲骰決定奇蹟位移：</p><button class="score-btn jump" onclick="rollMove(10, '奇蹟')">🎲 擲骰前進 (點數x10)</button></div>`;
     }
 }
 
-// 📏 發揮力量邏輯
+// 📏 靈魂拷問邏輯
+function rollSoul1(){
+    const d = Math.floor(Math.random()*6)+1;
+    soulScoreTemp = d;
+    applyScore('靈魂拷問', d);
+    document.getElementById('score-response').innerHTML = `
+        <div class="score-response">
+            <p>第一骰滿意度：🎲 ${d} -> <strong>獲得 +${d} 分</strong></p>
+            <p>請進行第二骰決定移動距離：</p>
+            <button class="score-btn jump" onclick="rollSoul2()">🎲 第二次擲骰 (移動)</button>
+        </div>`;
+}
+function rollSoul2(){
+    const d = Math.floor(Math.random()*6)+1;
+    const steps = d * soulScoreTemp;
+    movePlayer(steps, `靈魂導引 (${d}x${soulScoreTemp})`);
+}
+
+// 📏 顯化移動邏輯 (成就 x5, 奇蹟 x10)
+function rollMove(multiplier, name){
+    const d = Math.floor(Math.random()*6)+1;
+    const steps = d * multiplier;
+    movePlayer(steps, `${name}位移 (🎲${d} x ${multiplier})`);
+}
+
+function movePlayer(steps, reason){
+    const res = document.getElementById('score-response');
+    res.innerHTML = `<div class="score-response">🎲 擲骰結果 -> <strong>${reason}，前進 ${steps} 步！</strong></div>`;
+    gameState.currentKin = Math.min(gameState.currentKin + steps, 260);
+    setTimeout(() => {
+        updateCurrentPosition();
+        drawCard(); // 移動後自動觸發新位置的抽卡
+    }, 1000);
+}
+
+// 📏 其他計分邏輯
 function rollPower1(){
     const d = Math.floor(Math.random()*6)+1;
-    const isOdd = d % 2 !== 0;
-    const res = document.getElementById('score-response');
-    if(isOdd){
-        applyScore('發揮力量', 5);
-        res.innerHTML = `<div class="score-response">第一次擲骰：🎲 ${d} (單數) -> <strong>✅ Yes (+5分)</strong></div>`;
-    } else {
-        res.innerHTML = `<div class="score-response"><p>第一次：🎲 ${d} (雙數) -> <strong>❌ No</strong></p>
-            <button class="score-btn no" onclick="rollPower2()">🎲 第二次擲骰 (扣分判定)</button></div>`;
-    }
+    if(d%2!==0){ applyScore('發揮力量', 5); document.getElementById('score-response').innerHTML = `<div class="score-response">🎲 ${d} (單數) -> <strong>✅ Yes (+5分)</strong></div>`; }
+    else { document.getElementById('score-response').innerHTML = `<div class="score-response"><p>🎲 ${d} (雙數) -> ❌ No</p><button class="score-btn no" onclick="rollPower2()">🎲 第二次擲骰</button></div>`; }
 }
 function rollPower2(){
     const d = Math.floor(Math.random()*6)+1;
-    const penalty = (d % 2 !== 0) ? -3 : -5;
-    applyScore('發揮力量', penalty);
-    document.getElementById('score-response').innerHTML = `<div class="score-response">第二次擲骰：🎲 ${d} -> <strong>${penalty} 分</strong></div>`;
+    const s = (d%2!==0)?-3:-5;
+    applyScore('發揮力量', s);
+    document.getElementById('score-response').innerHTML = `<div class="score-response">第二次擲骰：🎲 ${d} -> <strong>結算 ${s} 分</strong></div>`;
 }
-
-// 📏 知與行邏輯 (1,6=+5 / 2,5=+3 / 3,4=+0)
 function rollKnowledge(){
     const d = Math.floor(Math.random()*6)+1;
     let s=0, txt="";
@@ -207,14 +216,6 @@ function applyScore(type, s){
     document.getElementById('total-score').textContent = gameState.totalScore;
 }
 
-function updateCurrentPosition(){
-    document.querySelectorAll('.kin-cell').forEach(c => {
-        c.classList.remove('current');
-        if(parseInt(c.textContent) === gameState.currentKin) c.classList.add('current');
-    });
-    document.getElementById('current-kin').textContent = gameState.currentKin;
-}
-
 function initBoard(){
     ['red','white','blue','yellow','green'].forEach(c=>document.getElementById('castle-'+c).innerHTML='');
     for(let k=1;k<=260;k++){
@@ -228,7 +229,7 @@ function initBoard(){
 
 function endGame(){
     const b = document.getElementById('score-breakdown');
-    b.innerHTML = Object.entries(gameState.cardScores).map(([t,s])=>`<div>${t}: ${s}</div>`).join('') + `<h3 style="margin-top:10px">總計: ${gameState.totalScore} 分</h3>`;
+    b.innerHTML = Object.entries(gameState.cardScores).map(([t,s])=>`<div>${t}: ${s}</div>`).join('') + `<h3 style="margin-top:10px">總結算: ${gameState.totalScore} 分</h3>`;
     document.getElementById('game-end').style.display = 'flex';
 }
 
