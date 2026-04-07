@@ -440,8 +440,8 @@ const greenCards = [
     { id:'T12', color:'green', type:'靈魂拷問', text:'如果錢不是問題，我最想過什麼樣的一天？', rule:'soul' },
     { id:'T13', color:'green', type:'靈魂拷問', text:'我真的準備好迎接全新的生命轉化了嗎？', rule:'soul' }
 ];
-// -------------------------------------------------------------------------
-// 🏁 第七步：核心運行邏輯整合
+// -------------------------------------------------------------------------// -------------------------------------------------------------------------
+// 🏁 第七步：核心運行邏輯整合 (修正：抽牌後判定統一使用 1 顆骰子)
 
 // 1. 合併所有錄入的 333 張牌卡
 const masterCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...greenCards];
@@ -456,7 +456,7 @@ let gameState = {
 
 let currentPools = { red: [], white: [], blue: [], yellow: [], green: [] };
 
-// 3. 地圖顏色定義 (精確對齊 Carol 版)
+// 3. 地圖顏色定義
 const GREEN_KIN_MAP = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260];
 
 function getKinType(k) {
@@ -473,14 +473,13 @@ function startGame() {
     document.getElementById('game-setup').style.display = 'none';
     document.getElementById('game-ui').style.display = 'block';
 
-    // 根據顏色將 333 張牌分配到各自的「洗牌堆」
     ['red', 'white', 'blue', 'yellow', 'green'].forEach(c => {
         currentPools[c] = masterCards.filter(m => m.color === c).sort(() => Math.random() - 0.5);
     });
     initBoard();
 }
 
-// 5. 渲染卓爾金曆地圖
+// 5. 渲染地圖
 function initBoard() {
     const grid = document.getElementById('tzolkin-grid');
     grid.innerHTML = '';
@@ -497,7 +496,7 @@ function initBoard() {
     updateUI();
 }
 
-// 6. 更新位置與介面狀態
+// 6. 更新 UI
 function updateUI() {
     document.querySelectorAll('.kin-cell').forEach(c => c.classList.remove('current'));
     const cur = document.getElementById(`kin-${gameState.currentKin}`);
@@ -505,16 +504,15 @@ function updateUI() {
     document.getElementById('display-kin').textContent = gameState.currentKin;
     document.getElementById('total-score').textContent = gameState.totalScore;
 
-    // 結束判定
     if (gameState.currentKin >= gameState.targetKin && gameState.targetKin !== 1) {
         setTimeout(() => {
-            alert(`🏁 旅程結算！\n你已抵達或超越目標 KIN ${gameState.targetKin}。\n最終累積總分：${gameState.totalScore}。`);
+            alert(`🏁 旅程結算！\n抵達目標 KIN ${gameState.targetKin}。\n最終總分：${gameState.totalScore}。`);
             document.getElementById('roll-btn').disabled = true;
         }, 600);
     }
 }
 
-// 7. 擲骰子功能 (包含動畫)
+// 7. 移動骰子 (維持 2 顆骰子前進)
 function rollDice() {
     const btn = document.getElementById('roll-btn');
     const res = document.getElementById('dice-result');
@@ -527,10 +525,8 @@ function rollDice() {
             clearInterval(anim);
             const d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1;
             gameState.lastRoll = d1 + d2;
-            res.className = 'dice-pop'; // 觸發放大彈跳效果
+            res.className = 'dice-pop';
             res.textContent = `結果：${gameState.lastRoll}`;
-            
-            // 移動位置
             gameState.currentKin = ((gameState.currentKin + gameState.lastRoll - 1) % 260) + 1;
             updateUI();
             setTimeout(drawCard, 600);
@@ -539,79 +535,75 @@ function rollDice() {
     }, 60);
 }
 
-// 8. 抽牌核心邏輯 (保證不重複)
+// 8. 抽牌 (不重複)
 function drawCard() {
     const type = getKinType(gameState.currentKin);
     let pool = currentPools[type];
-    
-    // 如果池子抽乾了就自動重新洗牌
     if (pool.length === 0) {
         currentPools[type] = masterCards.filter(m => m.color === type).sort(() => Math.random() - 0.5);
         pool = currentPools[type];
     }
-    
-    const card = pool.pop(); // 抽一張少一張
+    const card = pool.pop();
     const display = document.getElementById('card-display');
     display.innerHTML = `
         <div class="card ${type}">
             <small>ID: ${card.id}</small>
             <h3>${card.type}</h3>
             <p>${card.text}</p>
-            <div class="pool-info">池子剩餘: ${pool.length} 張</div>
+            <div class="pool-info">池餘: ${pool.length} 張</div>
         </div>`;
-    
     const res = document.getElementById('score-response');
-    res.innerHTML = ''; // 清空上一回合判定結果
+    res.innerHTML = '';
 
     if (card.rule === 'direct') {
         applyScore(card.score);
         res.innerHTML = `<p>能量結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
     } else if (card.rule === 'power') {
-        res.innerHTML = `<p>請進行「發揮力量」判定：</p><button class="action-btn" onclick="rollPower1()">🎲 第一次擲骰 (Yes/No)</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="rollPower1()">🎲 擲 1 顆骰判定 (Yes/No)</button>`;
     } else if (card.rule === 'knowledge') {
-        res.innerHTML = `<button class="action-btn" onclick="handleKnowledge()">🎲 智慧判定層次</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="handleKnowledge()">🎲 擲 1 顆骰判定智慧</button>`;
     } else {
-        res.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.rule}')">🎲 執行規則判定</button>`;
+        res.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.rule}')">🎲 擲 1 顆骰進行顯化</button>`;
     }
 }
 
-// 9. 特殊判定邏輯 (發揮力量、智慧、成就位移)
+// 9. 判定功能 (統一使用 1 顆骰子)
 function rollPower1() {
     const d = Math.floor(Math.random() * 6) + 1;
     const res = document.getElementById('score-response');
-    if (d % 2 !== 0) { applyScore(5); res.innerHTML = `<p>第一骰：🎲 ${d} (單數) -> ✅ <strong>Yes! +5分</strong></p>`; }
-    else { res.innerHTML = `<p>第一骰：🎲 ${d} (雙數) -> ❌ <strong>No! 請再次擲骰判定扣分：</strong></p><button class="action-btn" onclick="rollPower2()" style="background:#ee5253; color:#fff;">🎲 第二次擲骰判定</button>`; }
+    if (d % 2 !== 0) { applyScore(5); res.innerHTML = `<p>判定結果：🎲 ${d} (單數) -> ✅ <strong>Yes! +5分</strong></p>`; }
+    else { res.innerHTML = `<p>判定結果：🎲 ${d} (雙數) -> ❌ <strong>No! 請再擲骰判定扣分：</strong></p><button class="action-btn" onclick="rollPower2()" style="background:#ee5253; color:#fff;">🎲 擲 1 顆骰判定扣分</button>`; }
 }
 function rollPower2() {
     const d = Math.floor(Math.random() * 6) + 1;
     const s = (d % 2 !== 0) ? -3 : -5;
     applyScore(s);
-    document.getElementById('score-response').innerHTML = `<p>第二骰：🎲 ${d} -> <strong>結算 ${s} 分</strong></p>`;
+    document.getElementById('score-response').innerHTML = `<p>第二骰結果：🎲 ${d} -> <strong>結算 ${s} 分</strong></p>`;
 }
 
 function handleKnowledge() {
     const d = Math.floor(Math.random() * 6) + 1;
     let s = (d === 1 || d === 6) ? 5 : (d === 2 || d === 5) ? 3 : 0;
     applyScore(s);
-    document.getElementById('score-response').innerHTML = `<p>結果：🎲 ${d} -> <strong>增加 ${s} 分智慧能量</strong></p>`;
+    document.getElementById('score-response').innerHTML = `<p>智慧判定：🎲 ${d} -> <strong>增加 ${s} 分能量</strong></p>`;
 }
 
 function handleSpecial(rule) {
-    const d = Math.floor(Math.random() * 6) + 1;
+    const d = Math.floor(Math.random() * 6) + 1; // 這裡改為新擲的一顆骰子
     let msg = "";
     if (rule === 'soul') { 
         applyScore(d); 
-        msg = `滿意度評分：🎲 ${d} 分！`; 
+        msg = `靈魂評分：🎲 ${d} 分！`; 
     }
     else if (rule === 'become') { 
         applyScore(5); 
-        const steps = gameState.lastRoll * 5;
-        msg = `<strong>成就顯化！</strong> 分數+5，位移前進：$${gameState.lastRoll} \times 5 = ${steps}$ 步！`;
+        const steps = d * 5; // 用剛擲出的這顆 d 乘以 5
+        msg = `<strong>成就顯化！</strong> 分數+5，位移判定為 🎲 ${d}，前進 $${d} \times 5 = ${steps}$ 步！`;
         gameState.currentKin = ((gameState.currentKin + steps - 1) % 260) + 1;
     } else if (rule === 'magic') { 
         applyScore(10); 
-        const steps = gameState.lastRoll * 10;
-        msg = `<strong>奇蹟顯化！</strong> 分數+10，大位移跳躍：$${gameState.lastRoll} \times 10 = ${steps}$ 步！`;
+        const steps = d * 10; // 用剛擲出的這顆 d 乘以 10
+        msg = `<strong>奇蹟顯化！</strong> 分數+10，位移判定為 🎲 ${d}，跳躍 $${d} \times 10 = ${steps}$ 步！`;
         gameState.currentKin = ((gameState.currentKin + steps - 1) % 260) + 1;
     }
     document.getElementById('score-response').innerHTML = `<p>${msg}</p>`;
@@ -622,6 +614,8 @@ function applyScore(s) {
     gameState.totalScore += s;
     document.getElementById('total-score').textContent = gameState.totalScore;
 }
+
+initBoard();
 </script>
 </body>
 </html>
