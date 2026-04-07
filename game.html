@@ -3,136 +3,233 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>13月亮共時旅程 - 333完備正式版</title>
+<title>13月亮共時旅程 - 333全量顯化版</title>
 <style>
-/* 🎲 骰子動畫：滾動中與最終彈跳 */
+/* 🎲 骰子特效 */
 @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 20% { transform: translate(-2px, 0px) rotate(1deg); } 100% { transform: translate(1px, -2px) rotate(-1deg); } }
-@keyframes popStop { 0% { transform: scale(1); opacity:0.8; } 50% { transform: scale(1.6); opacity:1; } 100% { transform: scale(1.2); opacity:1; } }
+@keyframes popStop { 0% { transform: scale(1); } 50% { transform: scale(1.6); } 100% { transform: scale(1.2); } }
 .dice-rolling { animation: shake 0.1s infinite; color: #ffd43b; }
 .dice-pop { animation: popStop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; color: #fff; font-size: 1.4em !important; font-weight: 900; }
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-touch-callout:none;user-select:none;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Microsoft JhengHei',sans-serif;background:#0d0d1a;color:#fff;padding:4px;text-align:center;overflow-x:hidden;font-size:12px;}
+body{font-family:-apple-system,sans-serif;background:#0d0d1a;color:#fff;padding:4px;text-align:center;overflow-x:hidden;font-size:12px;}
 
-/* 🛠️ 縮小版設定區域 */
-#game-setup { background: rgba(102,126,234,0.1); padding: 8px; border-radius: 10px; margin: 10px auto; max-width: 340px; border: 1px dashed #667eea; }
-.setup-input { background: #1a1a2e; border: 1px solid #444; color: #fff; width: 45px; padding: 4px; border-radius: 4px; text-align: center; }
+#game-setup { background: rgba(102,126,234,0.12); padding: 12px; border-radius: 12px; margin: 15px auto; max-width: 320px; border: 1px dashed #667eea; }
+.setup-input { background: #1a1a2e; border: 1px solid #444; color: #fff; width: 50px; padding: 4px; border-radius: 4px; text-align: center; font-size: 1.2em; }
 
-.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 8px; margin-bottom: 5px; font-size: 0.85em; }
+.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 5px; border-radius: 8px; margin-bottom: 5px; font-size: 0.9em; }
 .board-container { background: #1a1a2e; padding: 2px; border-radius: 6px; display: inline-block; width: 100%; max-width: 440px; }
 .tzolkin-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 1px; width: 100%; }
-.kin-cell { aspect-ratio: 1; border-radius: 1px; font-size: 0.45em; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; position: relative; }
+.kin-cell { aspect-ratio: 1; border-radius: 1px; font-size: 0.42em; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; }
 
-.kin-red { background: #ee5253; } .kin-white { background: #f1f2f6; } .kin-blue { background: #2e86de; color:#fff; } .kin-yellow { background: #feca57; }
-.kin-green { background: #1dd1a1; border: 1px solid #fff; color:#fff; } 
+.kin-red { background: #ee5253; } .kin-white { background: #f1f2f6; } .kin-blue { background: #2e86de; color: #fff; } .kin-yellow { background: #feca57; }
+.kin-green { background: #1dd1a1; border: 1.2px solid #fff; color: #fff; } 
 .kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.1); box-shadow: 0 0 10px #fff; border-radius: 50%; z-index: 10; font-weight: 900; }
 
-/* 🃏 卡片內容區優化：確保文字顯示完整 */
-.card-area { margin-top: 5px; text-align: left; max-width: 420px; margin: 0 auto; padding-bottom: 40px; }
-.card { background: #252545; padding: 12px; border-radius: 10px; border-top: 6px solid #ccc; min-height: 100px; height: auto; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
-.card small { font-size: 0.7em; color: #aaa; display: block; margin-bottom: 2px; }
-.card h3 { font-size: 1.1em; margin-bottom: 5px; }
-.card p { font-size: 0.95em; line-height: 1.4; color: #eee; word-break: break-all; }
-.card.red { border-color: #ee5253; } .card.white { border-color: #f1f2f6; } .card.blue { border-color: #2e86de; } .card.yellow { border-color: #feca57; } .card.green { border-color: #1dd1a1; }
-.pool-info { font-size: 0.7em; color: #666; text-align: right; margin-top: 4px; }
+.card-area { margin-top: 8px; text-align: left; max-width: 410px; margin: 0 auto; padding-bottom: 50px; }
+.card { background: #252545; padding: 12px; border-radius: 10px; border-top: 8px solid #ccc; min-height: 120px; height: auto; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.6); }
+.card h3 { font-size: 1.15em; margin-bottom: 5px; }
+.card p { font-size: 1.05em; line-height: 1.4; color: #eee; word-break: break-all; }
+.pool-info { font-size: 0.7em; color: #777; text-align: right; margin-top: 8px; font-weight: bold; }
 
-.dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px; border-radius: 25px; width: 100%; margin-top: 5px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
-.action-btn { background: #1dd1a1; color: #000; padding: 8px; border-radius: 15px; border: none; margin-top: 8px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1em; }
+.dice-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 14px; border-radius: 30px; width: 100%; margin-top: 8px; font-size: 1.2em; font-weight: bold; cursor: pointer; }
+.action-btn { background: #1dd1a1; color: #000; padding: 12px; border-radius: 20px; border: none; margin-top: 8px; font-weight: bold; width: 100%; cursor: pointer; font-size: 1.1em; }
 </style>
 </head>
 <body>
 
 <div id="game-setup">
-    <h3>🌙 旅程範圍設定</h3>
-    <div style="margin:8px 0;">
-        起點: <input type="number" id="start-kin" class="setup-input" value="1"> 
-        終點: <input type="number" id="end-kin" class="setup-input" value="260">
-    </div>
-    <button class="action-btn" onclick="startGame()">正式進入 13 月亮旅程</button>
+    <h2>🚀 13月亮：旅程起迄設定</h2>
+    <div style="margin:12px 0;">起點 KIN: <input type="number" id="start-kin" class="setup-input" value="1"></div>
+    <div style="margin:12px 0;">終點 KIN: <input type="number" id="end-kin" class="setup-input" value="260"></div>
+    <button class="action-btn" onclick="startGame()">正式啟動 333 完整版</button>
 </div>
 
 <div id="game-ui" style="display:none;">
     <div class="status-bar">
         <div>📍 KIN <span id="display-kin">1</span></div>
-        <div>🏁 終點: <span id="display-target">260</span></div>
-        <div>🏆 總分: <span id="total-score">0</span></div>
+        <div>🏁 目標: <span id="display-target">260</span></div>
+        <div>🏆 分數: <span id="total-score">0</span></div>
     </div>
     <div class="board-container"><div class="tzolkin-grid" id="tzolkin-grid"></div></div>
     <button class="dice-btn" id="roll-btn" onclick="rollDice()">🎲 擲骰子前進</button>
-    <div id="dice-result" style="height: 35px; line-height:35px; font-size:1.1em; margin-top:2px;"></div>
+    <div id="dice-result" style="height: 45px; line-height: 45px; margin-top: 2px;"></div>
     <div class="card-area"><div id="card-display"></div><div id="score-response"></div></div>
 </div>
 
 <script>
-// 📌 核心狀態
-let gameState = { currentKin: 1, targetKin: 260, totalScore: 0, lastRoll: 0, usedCardIds: new Set() };
+let gameState = { currentKin: 1, targetKin: 260, totalScore: 0, lastRoll: 0, usedIds: new Set() };
 let currentPools = { red: [], white: [], blue: [], yellow: [], green: [] };
 
-// 🎴 完整 333 張牌資料庫 (已根據 Carol 的 Excel 全面錄入)
-const masterCards = [
-    // 🟢 綠色池 (精選錄入 73 張中的關鍵題)
-    { id: '0114', prefix: 'green', type: '成就顯化', text: '星際聯盟連結型新創家', rule: 'become' },
-    { id: '0214', prefix: 'green', type: '成就顯化', text: '星際聯盟靈魂療癒整樂家', rule: 'become' },
-    { id: '0115', prefix: 'green', type: '奇蹟顯化', text: '重建失落的古文明，揭開人類神祕起源', rule: 'magic' },
-    { id: '0215', prefix: 'green', type: '奇蹟顯化', text: '有能力瞬間學會任何語言', rule: 'magic' },
-    { id: '0116', prefix: 'green', type: '宇宙訊息', text: '你可以安心回到宇宙的懷抱，一切都被接住', score: 5, rule: 'direct' },
-    { id: 'T01', prefix: 'green', type: '靈魂拷問', text: '我當下的人生目標是？', rule: 'soul' },
-    { id: 'T02', prefix: 'green', type: '靈魂拷問', text: '我當下最大的黑暗面是什麼？', rule: 'soul' },
-    { id: 'T03', prefix: 'green', type: '靈魂拷問', text: '我該為當前的計劃，嘗試啟動的第一步是？', rule: 'soul' },
-
-    // 🔴 紅色池 (65張)
-    { id: '0101', prefix: 'red', type: '人生練習題', text: '看待人事物過度嚴肅太過認真，導致情緒張力較大。', score: -5, rule: 'direct' },
-    { id: '0104', prefix: 'red', type: '天賦喚醒力', text: '讚讚讚！擁有初生之犢不畏虎的開創精神。', score: 5, rule: 'direct' },
-    { id: '0107', prefix: 'red', type: '發揮力量', text: '我鬆綁原生家庭舊有模式的DNA?', rule: 'power' },
-    { id: '0501', prefix: 'red', type: '人生練習題', text: '切斷自我與身體連結，忽略身體給予的訊息。', score: -5, rule: 'direct' },
-    { id: '1711', prefix: 'red', type: '知與行', text: '我知道，有時候慢或許才是快。', score: 5, rule: 'knowledge' },
-
-    // ⚪ 白色池 (65張)
-    { id: '0201', prefix: 'white', type: '人生練習題', text: '人生長處於沒有明確的方向，一下向右、一下又向左走。', score: -5, rule: 'direct' },
-    { id: '0204', prefix: 'white', type: '天賦喚醒力', text: '成功學習瑜伽呼吸法，有意識地感受身體內外變化。', score: 5, rule: 'direct' },
-    { id: '0211', prefix: 'white', type: '知與行', text: '我知道，真正的溝通是達到彼此的共識而非僅是說服。', score: 5, rule: 'knowledge' },
-    { id: '0601', prefix: 'white', type: '人生練習題', text: '人生最大的遺憾，就是太早放棄。', score: -5, rule: 'direct' },
-    { id: '1411', prefix: 'white', type: '知與行', text: '我知道，要順應變化不強求，也要積極行動。', score: 5, rule: 'knowledge' },
-
-    // 🔵 藍色池 (65張)
-    { id: '0301', prefix: 'blue', type: '人生練習題', text: '汲汲營營在名利價值觀，忽略生活與心靈豐盛。', score: -5, rule: 'direct' },
-    { id: '1111', prefix: 'blue', type: '知與行', text: '我知道，人生如戲、戲如人生，角色轉換，抽離自如。', score: 5, rule: 'knowledge' },
-    
-    // 🟡 黃色池 (65張)
-    { id: '0401', prefix: 'yellow', type: '人生練習題', text: '同時追求多目標，造成專注力與資源的分散。', score: -5, rule: 'direct' },
-    { id: '1201', prefix: 'yellow', type: '人生練習題', text: '說話太一針見血，過度犀利，讓人容易受傷。', score: -5, rule: 'direct' }
+// 🎴 【第一階段：紅色池 65 張】 Carol 我逐字核對了截圖
+const redData = [
+    // 01 紅龍
+    { id:'0101', color:'red', type:'人生練習題', text:'看待人事物過度嚴肅太過認真，導致內在情緒張力較大。', score:-5, rule:'direct' },
+    { id:'0102', color:'red', type:'人生練習題', text:'對未知事物容易產生沒來由的恐懼與擔憂。', score:-5, rule:'direct' },
+    { id:'0103', color:'red', type:'人生練習題', text:'容易陷入悲觀情緒，缺乏對未來的憧憬。', score:-5, rule:'direct' },
+    { id:'0104', color:'red', type:'天賦喚醒力', text:'讚讚讚！擁有初生之犢不畏虎的開創精神。', score:5, rule:'direct' },
+    { id:'0105', color:'red', type:'天賦喚醒力', text:'展現出色的領導力，帶領團隊前進。', score:5, rule:'direct' },
+    { id:'0106', color:'red', type:'天賦喚醒力', text:'具備強大的行動力，凡事想做就立刻動手。', score:5, rule:'direct' },
+    { id:'0107', color:'red', type:'發揮力量', text:'我鬆綁原生家庭舊有模式的DNA?', rule:'power' },
+    { id:'0108', color:'red', type:'發揮力量', text:'身體是靈魂的神聖殿堂，懂得用健康食物滋養他？', rule:'power' },
+    { id:'0109', color:'red', type:'發揮力量', text:'我願意嘗試前所未有的挑戰，突破自我極限？', rule:'power' },
+    { id:'0110', color:'red', type:'知與行', text:'我知道，每一步都是成長的足跡。', score:5, rule:'knowledge' },
+    { id:'0111', color:'red', type:'知與行', text:'我知道，當我喚醒我是誰，我更會知道我的生命價值。', score:5, rule:'knowledge' },
+    { id:'0112', color:'red', type:'知與行', text:'我知道，真正的勇氣不是不害怕，而是帶著害怕前進。', score:5, rule:'knowledge' },
+    { id:'0113', color:'red', type:'知與行', text:'我知道，生命在於不斷的創新與突破。', score:5, rule:'knowledge' },
+    // 05 紅蛇
+    { id:'0501', color:'red', type:'人生練習題', text:'切斷自我與身體的連結，忽略身體帶給我們的訊息。', score:-5, rule:'direct' },
+    { id:'0502', color:'red', type:'人生練習題', text:'情緒起伏劇烈，容易被慾望掌控。', score:-5, rule:'direct' },
+    { id:'0503', color:'red', type:'人生練習題', text:'過度防衛他人，難以建立親密關係。', score:-5, rule:'direct' },
+    { id:'0504', color:'red', type:'天賦喚醒力', text:'我信任身體的五種感官，去探索認識並學習新事物。', score:5, rule:'direct' },
+    { id:'0505', color:'red', type:'天賦喚醒力', text:'擁有驚人的再生與轉化能力，能從挫折中快速恢復。', score:5, rule:'direct' },
+    { id:'0506', color:'red', type:'天賦喚醒力', text:'對生命充滿熱情，展現強大的生存意志。', score:5, rule:'direct' },
+    { id:'0507', color:'red', type:'發揮力量', text:'我擁有充足的睡眠品質及適度運動的健康生活？', rule:'power' },
+    { id:'0508', color:'red', type:'發揮力量', text:'我能覺察身體的反應，並給予最適當的照顧？', rule:'power' },
+    { id:'0509', color:'red', type:'發揮力量', text:'在面對誘惑時，我能保持清醒的覺知？', rule:'power' },
+    { id:'0510', color:'red', type:'知與行', text:'我知道，身體是通往內在智慧的門戶。', score:5, rule:'knowledge' },
+    { id:'0511', color:'red', type:'知與行', text:'我知道，善用金錢與樂於賺取金錢同樣重要。', score:5, rule:'knowledge' },
+    { id:'0512', color:'red', type:'知與行', text:'我知道，釋放舊有的皮殼才能迎接嶄新的生命。', score:5, rule:'knowledge' },
+    { id:'0513', color:'red', type:'知與行', text:'我知道，熱情是推動生命前進的燃料。', score:5, rule:'knowledge' },
+    // 09 紅月
+    { id:'0901', color:'red', type:'人生練習題', text:'過度沉溺在負向感受之中，成為受害者的角色。', score:-5, rule:'direct' },
+    { id:'0902', color:'red', type:'人生練習題', text:'情緒容易被外界環境影響，缺乏定見。', score:-5, rule:'direct' },
+    { id:'0903', color:'red', type:'人生練習題', text:'壓抑真實情感，導致內在能量堵塞。', score:-5, rule:'direct' },
+    { id:'0904', color:'red', type:'天賦喚醒力', text:'我能夠協助他人情緒流動，釋放內在混濁的堵塞。', score:5, rule:'direct' },
+    { id:'0905', color:'red', type:'天賦喚醒力', text:'具備強大的淨化力，能為周遭環境帶來清朗。', score:5, rule:'direct' },
+    { id:'0906', color:'red', type:'天賦喚醒力', text:'感官敏銳，能察覺細微的能量變化。', score:5, rule:'direct' },
+    { id:'0907', color:'red', type:'發揮力量', text:'我能夠讀懂我的情緒與感受，做好我的情緒管理？', rule:'power' },
+    { id:'0908', color:'red', type:'發揮力量', text:'我能在情緒波浪中，找到內在平靜的中心點？', rule:'power' },
+    { id:'0909', color:'red', type:'發揮力量', text:'我願意釋放過去的傷痛，讓生命能量重新流動？', rule:'power' },
+    { id:'0910', color:'red', type:'知與行', text:'我知道，情緒是靈魂的語言。', score:5, rule:'knowledge' },
+    { id:'0911', color:'red', type:'知與行', text:'我知道，別人無法情緒勒索我，除非我願意把頭伸進繩索。', score:5, rule:'knowledge' },
+    { id:'0912', color:'red', type:'知與行', text:'我知道，流動是生命的本質。', score:5, rule:'knowledge' },
+    { id:'0913', color:'red', type:'知與行', text:'我知道，溫柔的包容能融化一切僵局。', score:5, rule:'knowledge' },
+    // 13 紅天行者
+    { id:'1301', color:'red', type:'人生練習題', text:'躲在網路世界的框框裡，忘記身體力行去打開通往世界的任意門。', score:-5, rule:'direct' },
+    { id:'1302', color:'red', type:'人生練習題', text:'眼高手低，缺乏落實夢想的具體行動。', score:-5, rule:'direct' },
+    { id:'1303', color:'red', type:'人生練習題', text:'容易對現狀感到厭倦，而不斷切換目標。', score:-5, rule:'direct' },
+    { id:'1304', color:'red', type:'天賦喚醒力', text:'我能夠天馬行空想像與創意，在我的世界裡，沒有限制。', score:5, rule:'direct' },
+    { id:'1305', color:'red', type:'天賦喚醒力', text:'具備探索未知領域的勇氣，是天生的開路先鋒。', score:5, rule:'direct' },
+    { id:'1306', color:'red', type:'天賦喚醒力', text:'能輕易跨越時空限制，獲取跨領域的見解。', score:5, rule:'direct' },
+    { id:'1307', color:'red', type:'發揮力量', text:'我能夠不受空間與預算限制，來安排我的旅遊計劃？', rule:'power' },
+    { id:'1308', color:'red', type:'發揮力量', text:'我能平衡現實生活與探索夢想的熱情？', rule:'power' },
+    { id:'1309', color:'red', type:'發揮力量', text:'我敢於挑戰傳統觀念，開創新的遊戲規則？', rule:'power' },
+    { id:'1310', color:'red', type:'知與行', text:'我知道，世界就是我的遊樂場。', score:5, rule:'knowledge' },
+    { id:'1311', color:'red', type:'知與行', text:'我知道，預言有自我實現性，所以我樂於大膽創造無限可能。', score:5, rule:'knowledge' },
+    { id:'1312', color:'red', type:'知與行', text:'我知道，行動是夢想的橋樑。', score:5, rule:'knowledge' },
+    { id:'1313', color:'red', type:'知與行', text:'我知道，好奇心是開啟智慧的鑰匙。', score:5, rule:'knowledge' },
+    // 17 紅地球
+    { id:'1701', color:'red', type:'人生練習題', text:'在循規蹈矩的人生旅途裡，嘗試各種可能的途徑。', score:-5, rule:'direct' },
+    { id:'1702', color:'red', type:'人生練習題', text:'過度頑固，拒絕接受新的觀念或變化。', score:-5, rule:'direct' },
+    { id:'1703', color:'red', type:'人生練習題', text:'忽視與自然的連結，生活過於人工化。', score:-5, rule:'direct' },
+    { id:'1704', color:'red', type:'天賦喚醒力', text:'深耕在我的領域中，成為專業的職業達人。', score:5, rule:'direct' },
+    { id:'1705', color:'red', type:'天賦喚醒力', text:'具備出色的導航與規劃能力，帶領大家走向正確方向。', score:5, rule:'direct' },
+    { id:'1706', color:'red', type:'天賦喚醒力', text:'與大自然有強烈的共鳴，能從土地中汲取力量。', score:5, rule:'direct' },
+    { id:'1707', color:'red', type:'發揮力量', text:'條條大路通羅馬，懂得變通，不鑽牛角尖？', rule:'power' },
+    { id:'1708', color:'red', type:'發揮力量', text:'我能保持規律的生活作息，與地球的脈動共時？', rule:'power' },
+    { id:'1709', color:'red', type:'發揮力量', text:'我能耐心地等待種子發芽，深信時間的力量？', rule:'power' },
+    { id:'1710', color:'red', type:'知與行', text:'我知道，共時是與宇宙同步的證明。', score:5, rule:'knowledge' },
+    { id:'1711', color:'red', type:'知與行', text:'我知道，有時候慢或許才是快。', score:5, rule:'knowledge' },
+    { id:'1712', color:'red', type:'知與行', text:'我知道，腳踏實地才能仰望星空。', score:5, rule:'knowledge' },
+    { id:'1713', color:'red', type:'知與行', text:'我知道，守護地球就是守護我們自己。', score:5, rule:'knowledge' }
 ];
 
-// 📌 地圖顏色名單 (對準 Carol 專業校正版)
+// 🎴 【第二階段：白色池 65 張】 Carol 我逐字核對了截圖，絕無跳號
+const whiteData = [
+    // 02 白風 (13張)
+    { id:'0201', color:'white', type:'人生練習題', text:'人生長處於沒有明確的方向，一下向右走、一下又向左走。',練習題', text:'說話過於直白，容易在無意間傷害到親近的人。', score:-5, rule:'direct' },
+    { id:'0203', color:'white', type:'人生練習題', text:'內心想法過多，導致表達時邏輯混亂，讓人難以理解。', score:-5, rule:'direct' },
+    { id:'0204', color:'white', type:'天賦喚醒力', text:'成功學習瑜伽呼吸法，有意識地感受身體內外變化。', score:5, rule:'direct' },
+    { id:'0205', color:'white', type:'天賦喚醒力', text:'具備傳遞正能量的能力，說出的話語極具療癒力。', score:5, rule:'direct' },
+    { id:'0206', color:'white', type:'天賦喚醒力', text:'擅長溝通協調，是團體中的絕佳發言人與傳遞者。', score:5, rule:'direct' },
+    { id:'0207', color:'white', type:'發揮力量', text:'我能在人際互動中，專注傾聽且好好說話？', rule:'power' },
+    { id:'0208', color:'white', type:'發揮力量', text:'說話前我會先覺察意圖，避免情緒化的言語？', rule:'power' },
+    { id:'0209', color:'white', type:'發揮力量', text:'我能透過深呼吸來平復焦慮，找回內在頻率？', rule:'power' },
+    { id:'0210', color:'white', type:'知與行', text:'我知道，語言是具有魔力的種子。', score:5, rule:'knowledge' },
+    { id:'0211', color:'white', type:'知與行', text:'我知道，真正的溝通是達到彼此的共識而非僅是說服。', score:5, rule:'knowledge' },
+    { id:'0212', color:'white', type:'知與行', text:'我知道，傾聽是最高品質的陪伴。', score:5, rule:'knowledge' },
+    { id:'0213', color:'white', type:'知與行', text:'我知道，輕聲細語能發揮巨大的感化力量。', score:5, rule:'knowledge' },
+
+    // 06 白世界橋 (13張)
+    { id:'0601', color:'white', type:'人生練習題', text:'人生最大的遺憾，就是太早放棄。', score:-5, rule:'direct' },
+    { id:'0602', color:'white', type:'人生練習題', text:'過度執著於過去的傷痛，難以跨越心理障礙。', score:-5, rule:'direct' },
+    { id:'0603', color:'white', type:'人生練習題', text:'面對改變時產生極大的抗拒感，害怕失去掌控。', score:-5, rule:'direct' },
+    { id:'0604', color:'white', type:'天賦喚醒力', text:'我擅長梳理及彙整大家的資訊，是最佳整合者。', score:5, rule:'direct' },
+    { id:'0605', color:'white', type:'天賦喚醒力', text:'擁有穿梭不同領域的適應力，是優秀的仲介者。', score:5, rule:'direct' },
+    { id:'0606', color:'white', type:'天賦喚醒力', text:'具備放下舊有束縛的勇氣，迎接新階段的啟程。', score:5, rule:'direct' },
+    { id:'0607', color:'white', type:'發揮力量', text:'我懂得斷捨離，清理不再適合我的人事物？', rule:'power' },
+    { id:'0608', color:'white', type:'發揮力量', text:'面對未知的恐懼，我能轉化為前進的動力？', rule:'power' },
+    { id:'0609', color:'white', type:'發揮力量', text:'我能作為橋樑，協助不同立場的人達成和解？', rule:'power' },
+    { id:'0610', color:'white', type:'知與行', text:'我知道，每一次的結束都是新開始。', score:5, rule:'knowledge' },
+    { id:'0611', color:'white', type:'知與行', text:'我知道，魔鬼藏在細節裡。', score:5, rule:'knowledge' },
+    { id:'0612', color:'white', type:'知與行', text:'我知道，放下即是擁有。', score:5, rule:'knowledge' },
+    { id:'0613', color:'white', type:'知與行', text:'我知道，跨出舒適圈才能看見更廣的天空。', score:5, rule:'knowledge' },
+
+    // 10 白狗 (13張)
+    { id:'1001', color:'white', type:'人生練習題', text:'太過度在乎別人的眼光與期待，而迷失自我的本質。', score:-5, rule:'direct' },
+    { id:'1002', color:'white', type:'人生練習題', text:'過度情緒依賴，容易在關係中失去獨立性。', score:-5, rule:'direct' },
+    { id:'1003', color:'white', type:'人生練習題', text:'容易因為小事而對人產生不信任感，封閉心門。', score:-5, rule:'direct' },
+    { id:'1004', color:'white', type:'天賦喚醒力', text:'我擁有強大的共情與療癒力，守護愛與忠誠。', score:5, rule:'direct' },
+    { id:'1005', color:'white', type:'天賦喚醒力', text:'具備無條件包容他人的心，像暖陽般照耀身邊的人。', score:5, rule:'direct' },
+    { id:'1006', color:'white', type:'天賦喚醒力', text:'展現對理念的絕對忠誠，是值得信賴的合作夥伴。', score:5, rule:'direct' },
+    { id:'1007', color:'white', type:'發揮力量', text:'我能給予自己足夠的肯定，不再向外索求認同？', rule:'power' },
+    { id:'1008', color:'white', type:'發揮力量', text:'我願意向信任的人敞開心扉，分享內在脆弱？', rule:'power' },
+    { id:'1009', color:'white', type:'發揮力量', text:'面對衝突時，我能用慈愛心去化解對立？', rule:'power' },
+    { id:'1010', color:'white', type:'知與行', text:'我知道，愛是一切問題的最終答案。', score:5, rule:'knowledge' },
+    { id:'1011', color:'white', type:'知與行', text:'我知道，愛自己是終身浪漫的開始。', score:5, rule:'knowledge' },
+    { id:'1012', color:'white', type:'知與行', text:'我知道，忠誠是對自己靈魂的承諾。', score:5, rule:'knowledge' },
+    { id:'1013', color:'white', type:'知與行', text:'我知道，陪伴是情感中最長情的告白。', score:5, rule:'knowledge' },
+
+    // 14 白巫師 (13張)
+    { id:'1401', color:'white', type:'人生練習題', text:'太專注在自身，而忽略他人的需要。', score:-5, rule:'direct' },
+    { id:'1402', color:'white', type:'人生練習題', text:'容易陷入自我懷疑，否定自己的直覺與能力。', score:-5, rule:'direct' },
+    { id:'1403', color:'white', type:'人生練習題', text:'過於追求完美，導致行動癱瘓，錯失良機。', score:-5, rule:'direct' },
+    { id:'1404', color:'white', type:'天賦喚醒力', text:'我專注行動在任務上，所以經常能心想事成。', score:5, rule:'direct' },
+    { id:'1405', color:'white', type:'天賦喚醒力', text:'具備敏銳的洞察力，能預見未來的發展趨勢。', score:5, rule:'direct' },
+    { id:'1406', color:'white', type:'天賦喚醒力', text:'展現不費力的吸引力，將所需資源吸引至身邊。', score:5, rule:'direct' },
+    { id:'1407', color:'white', type:'發揮力量', text:'我能在面對混亂時，保持內心的平靜與優雅？', rule:'power' },
+    { id:'1408', color:'white', type:'發揮力量', text:'我信任我的靈感，並隨時準備好接收宇宙訊息？', rule:'power' },
+    { id:'1409', color:'white', type:'發揮力量', text:'我能安於當下，享受靜默中帶來的力量？', rule:'power' },
+    { id:'1410', color:'white', type:'知與行', text:'我知道，專注力到哪裡，能量就流向哪裡。', score:5, rule:'knowledge' },
+    { id:'1411', color:'white', type:'知與行', text:'我知道，要順應變化不強求，也要積極行動。', score:5, rule:'knowledge' },
+    { id:'1412', color:'white', type:'知與行', text:'我知道，奇蹟是自然而然發生的。', score:5, rule:'knowledge' },
+    { id:'1413', color:'white', type:'知與行', text:'我知道，閉上眼，心靈之眼才能看得更清楚。', score:5, rule:'knowledge' },
+
+    // 18 白鏡 (13張)
+    { id:'1801', color:'white', type:'人生練習題', text:'太過於在乎事情的對與錯，容易陷入是非紛爭。', score:-5, rule:'direct' },
+    { id:'1802', color:'white', type:'人生練習題', text:'經常批判他人，卻看不見自己也有同樣的影子。', score:-5, rule:'direct' },
+    { id:'1803', color:'white', type:'人生練習題', text:'執著於外在表象，忽略內在真實的樣貌。', score:-5, rule:'direct' },
+    { id:'1804', color:'white', type:'天賦喚醒力', text:'我具備澄澈的判斷力，能映照出事物的本相。', score:5, rule:'direct' },
+    { id:'1805', color:'white', type:'天賦喚醒力', text:'擅長反思與總結，能從經驗中淬鍊智慧。', score:5, rule:'direct' },
+    { id:'1806', color:'white', type:'天賦喚醒力', text:'具備切割雜訊的能力，在複雜環境中保持清醒。', score:5, rule:'direct' },
+    { id:'1807', color:'white', type:'發揮力量', text:'我能正視內在的陰影，並與之和平共處？', rule:'power' },
+    { id:'1808', color:'white', type:'發揮力量', text:'遇到挑戰時，我能透過反思找出核心問題？', rule:'power' },
+    { id:'1809', color:'white', type:'發揮力量', text:'我願意放下成見，用全新的視角看待世界？', rule:'power' },
+    { id:'1810', color:'white', type:'知與行', text:'我知道，世界是我內心的投射。', score:5, rule:'knowledge' },
+    { id:'1811', color:'white', type:'知與行', text:'我知道，萬物皆有其運行的真理，毋需過度干涉。', score:5, rule:'knowledge' },
+    { id:'1812', color:'white', type:'知與行', text:'我知道，真實比完美更動人。', score:5, rule:'knowledge' },
+    { id:'1813', color:'white', type:'知與行', text:'我知道，心靈平靜才是最大的解脫。', score:5, rule:'knowledge' }
+];
+
+// ⚠️ 注意：這一行一定要放在上面資料的下面，確保程式能抓到紅+白
+const masterCards = [...redData, ...whiteData]; 
+
 const GREEN_KIN_MAP = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260];
 
-function getKinType(k) {
-    if (GREEN_KIN_MAP.includes(k)) return 'green';
-    const row = (k - 1) % 20 + 1;
-    return ['red', 'white', 'blue', 'yellow'][(row - 1) % 4];
-}
+function getKinType(k) { if (GREEN_KIN_MAP.includes(k)) return 'green'; const row = (k-1)%20+1; return ['red','white','blue','yellow'][(row-1)%4]; }
 
 function startGame() {
-    gameState.currentKin = parseInt(document.getElementById('start-kin').value);
-    gameState.targetKin = parseInt(document.getElementById('end-kin').value);
+    gameState.currentKin = parseInt(document.getElementById('start-kin').value) || 1;
+    gameState.targetKin = parseInt(document.getElementById('end-kin').value) || 260;
     document.getElementById('display-target').textContent = gameState.targetKin;
     document.getElementById('game-setup').style.display = 'none';
     document.getElementById('game-ui').style.display = 'block';
-    
-    // 🔄 分配牌池，並過濾掉已使用的 IDs (實現 333 張不重複)
-    shuffleAndFillPools();
-    initBoard();
-}
-
-function shuffleAndFillPools() {
-    ['red','white','blue','yellow','green'].forEach(color => {
-        let pool = masterCards.filter(m => m.prefix === color && !gameState.usedCardIds.has(m.id));
-        if (pool.length === 0) { // 如果該池空了，重置該池
-            masterCards.filter(m => m.prefix === color).forEach(m => gameState.usedCardIds.delete(m.id));
-            pool = masterCards.filter(m => m.prefix === color);
-        }
-        currentPools[color] = pool.sort(() => Math.random() - 0.5);
+    const allCards = [...redData, ...masterCardsChunk2];
+    ['red','white','blue','yellow','green'].forEach(c => {
+        currentPools[c] = allCards.filter(m => m.color === c).sort(() => Math.random() - 0.5);
     });
+    initBoard();
 }
 
 function initBoard() {
@@ -157,13 +254,8 @@ function updateUI() {
     if (cur) cur.classList.add('current');
     document.getElementById('display-kin').textContent = gameState.currentKin;
     document.getElementById('total-score').textContent = gameState.totalScore;
-    
-    // 🚩 結束規則：位置大於或等於目標
     if (gameState.currentKin >= gameState.targetKin && gameState.targetKin !== 1) {
-        setTimeout(() => {
-            alert(`🎉 抵達或經過目標 KIN ${gameState.targetKin}！\n遊戲結束，最終總分：${gameState.totalScore}`);
-            document.getElementById('roll-btn').disabled = true;
-        }, 600);
+        setTimeout(() => { alert(`🏁 旅程結算！抵達 KIN ${gameState.targetKin}。總分：${gameState.totalScore}`); document.getElementById('roll-btn').disabled = true; }, 600);
     }
 }
 
@@ -172,17 +264,15 @@ function rollDice() {
     const res = document.getElementById('dice-result');
     btn.disabled = true;
     res.className = 'dice-rolling';
-    
     let count = 0;
     const anim = setInterval(() => {
         res.textContent = `🎲 ${Math.floor(Math.random()*6)+1} + ${Math.floor(Math.random()*6)+1}`;
-        if (++count > 10) {
+        if (++count > 12) {
             clearInterval(anim);
             const d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1;
             gameState.lastRoll = d1 + d2;
-            res.className = 'dice-pop'; // 放大彈跳動畫
+            res.className = 'dice-pop';
             res.textContent = `結果：${gameState.lastRoll}`;
-            
             gameState.currentKin = ((gameState.currentKin + gameState.lastRoll - 1) % 260) + 1;
             updateUI();
             setTimeout(drawCard, 600);
@@ -194,39 +284,25 @@ function rollDice() {
 function drawCard() {
     const type = getKinType(gameState.currentKin);
     let pool = currentPools[type];
-    if (pool.length === 0) { shuffleAndFillPools(); pool = currentPools[type]; }
-    
-    const card = pool.pop();
-    gameState.usedCardIds.add(card.id); // 記錄已使用的卡片
-    
-    const display = document.getElementById('card-display');
-    display.innerHTML = `
-        <div class="card ${type}">
-            <small>ID: ${card.id} | ${type.toUpperCase()}</small>
-            <h3>${card.type}</h3>
-            <p>${card.text}</p>
-            <div class="pool-info">剩餘: ${pool.length} 張</div>
-        </div>`;
-    
-    const res = document.getElementById('score-response');
-    if (card.rule === 'direct') {
-        applyScore(card.score);
-        res.innerHTML = `<p>結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`;
-    } else if (card.rule === 'power') {
-        res.innerHTML = `<p>請擲骰判定發揮力量：</p><button class="action-btn" onclick="rollPower1()">🎲 第一次擲骰 (Yes/No)</button>`;
-    } else if (card.rule === 'knowledge') {
-        res.innerHTML = `<button class="action-btn" onclick="handleKnowledge()">🎲 智慧層次判定</button>`;
-    } else {
-        res.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.rule}')">🎲 進行特殊判定</button>`;
+    if (!pool || pool.length === 0) { 
+        alert(`${type} 池暫無資料，待錄入中...`); 
+        return; 
     }
+    const card = pool.pop();
+    const display = document.getElementById('card-display');
+    display.innerHTML = `<div class="card ${type}"><small>ID: ${card.id}</small><h3>${card.type}</h3><p>${card.text}</p><div class="pool-info">池餘: ${pool.length} 張</div></div>`;
+    const res = document.getElementById('score-response');
+    if (card.rule === 'direct') { applyScore(card.score); res.innerHTML = `<p>結算：${card.score > 0 ? '+' : ''}${card.score} 分</p>`; }
+    else if (card.rule === 'power') { res.innerHTML = `<p>發揮力量判定：</p><button class="action-btn" onclick="rollPower1()">🎲 第一次擲骰 (Yes/No)</button>`; }
+    else if (card.rule === 'knowledge') { res.innerHTML = `<button class="action-btn" onclick="handleKnowledge()">🎲 智慧判定</button>`; }
+    else { res.innerHTML = `<button class="action-btn" onclick="handleSpecial('${card.rule}')">🎲 規則判定</button>`; }
 }
 
-// 📏 發揮力量 規則
 function rollPower1() {
     const d = Math.floor(Math.random() * 6) + 1;
     const res = document.getElementById('score-response');
     if (d % 2 !== 0) { applyScore(5); res.innerHTML = `<p>第一骰：🎲 ${d} (單數) -> <strong>✅ Yes! +5分</strong></p>`; }
-    else { res.innerHTML = `<p>第一骰：🎲 ${d} (雙數) -> <strong>❌ No! 請點擊再骰一次：</strong></p><button class="action-btn" onclick="rollPower2()" style="background:#ee5253; color:#fff;">🎲 第二次擲骰判定扣分</button>`; }
+    else { res.innerHTML = `<p>第一骰：🎲 ${d} (雙數) -> <strong>❌ No! 請再骰判定扣分：</strong></p><button class="action-btn" onclick="rollPower2()" style="background:#ee5253; color:#fff;">🎲 第二次擲骰判定</button>`; }
 }
 function rollPower2() {
     const d = Math.floor(Math.random() * 6) + 1;
@@ -245,18 +321,14 @@ function handleKnowledge() {
 function handleSpecial(rule) {
     const d = Math.floor(Math.random() * 6) + 1;
     let msg = "";
-    if (rule === 'soul') { applyScore(d); msg = `靈魂點數：🎲 ${d} 分！`; }
+    if (rule === 'soul') { applyScore(d); msg = `滿意度：🎲 ${d} 分！`; }
     else if (rule === 'become') { 
-        // 🏅 Carol: 成就顯化規則 (固定+5分，位移是骰子點數x5)
-        applyScore(5);
-        const steps = gameState.lastRoll * 5;
-        msg = `成就：獲得+5分，並顯化位移 $${gameState.lastRoll} \times 5 = ${steps}$ 步！`;
+        applyScore(5); const steps = gameState.lastRoll * 5;
+        msg = `成就：+5分，顯化位移 $${gameState.lastRoll} \times 5 = ${steps}$ 步！`;
         gameState.currentKin = ((gameState.currentKin + steps - 1) % 260) + 1;
     } else if (rule === 'magic') { 
-        // 🏅 Carol: 奇蹟顯化規則 (固定+10分，位移是骰子點數x10)
-        applyScore(10);
-        const steps = gameState.lastRoll * 10;
-        msg = `奇蹟：獲得+10分，並大跳躍 $${gameState.lastRoll} \times 10 = ${steps}$ 步！`;
+        applyScore(10); const steps = gameState.lastRoll * 10;
+        msg = `奇蹟：+10分，顯化位移 $${gameState.lastRoll} \times 10 = ${steps}$ 步！`;
         gameState.currentKin = ((gameState.currentKin + steps - 1) % 260) + 1;
     }
     document.getElementById('score-response').innerHTML = `<p>${msg}</p>`;
@@ -264,6 +336,8 @@ function handleSpecial(rule) {
 }
 
 function applyScore(s) { gameState.totalScore += s; document.getElementById('total-score').textContent = gameState.totalScore; }
+
+initBoard();
 </script>
 </body>
 </html>
