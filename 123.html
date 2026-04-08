@@ -28,37 +28,24 @@
         .btn-main { width: 100%; padding: 15px; border-radius: 30px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-bottom: 10px; }
         .btn-secondary { width: 100%; padding: 12px; border-radius: 30px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: bold; cursor: pointer; margin-top: 5px; }
         
-        /* 當前卡片顯示 */
-        #current-card-display { margin-top: 20px; display: none; }
-        .card-result { padding: 20px; border-radius: 12px; border-left: 8px solid #ccc; background: rgba(255,255,255,0.08); }
-        .type-tag { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.8em; margin-bottom: 10px; font-weight: bold; color: #000; }
-        
-        /* 歷史軌跡 - 強化牌義顯示 */
-        #history { margin-top: 40px; }
-        .history-item { 
-            background: rgba(255,255,255,0.03); 
-            margin-bottom: 15px; 
-            padding: 15px; 
-            border-radius: 12px; 
-            border-left: 4px solid #444;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .hist-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .hist-id-type { font-size: 0.85em; color: #888; }
+        /* 歷史軌跡 */
+        .history-item { background: rgba(255,255,255,0.03); margin-bottom: 15px; padding: 15px; border-radius: 12px; border-left: 4px solid #444; display: flex; flex-direction: column; gap: 8px; }
         .hist-text { font-size: 1em; color: #eee; line-height: 1.4; }
         .hist-score { font-weight: bold; font-size: 1.1em; align-self: flex-end; }
 
         /* 結算彈窗 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: var(--card-bg); padding: 30px; border-radius: 20px; text-align: center; border: 2px solid var(--accent); max-width: 450px; width: 100%; }
+        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 20px; text-align: center; border: 2px solid var(--accent); max-width: 450px; width: 100%; overflow-y: auto; max-height: 90vh; }
         
-        .bg-red { background: var(--red); border-color: var(--red) !important; } 
-        .bg-white { background: var(--white); border-color: var(--white) !important; }
-        .bg-blue { background: var(--blue); color: #fff !important; border-color: var(--blue) !important; } 
-        .bg-yellow { background: var(--yellow); border-color: var(--yellow) !important; } 
-        .bg-green { background: var(--green); border-color: var(--green) !important; }
+        /* 結算分數表格 */
+        .score-summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
+        .summary-box { padding: 10px 5px; border-radius: 8px; font-size: 0.8em; font-weight: bold; }
+        
+        .bg-red { background: var(--red); color: #000; } 
+        .bg-white { background: var(--white); color: #000; }
+        .bg-blue { background: var(--blue); color: #fff; } 
+        .bg-yellow { background: var(--yellow); color: #000; } 
+        .bg-green { background: var(--green); color: #000; }
         
         .text-plus { color: var(--green); } .text-minus { color: var(--red); }
     </style>
@@ -73,25 +60,18 @@
 
     <div class="status-bar">
         <span class="round-tag">🚀 第 <span id="round-num">1</span> / 3 回合</span>
-        <span class="score-tag">🏆 總頻率：<span id="total-score-display">0</span></span>
+        <span class="score-tag">🏆 總計：<span id="total-score-display">0</span></span>
     </div>
 
     <div class="input-group">
         <label>🔢 1. 輸入牌卡 ID</label>
-        <input type="text" id="card-id" placeholder="例如：0101">
+        <input type="text" id="card-id" placeholder="牌卡編號">
         
         <label>✨ 2. 本次獲得的分數</label>
-        <input type="number" id="manual-score" placeholder="輸入骰子判定的分數">
+        <input type="number" id="manual-score" placeholder="輸入分數">
         
         <button class="btn-main" onclick="processEntry()">紀錄此步覺察</button>
         <button class="btn-secondary" onclick="confirmEndRound()">結束本回合</button>
-    </div>
-
-    <div id="current-card-display">
-        <div id="result-box" class="card-result">
-            <div id="card-type" class="type-tag"></div>
-            <h3 id="card-content" style="margin: 10px 0; font-size: 1.15em;"></h3>
-        </div>
     </div>
 
     <div id="history">
@@ -100,14 +80,14 @@
     </div>
 </div>
 
-<!-- 結算彈窗 -->
 <div id="summary-modal" class="modal">
     <div class="modal-content">
-        <h2 id="modal-title">🌈 旅程結算</h2>
-        <div id="modal-body" style="margin: 20px 0; font-size: 1.1em; line-height: 1.8;"></div>
-        <button class="btn-main" onclick="closeModal()">繼續前行</button>
+        <h2 id="modal-title" style="font-size: 1.5em;">🌈 旅程結算</h2>
+        <div id="modal-body"></div>
+        <button class="btn-main" id="modal-btn" onclick="closeModal()">繼續前行</button>
     </div>
 </div>
+
 
 <script>
 // --- 資料池匯整 ---
@@ -461,68 +441,49 @@ const greenCards = [
 
 // --- 核心邏輯 ---
 let allCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...greenCards];
-let totalScore = 0;
-let currentRound = 1;
 
-const levels = [
-    { min: 850, title: "鼎盛階段 - 繁盛 • 成蔭", desc: "為他人帶來庇蔭與影響力。你已是能量的源頭。" },
-    { min: 650, title: "成熟階段 - 穩固 • 堅韌", desc: "歷經淬鍊，厚實堅韌。你已站穩生命的主場。" },
-    { min: 450, title: "發展階段 - 定向 • 茁壯", desc: "方向明確，漸趨健全。你正在快速成長中。" },
-    { min: 250, title: "初生階段 - 萌芽 • 破土", desc: "蘊含可能性與期待。生命的種子正在覺醒。" },
-    { min: -999, title: "基礎階段 - 孕育 • 沃土", desc: "正在累積能量的過程。每一滴淚水都是養分。" }
-];
+// 遊戲狀態紀錄各色分數
+let colorScores = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
+let currentRound = 1;
 
 function processEntry() {
     const idInput = document.getElementById('card-id').value.trim();
     const scoreInput = parseInt(document.getElementById('manual-score').value) || 0;
-    
     const foundCard = allCards.find(c => c.id === idInput);
 
-    if (!foundCard) {
-        alert("找不到這個 ID，請確認牌卡編號是否正確。");
-        return;
-    }
+    if (!foundCard) { alert("找不到這個 ID！"); return; }
 
-    // 顯示當前卡片
-    const display = document.getElementById('current-card-display');
-    const typeTag = document.getElementById('card-type');
-    const resultBox = document.getElementById('result-box');
-    
-    display.style.display = 'block';
-    typeTag.textContent = foundCard.type;
-    typeTag.className = `type-tag bg-${foundCard.color}`;
-    resultBox.style.borderLeftColor = `var(--${foundCard.color})`;
-    document.getElementById('card-content').textContent = foundCard.text;
-    
-    // 更新分數
-    totalScore += scoreInput;
-    document.getElementById('total-score-display').textContent = totalScore;
+    // 更新各別顏色分數
+    colorScores[foundCard.color] += scoreInput;
+    updateDisplayTotal();
 
-    // 歷史紀錄 (包含牌義)
+    // 增加歷史紀錄
     const historyList = document.getElementById('history-list');
     const item = document.createElement('div');
     item.className = 'history-item';
     item.style.borderLeftColor = `var(--${foundCard.color})`;
-    
     const scoreClass = scoreInput >= 0 ? 'text-plus' : 'text-minus';
     
     item.innerHTML = `
-        <div class="hist-header">
-            <span class="hist-id-type">ID: ${foundCard.id} | ${foundCard.type}</span>
-        </div>
+        <div style="font-size:0.85em; color:#888;">ID: ${foundCard.id} | ${foundCard.type}</div>
         <div class="hist-text">${foundCard.text}</div>
         <div class="hist-score ${scoreClass}">${scoreInput > 0 ? '+' : ''}${scoreInput}</div>
     `;
     historyList.insertBefore(item, historyList.firstChild);
 
-    // 清空輸入並聚焦 ID
     document.getElementById('card-id').value = '';
     document.getElementById('manual-score').value = '';
     document.getElementById('card-id').focus();
 }
 
+// 實時更新顯示總分 (此處為簡單累加，結算時才套用負分歸零規則)
+function updateDisplayTotal() {
+    let rawTotal = Object.values(colorScores).reduce((a, b) => a + b, 0);
+    document.getElementById('total-score-display').textContent = rawTotal;
+}
+
 function confirmEndRound() {
-    if (confirm(`結束第 ${currentRound} 回合旅程？將會保留累積積分。`)) {
+    if (confirm(`結束第 ${currentRound} 回合？`)) {
         if (currentRound < 3) {
             showRoundSummary();
         } else {
@@ -534,50 +495,65 @@ function confirmEndRound() {
 function showRoundSummary() {
     const modal = document.getElementById('summary-modal');
     const body = document.getElementById('modal-body');
-    body.innerHTML = `
-        <p>第 ${currentRound} 回合完成！</p>
-        <p>當前累積指數：<span class="score-tag">${totalScore}</span></p>
-        <p style="font-size:0.9em; color:#888; margin-top:10px;">請繼續擲骰，開啟下一段生命探險。</p>
-    `;
+    body.innerHTML = `<p>第 ${currentRound} 回合能量校準完成！</p><p>累積總積分：${Object.values(colorScores).reduce((a, b) => a + b, 0)}</p>`;
     modal.style.display = 'flex';
 }
 
 function showFinalSummary() {
     const modal = document.getElementById('summary-modal');
     const body = document.getElementById('modal-body');
-    const result = levels.find(l => totalScore >= l.min) || levels[4];
     
+    // 結算邏輯：分別統計，低於 0 則計為 0
+    let finalRed = Math.max(0, colorScores.red);
+    let finalWhite = Math.max(0, colorScores.white);
+    let finalBlue = Math.max(0, colorScores.blue);
+    let finalYellow = Math.max(0, colorScores.yellow);
+    let finalGreen = Math.max(0, colorScores.green);
+    
+    let totalManifestation = finalRed + finalWhite + finalBlue + finalYellow + finalGreen;
+
+    const levels = [
+    { min: 850, title: "鼎盛階段 - 繁盛 • 成蔭", desc: "為他人帶來庇蔭與影響力。你已是能量的源頭。" },
+    { min: 650, title: "成熟階段 - 穩固 • 堅韌", desc: "歷經淬鍊，厚實堅韌。你已站穩生命的主場。" },
+    { min: 450, title: "發展階段 - 定向 • 茁壯", desc: "方向明確，漸趨健全。你正在快速成長中。" },
+    { min: 250, title: "初生階段 - 萌芽 • 破土", desc: "蘊含可能性與期待。生命的種子正在覺醒。" },
+    { min: -999, title: "基礎階段 - 孕育 • 沃土", desc: "正在累積能量的過程。每一滴淚水都是養分。" }
+];
+
+    const result = levels.find(l => totalManifestation >= l.min) || levels[4];
+
     body.innerHTML = `
-        <p style="font-size:0.9em;">✨ 333 全量顯化達成 ✨</p>
-        <h3 style="color:var(--yellow); margin:10px 0; font-size:1.5em;">${result.title}</h3>
-        <p style="font-size:1.4em; font-weight:bold;">總積分：${totalScore}</p>
-        <p style="color:#ccc; font-size:0.95em; margin-top:15px; padding:0 10px;">${result.desc}</p>
-        <p style="margin-top:20px; font-style:italic; font-size:0.85em; color:var(--accent);">In Lak'ech. 我是你，你是我。</p>
+        <p style="font-size:0.9em; color:#aaa;">✨ 333 全量顯化結算 ✨</p>
+        <div class="score-summary-grid">
+            <div class="summary-box bg-red">紅<br>${finalRed}</div>
+            <div class="summary-box bg-white">白<br>${finalWhite}</div>
+            <div class="summary-box bg-blue">藍<br>${finalBlue}</div>
+            <div class="summary-box bg-yellow">黃<br>${finalYellow}</div>
+            <div class="summary-box bg-green">綠<br>${finalGreen}</div>
+        </div>
+        <p style="font-size:0.8em; color:#888; margin-top:-10px;">(註：負分已自動淨化歸零)</p>
+        <h3 style="color:var(--yellow); font-size:1.4em; margin-top:15px;">${result.title}</h3>
+        <p style="font-size:1.6em; font-weight:bold;">總顯化指數：${totalManifestation}</p>
+        <p style="margin-top:20px; font-style:italic; font-size:0.8em; color:var(--accent);">In Lak'ech. 我是你，你是我。</p>
     `;
-    document.getElementById('modal-title').textContent = "🏁 旅程最終結算";
+    
+    document.getElementById('modal-title').textContent = "🏁 最終旅程結算";
+    document.getElementById('modal-btn').textContent = "重啟旅程";
+    document.getElementById('modal-btn').onclick = () => location.reload();
     modal.style.display = 'flex';
-    const btn = modal.querySelector('button');
-    btn.textContent = "重啟旅程";
-    btn.onclick = () => location.reload();
 }
 
 function closeModal() {
     document.getElementById('summary-modal').style.display = 'none';
     currentRound++;
     document.getElementById('round-num').textContent = currentRound;
-    // 不清空 history，讓玩家可以看到全程的牌義
     const divider = document.createElement('div');
-    divider.style.textAlign = 'center';
-    divider.style.padding = '10px';
-    divider.style.color = '#7b61ff';
-    divider.style.fontSize = '0.8em';
+    divider.style.textAlign = 'center'; divider.style.padding = '10px'; divider.style.color = '#7b61ff'; divider.style.fontSize = '0.8em';
     divider.innerHTML = `━━━ 第 ${currentRound} 回合開始 ━━━`;
     document.getElementById('history-list').insertBefore(divider, document.getElementById('history-list').firstChild);
-    document.getElementById('current-card-display').style.display = 'none';
 }
 </script>
 </body>
 </html>
-
 
 
