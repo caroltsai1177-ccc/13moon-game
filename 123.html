@@ -587,11 +587,11 @@ function showFinalSummary(gridData) {
     const exportDiv = document.getElementById('export-actions');
 
     const levels = [
-    { min: 850, title: "鼎盛階段 - 繁盛 • 成蔭", desc: "為他人帶來庇蔭與影響力。你已是能量的源頭。" },
-    { min: 650, title: "成熟階段 - 穩固 • 堅韌", desc: "歷經淬鍊，厚實堅韌。你已站穩生命的主場。" },
-    { min: 450, title: "發展階段 - 定向 • 茁壯", desc: "方向明確，漸趨健全。你正在快速成長中。" },
-    { min: 250, title: "初生階段 - 萌芽 • 破土", desc: "蘊含可能性與期待。生命的種子正在覺醒。" },
-    { min: -999, title: "基礎階段 - 孕育 • 沃土", desc: "正在累積能量的過程。每一滴淚水都是養分。" }
+    { min: 85, title: "鼎盛階段 - 繁盛 • 成蔭", desc: "為他人帶來庇蔭與影響力。你已是能量的源頭。" },
+    { min: 65, title: "成熟階段 - 穩固 • 堅韌", desc: "歷經淬鍊，厚實堅韌。你已站穩生命的主場。" },
+    { min: 45, title: "發展階段 - 定向 • 茁壯", desc: "方向明確，漸趨健全。你正在快速成長中。" },
+    { min: 25, title: "初生階段 - 萌芽 • 破土", desc: "蘊含可能性與期待。生命的種子正在覺醒。" },
+    { min: -99, title: "基礎階段 - 孕育 • 沃土", desc: "正在累積能量的過程。每一滴淚水都是養分。" }
 ];
     const result = levels.find(l => gridData.total >= l.min) || levels[4];
 
