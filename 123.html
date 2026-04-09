@@ -112,6 +112,7 @@
 <script>
 // --- 資料池匯整 ---
 const redCards = [
+     // 紅色系 (01, 05, 09, 13, 17)
    { id:'0101', color:'red', type:'人生練習題', text:'看到人事物過度嚴肅太過認真，導致內在情緒張力較大，對外在的關係之間相較緊繃', score:-5, rule:'direct' },
     { id:'0102', color:'red', type:'人生練習題', text:'獨斷傲慢，缺乏學習的態度與精神', score:-5, rule:'direct' },
     { id:'0103', color:'red', type:'人生練習題', text:'不願意請求協助，過度承擔責任，累死自己又想要死撐', score:-5, rule:'direct' },
@@ -180,6 +181,7 @@ const redCards = [
 ];
 
 const whiteCards = [
+     // 白色系 (02, 06, 10, 14, 18)
      { id:'0201', color:'white', type:'人生練習題', text:'人生長處於沒有明確的方向，一下向右走、一下又向左走', score:-5, rule:'direct' },
     { id:'0202', color:'white', type:'人生練習題', text:'常常盲目跟著別人的腳步前進，卻不知道他們要去哪裡', score:-5, rule:'direct' },
     { id:'0203', color:'white', type:'人生練習題', text:'忘記我是自由的，我可以隨心所欲去要去的地方', score:-5, rule:'direct' },
@@ -248,6 +250,7 @@ const whiteCards = [
 ];
 
 const blueCards = [
+    // 藍色系 (03, 07, 11, 15, 19)
   { id:'0301', color:'blue', type:'人生練習題', text:'汲汲營營在名與利的價值觀，忽略生活與心靈的豐盛', score:-5, rule:'direct' },
     { id:'0302', color:'blue', type:'人生練習題', text:'空有白日夢，卻忘了去付諸行動，實現夢想。', score:-5, rule:'direct' },
     { id:'0303', color:'blue', type:'人生練習題', text:'不相信自己可以擁有夢想，甚至不敢大膽做夢。', score:-5, rule:'direct' },
@@ -316,6 +319,7 @@ const blueCards = [
 ];
 
 const yellowCards = [
+     // 黃色系 (04, 08, 12, 16, 20)
   { id:'0401', color:'yellow', type:'人生練習題', text:'同時追求過多目標，造成專注力與資源的分散', score:-5, rule:'direct' },
     { id:'0402', color:'yellow', type:'人生練習題', text:'急著功成名就，而忽略善良純真與幫助他人', score:-5, rule:'direct' },
     { id:'0403', color:'yellow', type:'人生練習題', text:'執著於結果的得失，而忽略過程累積的收穫', score:-5, rule:'direct' },
@@ -384,6 +388,7 @@ const yellowCards = [
 ];
 
 const greenCards = [
+    // 綠色系 (所有 14, 15, 16 結尾及 T 開頭)
        { id:'0114', color:'green', type:'成就顯化', text:'星際聯盟連續型新創家', score:5, rule:'become' },
     { id:'0214', color:'green', type:'成就顯化', text:'星際聯盟靈魂療癒聲樂家', score:5, rule:'become' },
     { id:'0314', color:'green', type:'成就顯化', text:'星際聯盟奧斯卡最佳編劇', score:5, rule:'become' },
@@ -590,7 +595,6 @@ function showSummary() {
     { min: 250, title: "初生階段 - 萌芽 • 破土", desc: "蘊含可能性與期待。生命的種子正在覺醒。" },
     { min: -999, title: "基礎階段 - 孕育 • 沃土", desc: "正在累積能量的過程。每一滴淚水都是養分。" }
 ];
-
         const res = levels.find(l => data.final >= l.min) || levels[4];
         title.textContent = "🏁 旅程最終顯化結算";
         body.innerHTML = `
