@@ -106,6 +106,7 @@
 <script>
 
 
+
 // --- 牌卡資料池 ---
 const redCards= [
    { id:'0101', color:'red', type:'人生練習題', text:'看到人事物過度嚴肅太過認真，導致內在情緒張力較大，對外在的關係之間相較緊繃', score:-5, rule:'direct' },
@@ -457,17 +458,13 @@ let allCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...gre
 let journeyLog = [];
 let currentRound = 1;
 
+// 更新後的等級定義 (指數已放大 10 倍後的區間)
 const levels = [
-    { min: 85, title: "鼎盛階段-繁盛•成蔭
-為他人帶來庇蔭與影響力" },
-    { min: 65, title: "成熟階段-穩固•堅韌
-歷經淬鍊，厚實堅韌" },
-    { min: 45, title: "發展階段-定向•茁壯
-方向明確，漸趨健全有力" },
-    { min: 25, title: "初生階段-萌芽•破土
-蘊含可能性與期待" },
-    { min: -99, title: "基礎階段-孕育•沃土
-高維度頻率能量" }
+    { min: 850, title: "鼎盛階段-繁盛•成蔭", desc: "為他人帶來庇蔭與影響力" },
+    { min: 650, title: "成熟階段-穩固•堅韌", desc: "歷經淬鍊，厚實堅韌" },
+    { min: 450, title: "發展階段-定向•茁壯", desc: "方向明確，漸趨健全有力" },
+    { min: 250, title: "初生階段-萌芽•破土", desc: "蘊含可能性與期待" },
+    { min: 0,   title: "基礎階段-孕育•沃土", desc: "高維度頻率能量" }
 ];
 
 function processEntry() {
@@ -477,8 +474,14 @@ function processEntry() {
     const scoreInput = parseInt(document.getElementById('manual-score').value) || 0;
     
     const foundCard = allCards.find(c => c.id === idInput);
-    if (!foundCard) return alert("找不到此牌卡 ID！");
-    if (!kin) return alert("請輸入 KIN 編號");
+    if (!foundCard) {
+        alert("找不到此牌卡 ID，請檢查編號是否有誤！");
+        return;
+    }
+    if (!kin) {
+        alert("請輸入 KIN 編號");
+        return;
+    }
 
     journeyLog.push({
         round: currentRound,
@@ -490,25 +493,29 @@ function processEntry() {
     });
 
     renderHistory();
-    // 清空
+
     document.getElementById('kin-number').value = '';
     document.getElementById('card-id').value = '';
     document.getElementById('manual-score').value = '';
     document.getElementById('kin-number').focus();
 }
 
+// 分色計分邏輯：先加總，負分則歸零，最後統計結果乘 10
 function calculateScores() {
-    let totals = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
+    let rawTotals = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
     journeyLog.forEach(item => {
-        totals[item.card.color] += item.score;
+        rawTotals[item.card.color] += item.score;
     });
 
-    Object.keys(totals).forEach(key => {
-        if (totals[key] < 0) totals[key] = 0;
+    let displayTotals = {};
+    Object.keys(rawTotals).forEach(key => {
+        // 先執行負分歸零，再乘以 10
+        let processed = rawTotals[key] < 0 ? 0 : rawTotals[key];
+        displayTotals[key] = processed * 10;
     });
 
-    const sum = Object.values(totals).reduce((a, b) => a + b, 0);
-    return { totals, sum };
+    const sum = Object.values(displayTotals).reduce((a, b) => a + b, 0);
+    return { totals: displayTotals, sum };
 }
 
 function renderHistory() {
@@ -543,7 +550,7 @@ function renderHistory() {
 }
 
 function deleteEntry(idx) {
-    if (confirm("刪除這筆紀錄？")) {
+    if (confirm("確定要刪除這筆紀錄嗎？")) {
         journeyLog.splice(idx, 1);
         renderHistory();
     }
@@ -557,10 +564,11 @@ function editEntry(idx) {
     document.getElementById('manual-score').value = item.score;
     journeyLog.splice(idx, 1);
     renderHistory();
+    document.getElementById('manual-score').focus();
 }
 
 function confirmEndRound() {
-    if (confirm(`結束第 ${currentRound} 回合？`)) {
+    if (confirm(`要結束第 ${currentRound} 回合的旅程並結算嗎？`)) {
         showSummary(currentRound === 3);
     }
 }
@@ -577,14 +585,18 @@ function showSummary(isFinal) {
 
     if (isFinal) {
         const level = levels.find(l => sum >= l.min) || levels[4];
-        document.getElementById('modal-title').textContent = "🏁 最終旅程結算";
-        body.innerHTML = `<h3>${level.title}</h3><p>總頻率：${sum}</p>`;
+        document.getElementById('modal-title').textContent = "意識頻率指數圖";
+        body.innerHTML = `
+            <h3 style="color:var(--yellow); margin-bottom:5px;">${level.title}</h3>
+            <p style="color:#aaa; font-size:0.9em; margin-bottom:15px;">${level.desc}</p>
+            <p style="font-size:1.8em; font-weight:bold; margin-top:10px;">總指數：${sum}</p>
+        `;
         const btn = modal.querySelector('button');
-        btn.textContent = "重新開始";
+        btn.textContent = "重啟新旅程";
         btn.onclick = () => location.reload();
     } else {
         document.getElementById('modal-title').textContent = `🌈 回合 ${currentRound} 結算`;
-        body.innerHTML = `<p>目前累積總頻率：${sum}</p>`;
+        body.innerHTML = `<p>目前累積總指數：<span style="color:var(--yellow); font-size:1.4em; font-weight:bold;">${sum}</span></p>`;
     }
     modal.style.display = 'flex';
 }
@@ -596,33 +608,50 @@ function closeModal() {
 }
 
 function exportHistory() {
+    if (journeyLog.length === 0) return alert("還沒有紀錄可以匯出喔！");
+    
     const { totals, sum } = calculateScores();
     let win = window.open('', '_blank');
     let content = `
-        <html><head><style>
-            body { font-family: sans-serif; padding: 20px; color: #333; }
-            .grid { display: flex; gap: 10px; margin-bottom: 20px; }
-            .grid div { padding: 10px; border-radius: 5px; font-weight: bold; }
+        <html><head><title>意識頻率指數報告</title><style>
+            body { font-family: sans-serif; padding: 20px; color: #333; line-height: 1.6; }
+            .grid { display: flex; gap: 10px; margin: 20px 0; }
+            .grid div { flex: 1; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
             .red { background: #ee5253; color: white; } 
-            .white { background: #f1f2f6; border: 1px solid #ddd; } 
+            .white { background: #f1f2f6; border: 1px solid #ccc; color: #444444; } 
             .blue { background: #2e86de; color: white; } 
-            .yellow { background: #feca57; } 
-            .green { background: #1dd1a1; }
+            .yellow { background: #feca57; color: black; } 
+            .green { background: #1dd1a1; color: black; }
             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #eee; padding: 10px; text-align: left; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background: #f9f9f9; }
+            .color-text-red { color: #ee5253; font-weight: bold; }
+            .color-text-white { color: #444444; font-weight: bold; }
+            .color-text-blue { color: #2e86de; font-weight: bold; }
+            .color-text-yellow { color: #d4a017; font-weight: bold; }
+            .color-text-green { color: #16a085; font-weight: bold; }
         </style></head><body>
-        <h2>13月亮曆：共時旅程紀錄報告</h2>
-        <p>總頻率：<strong>${sum}</strong> (負分已歸零計算)</p>
+        <h2>意識頻率指數圖：旅程報告</h2>
+        <p>總累積頻率指數：<strong>${sum}</strong> (每項已放大 10 倍)</p>
         <div class="grid">
             <div class="red">紅: ${totals.red}</div><div class="white">白: ${totals.white}</div>
             <div class="blue">藍: ${totals.blue}</div><div class="yellow">黃: ${totals.yellow}</div>
             <div class="green">綠: ${totals.green}</div>
         </div>
         <table>
-            <tr><th>回合</th><th>方式</th><th>KIN</th><th>類別</th><th>內容</th><th>獲得分數</th></tr>
+            <thead><tr><th>回合</th><th>方式</th><th>KIN</th><th>類別</th><th>內容</th><th>獲得分數</th></tr></thead>
+            <tbody>
             ${journeyLog.map(i => `
-                <tr><td>${i.round}</td><td>${i.action}</td><td>${i.kin}</td><td>${i.card.type}</td><td>${i.card.text}</td><td>${i.score}</td></tr>
+                <tr>
+                    <td>${i.round}</td>
+                    <td>${i.action}</td>
+                    <td>${i.kin}</td>
+                    <td class="color-text-${i.card.color}">${i.card.type}</td>
+                    <td>${i.card.text}</td>
+                    <td>${i.score >= 0 ? '+' : ''}${i.score}</td>
+                </tr>
             `).join('')}
+            </tbody>
         </table>
         </body></html>
     `;
