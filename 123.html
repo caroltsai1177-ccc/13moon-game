@@ -3,120 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>13月亮曆：共時旅程紀錄儀 (333顯化版)</title>
+    <title>13月亮：共時旅程紀錄儀 (可編輯版)</title>
     <style>
         :root {
             --bg-dark: #0f111a;
             --card-bg: #1a1c2c;
             --accent: #7b61ff;
-            --red: #ee5253; --white: #f1f2f6; --blue: #2e86de; --yellow: #feca57; --green: #1dd1a1;
+            --red: #ee5253; 
+            --white: #f1f2f6; 
+            --blue: #2e86de; 
+            --yellow: #feca57; 
+            --green: #1dd1a1;
+            --gray-export: #444444; /* 白色卡片匯出時使用的深灰色 */
         }
         body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: var(--bg-dark); color: #fff; margin: 0; padding: 15px; line-height: 1.6; }
-        .container { max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
+        .container { max-width: 600px; margin: 0 auto; padding-bottom: 60px; }
         header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
         
         .status-bar { display: flex; justify-content: space-between; margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 12px 18px; border-radius: 12px; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
         .round-tag { color: var(--accent); }
         .score-tag { color: var(--yellow); }
 
-        /* 輸入區 */
         .input-group { background: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 20px; border: 1px solid rgba(123, 97, 255, 0.2); }
-        .row { display: flex; gap: 10px; margin-bottom: 12px; }
-        .col { flex: 1; display: flex; flex-direction: column; }
-        label { display: block; margin-bottom: 5px; font-size: 0.85em; color: #aaa; }
-        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #0d0d1a; color: #fff; font-size: 1em; box-sizing: border-box; }
+        label { display: block; margin-bottom: 8px; font-size: 0.9em; color: #aaa; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #0d0d1a; color: #fff; font-size: 1.1em; box-sizing: border-box; }
         
-        .btn-main { width: 100%; padding: 15px; border-radius: 30px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-top: 10px; }
-        .btn-secondary { width: 100%; padding: 12px; border-radius: 30px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: bold; cursor: pointer; margin-top: 8px; }
-        .btn-export { background: #2e86de; border: none; color: white; padding: 10px; border-radius: 20px; font-size: 0.9em; cursor: pointer; margin-top: 10px; }
+        .btn-main { width: 100%; padding: 15px; border-radius: 30px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-bottom: 10px; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); }
+        .btn-secondary { width: 100%; padding: 12px; border-radius: 30px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font-weight: bold; cursor: pointer; margin-top: 5px; }
         
-        /* 歷史軌跡 */
-        .history-item { background: rgba(255,255,255,0.03); margin-bottom: 15px; padding: 15px; border-radius: 12px; border-left: 5px solid #444; }
-        .action-label { font-size: 0.75em; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.15); color: #fff; margin-right: 5px; }
-        .hist-kin { font-weight: bold; color: var(--accent); margin-right: 5px; }
-        .hist-text { font-size: 1.05em; color: #eee; margin: 10px 0; border-bottom: 1px dashed #333; padding-bottom: 10px; }
-        .hist-meta { font-size: 0.8em; color: #888; display: flex; justify-content: space-between; align-items: center; }
+        .action-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-export { background: #2ecc71; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
 
-        /* 結算彈窗 */
+        #current-card-display { margin-top: 20px; display: none; }
+        .card-result { padding: 20px; border-radius: 12px; border-left: 8px solid #ccc; background: rgba(255,255,255,0.08); }
+        .type-tag { display: inline-block; padding: 4px 12px; border-radius: 15px; font-size: 0.8em; margin-bottom: 10px; font-weight: bold; color: #000; }
+
+        .history-item { background: rgba(255,255,255,0.03); margin-bottom: 15px; padding: 15px; border-radius: 12px; border-left: 4px solid #444; position: relative; }
+        .hist-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
+        .hist-id-type { font-size: 0.85em; color: #888; }
+        .hist-text { font-size: 1em; color: #eee; line-height: 1.4; padding-right: 60px; }
+        .hist-score { font-weight: bold; font-size: 1.1em; color: var(--yellow); }
+        
+        .item-actions { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 8px; }
+        .btn-del { background: rgba(238, 82, 83, 0.2); color: var(--red); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75em; }
+        .btn-edit { background: rgba(123, 97, 255, 0.2); color: var(--accent); border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75em; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 20px; text-align: center; border: 2px solid var(--accent); max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: var(--card-bg); padding: 30px; border-radius: 20px; text-align: center; border: 2px solid var(--accent); max-width: 450px; width: 100%; }
         
-        /* 分數網格 */
-        .score-summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 15px 0; }
-        .summary-box { padding: 10px 2px; border-radius: 8px; font-size: 0.8em; font-weight: bold; border: 1px solid rgba(255,255,255,0.1); }
-        
-        .bg-red { background: var(--red); color: #000; } 
-        .bg-white { background: var(--white); color: #000; }
-        .bg-blue { background: var(--blue); color: #fff; } 
-        .bg-yellow { background: var(--yellow); color: #000; } 
-        .bg-green { background: var(--green); color: #000; }
+        /* 顏色標籤樣式 */
+        .bg-red { background: var(--red); } 
+        .bg-white { background: var(--white); }
+        .bg-blue { background: var(--blue); color: #fff !important; } 
+        .bg-yellow { background: var(--yellow); } 
+        .bg-green { background: var(--green); }
         .text-plus { color: var(--green); } .text-minus { color: var(--red); }
     </style>
 </head>
 <body>
-
 <div class="container">
     <header>
         <h2>🌙 13月亮：共時旅程紀錄儀</h2>
         <p style="font-size: 0.85em; color: #888;">KIN 146 電力的白世界橋 陪伴你的自覺之旅</p>
     </header>
-
     <div class="status-bar">
         <span class="round-tag">🚀 第 <span id="round-num">1</span> / 3 回合</span>
-        <span class="score-tag">🏆 即時累積：<span id="total-score-display">0</span></span>
+        <span class="score-tag">🏆 總頻率：<span id="total-score-display">0</span></span>
     </div>
-
     <div class="input-group">
-        <div class="row">
-            <div class="col">
-                <label>📍 動作</label>
-                <select id="action-type">
-                    <option value="到達">到達</option>
-                    <option value="飛到">飛到</option>
-                    <option value="獲贈">獲贈</option>
-                    <option value="贈出">贈出</option>
-                </select>
-            </div>
-            <div class="col">
-                <label>🔢 KIN 編號</label>
-                <input type="number" id="kin-number" placeholder="幾號 KIN?">
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col">
-                <label>🗂️ 牌卡 ID</label>
-                <input type="text" id="card-id" placeholder="ID 編號">
-            </div>
-            <div class="col">
-                <label>✨ 本步分數</label>
-                <input type="number" id="manual-score" placeholder="分數">
-            </div>
-        </div>
-        
-        <button class="btn-main" onclick="processEntry()">紀錄本步覺察</button>
+        <label>🔢 1. 輸入牌卡 ID</label>       
+        <input type="text" id="card-id" placeholder="例如：0101">
+        <label>✨ 2. 本次獲得的分數</label>
+        <input type="number" id="manual-score" placeholder="輸入骰子判定的分數">
+        <button class="btn-main" onclick="processEntry()">紀錄此步覺察</button>
         <button class="btn-secondary" onclick="confirmEndRound()">結束本回合</button>
+    </div>
+    
+    <div id="current-card-display">
+        <div id="result-box" class="card-result">
+            <div id="card-type" class="type-tag"></div>
+            <h3 id="card-content" style="margin: 10px 0; font-size: 1.15em;"></h3>
+        </div>
     </div>
 
     <div id="history">
-        <h4 style="border-left: 4px solid var(--accent); padding-left: 10px; margin-bottom: 15px;">旅程軌跡</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 style="border-left: 4px solid var(--accent); padding-left: 10px; margin: 0;">旅程軌跡</h4>
+            <button class="btn-export" onclick="exportHistory()">📤 匯出文字紀錄</button>
+        </div>
         <div id="history-list"></div>
     </div>
 </div>
 
 <div id="summary-modal" class="modal">
     <div class="modal-content">
-        <h2 id="modal-title" style="font-size: 1.4em;">🌈 回合能量結算</h2>
-        <div id="modal-body"></div>
-        <div id="export-actions" style="display: none; gap: 10px; margin-top: 15px;">
-            <button class="btn-export" style="flex:1;" onclick="copyToClipboard()">複製文字報告</button>
-            <button class="btn-export" style="flex:1; background:#1dd1a1; color:#000;" onclick="downloadReport()">下載紀錄檔</button>
-        </div>
-        <button class="btn-main" id="modal-btn" onclick="closeModal()" style="margin-top: 20px;">繼續前行</button>
+        <h2 id="modal-title">🌈 旅程結算</h2>
+        <div id="modal-body" style="margin: 20px 0; font-size: 1.1em; line-height: 1.8;"></div>
+        <button class="btn-main" onclick="closeModal()">繼續前行</button>
     </div>
 </div>
 
 <script>
+
 // --- 牌卡資料池 ---
 const redCards= [
    { id:'0101', color:'red', type:'人生練習題', text:'看到人事物過度嚴肅太過認真，導致內在情緒張力較大，對外在的關係之間相較緊繃', score:-5, rule:'direct' },
@@ -463,189 +452,185 @@ const greenCards = [
     { id:'T13', color:'green', type:'靈魂拷問', text:'我如何喜悅的活在當下？', rule:'soul' }
 ];
 
+// --- 核心邏輯 ---
 let allCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...greenCards];
-
-// 狀態管理
-let colorScores = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
+let historyData = []; // 儲存所有紀錄的陣列
+let totalScore = 0;
 let currentRound = 1;
-let journeyLog = []; 
+
+const levels = [
+    { min: 850, title: "鼎盛階段 - 繁盛 • 成蔭", desc: "為他人帶來庇蔭與影響力。你已是能量的源頭。" },
+    { min: 650, title: "成熟階段 - 穩固 • 堅韌", desc: "歷經淬鍊，厚實堅韌。你已站穩生命的主場。" },
+    { min: 450, title: "發展階段 - 定向 • 茁壯", desc: "方向明確，漸趨健全。你正在快速成長中。" },
+    { min: 250, title: "初生階段 - 萌芽 • 破土", desc: "蘊含可能性與期待。生命的種子正在覺醒。" },
+    { min: -999, title: "基礎階段 - 孕育 • 沃土", desc: "正在累積能量的過程。每一滴淚水都是養分。" }
+];
 
 function processEntry() {
-    const action = document.getElementById('action-type').value;
-    const kin = document.getElementById('kin-number').value.trim();
     const idInput = document.getElementById('card-id').value.trim();
     const scoreInput = parseInt(document.getElementById('manual-score').value) || 0;
-    
     const foundCard = allCards.find(c => c.id === idInput);
 
-    if (!foundCard) { alert("找不到該牌卡 ID！"); return; }
-    if (!kin) { alert("請輸入 KIN 編號。"); return; }
+    if (!foundCard) {
+        alert("找不到這個 ID，請確認牌卡編號是否正確。");
+        return;
+    }
 
-    colorScores[foundCard.color] += scoreInput;
-    
-    journeyLog.push({
+    // 將資料推入陣列
+    const entry = {
+        timestamp: new Date().getTime(),
         round: currentRound,
-        action: action,
-        kin: kin,
-        id: foundCard.id,
-        color: foundCard.color,
-        type: foundCard.type,
-        text: foundCard.text,
+        card: { ...foundCard },
         score: scoreInput
-    });
+    };
+    historyData.push(entry);
 
-    updateDisplayTotal();
+    // 顯示即時卡片結果
+    const display = document.getElementById('current-card-display');
+    const typeTag = document.getElementById('card-type');
+    const resultBox = document.getElementById('result-box');
+    display.style.display = 'block';
+    typeTag.textContent = foundCard.type;
+    typeTag.className = `type-tag bg-${foundCard.color}`;
+    resultBox.style.borderLeftColor = `var(--${foundCard.color})`;
+    document.getElementById('card-content').textContent = foundCard.text;
+
     renderHistory();
-
-    document.getElementById('kin-number').value = '';
+    
+    // 清空輸入
     document.getElementById('card-id').value = '';
     document.getElementById('manual-score').value = '';
-    document.getElementById('kin-number').focus();
+    document.getElementById('card-id').focus();
 }
 
-function updateDisplayTotal() {
-    // 介面上顯示的是即時累加（包含負數）
-    let rawTotal = Object.values(colorScores).reduce((a, b) => a + b, 0);
-    document.getElementById('total-score-display').textContent = rawTotal;
-}
-
+// 渲染歷史列表並重新計算總分
 function renderHistory() {
     const historyList = document.getElementById('history-list');
     historyList.innerHTML = '';
-    [...journeyLog].reverse().forEach(log => {
-        if (log.round !== currentRound) return;
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.style.borderLeftColor = `var(--${log.color})`;
-        const scoreClass = log.score >= 0 ? 'text-plus' : 'text-minus';
-        item.innerHTML = `
+    totalScore = 0;
+
+    // 由新到舊排列
+    [...historyData].reverse().forEach((item, index) => {
+        const realIndex = historyData.length - 1 - index;
+        totalScore += item.score;
+
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.style.borderLeftColor = `var(--${item.card.color})`;
+        
+        const scoreClass = item.score >= 0 ? 'text-plus' : 'text-minus';
+        div.innerHTML = `
             <div class="hist-header">
-                <div><span class="action-label">${log.action}</span><span class="hist-kin">KIN ${log.kin}</span></div>
-                <div style="font-size:0.75em; color:#888;">ID: ${log.id} | ${log.type}</div>
+                <span class="hist-id-type">R${item.round} | ID: ${item.card.id} | ${item.card.type}</span>
             </div>
-            <div class="hist-text">${log.text}</div>
-            <div class="hist-meta"><span>第 ${log.round} 回合</span><span class="${scoreClass}">${log.score > 0 ? '+' : ''}${log.score}</span></div>
+            <div class="hist-text">${item.card.text}</div>
+            <div class="hist-score ${scoreClass}">${item.score > 0 ? '+' : ''}${item.score}</div>
+            <div class="item-actions">
+                <button class="btn-edit" onclick="editEntry(${realIndex})">編輯</button>
+                <button class="btn-del" onclick="deleteEntry(${realIndex})">刪除</button>
+            </div>
         `;
-        historyList.appendChild(item);
+        historyList.appendChild(div);
     });
+
+    document.getElementById('total-score-display').textContent = totalScore;
 }
 
-function confirmEndRound() {
-    if (confirm(`結束第 ${currentRound} 回合？系統將統計五色能量並保留進度。`)) {
-        showRoundSummary();
+function deleteEntry(index) {
+    if (confirm("確定要刪除這筆紀錄嗎？總分將會重新計算。")) {
+        historyData.splice(index, 1);
+        renderHistory();
     }
 }
 
-// 通用的五色統計 HTML 生成
-function generateScoreGridHTML() {
-    // 核心邏輯：低於 0 計為 0
-    const fR = Math.max(0, colorScores.red);
-    const fW = Math.max(0, colorScores.white);
-    const fB = Math.max(0, colorScores.blue);
-    const fY = Math.max(0, colorScores.yellow);
-    const fG = Math.max(0, colorScores.green);
-    const manifestTotal = fR + fW + fB + fY + fG;
+function editEntry(index) {
+    const item = historyData[index];
+    document.getElementById('card-id').value = item.card.id;
+    document.getElementById('manual-score').value = item.score;
+    historyData.splice(index, 1);
+    renderHistory();
+    document.getElementById('card-id').focus();
+    alert("已將資料填回上方輸入框，修改後請重新點擊「紀錄此步覺察」。");
+}
 
-    return {
-        html: `
-            <div class="score-summary-grid">
-                <div class="summary-box bg-red">紅<br>${fR}</div>
-                <div class="summary-box bg-white">白<br>${fW}</div>
-                <div class="summary-box bg-blue">藍<br>${fB}</div>
-                <div class="summary-box bg-yellow">黃<br>${fY}</div>
-                <div class="summary-box bg-green">綠<br>${fG}</div>
+function exportHistory() {
+    if (historyData.length === 0) return alert("尚無紀錄可匯出。");
+
+    let exportWin = window.open('', '_blank');
+    let html = `
+        <html><head><title>13月亮曆旅程紀錄匯出</title>
+        <style>
+            body { font-family: sans-serif; padding: 20px; line-height: 1.8; color: #333; }
+            .item { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+            .red { color: #ee5253; }
+            .blue { color: #2e86de; }
+            .yellow { color: #feca57; }
+            .green { color: #1dd1a1; }
+            .white { color: #444444; font-weight: bold; } /* 白色卡片轉深灰 */
+            .score { font-weight: bold; margin-left: 10px; }
+        </style></head><body>
+        <h2>🌙 13月亮：共時旅程紀錄儀 - 旅程報告</h2>
+        <p>總累積頻率：<strong>${totalScore}</strong></p><hr>
+    `;
+
+    historyData.forEach(item => {
+        // 顏色轉換邏輯
+        let displayColor = item.card.color;
+        html += `
+            <div class="item">
+                <span class="${displayColor}">[${item.card.type}]</span> 
+                <span>${item.card.text}</span>
+                <span class="score">(${item.score > 0 ? '+' : ''}${item.score})</span>
             </div>
-            <p style="font-size:1.3em; font-weight:bold; margin-top:10px;">顯化能量總計：${manifestTotal}</p>
-            <p style="font-size:0.75em; color:#888;">(已套用負分淨化規則)</p>
-        `,
-        total: manifestTotal
-    };
+        `;
+    });
+
+    html += `</body></html>`;
+    exportWin.document.write(html);
+    exportWin.document.close();
+}
+
+function confirmEndRound() {
+    if (confirm(`結束第 ${currentRound} 回合旅程？將會保留累積積分。`)) {
+        if (currentRound < 3) showRoundSummary();
+        else showFinalSummary();
+    }
 }
 
 function showRoundSummary() {
     const modal = document.getElementById('summary-modal');
     const body = document.getElementById('modal-body');
-    const title = document.getElementById('modal-title');
-    const exportDiv = document.getElementById('export-actions');
-    const gridData = generateScoreGridHTML();
-
-    if (currentRound < 3) {
-        title.textContent = `🌈 第 ${currentRound} 回合校準完成`;
-        body.innerHTML = gridData.html;
-        exportDiv.style.display = 'none';
-        modal.style.display = 'flex';
-    } else {
-        showFinalSummary(gridData);
-    }
+    body.innerHTML = `
+        <p>第 ${currentRound} 回合完成！</p>
+        <p>當前累積指數：<span class="score-tag">${totalScore}</span></p>
+        <p style="font-size:0.9em; color:#888; margin-top:10px;">請繼續擲骰，開啟下一段生命探險。</p>
+    `;
+    modal.style.display = 'flex';
 }
 
-function showFinalSummary(gridData) {
+function showFinalSummary() {
     const modal = document.getElementById('summary-modal');
     const body = document.getElementById('modal-body');
-    const title = document.getElementById('modal-title');
-    const btn = document.getElementById('modal-btn');
-    const exportDiv = document.getElementById('export-actions');
-
-    const levels = [
-    { min: 85, title: "鼎盛階段 - 繁盛 • 成蔭", desc: "為他人帶來庇蔭與影響力。你已是能量的源頭。" },
-    { min: 65, title: "成熟階段 - 穩固 • 堅韌", desc: "歷經淬鍊，厚實堅韌。你已站穩生命的主場。" },
-    { min: 45, title: "發展階段 - 定向 • 茁壯", desc: "方向明確，漸趨健全。你正在快速成長中。" },
-    { min: 25, title: "初生階段 - 萌芽 • 破土", desc: "蘊含可能性與期待。生命的種子正在覺醒。" },
-    { min: -99, title: "基礎階段 - 孕育 • 沃土", desc: "正在累積能量的過程。每一滴淚水都是養分。" }
-];
-    const result = levels.find(l => gridData.total >= l.min) || levels[4];
-
-    title.textContent = "🏁 333 全量顯化最終結算";
+    const result = levels.find(l => totalScore >= l.min) || levels[4];
     body.innerHTML = `
-        ${gridData.html}
-        <h3 style="color:var(--yellow); font-size:1.4em; margin-top:20px;">【${result.title}】</h3>
-        <p style="font-size:0.85em; color:#bbb; margin-top:5px;">恭喜完成三回合生命共振之旅</p>
+        <p style="font-size:0.9em;">✨ 333 全量顯化達成 ✨</p>
+        <h3 style="color:var(--yellow); margin:10px 0; font-size:1.5em;">${result.title}</h3>
+        <p style="font-size:1.4em; font-weight:bold;">總積分：${totalScore}</p>
+        <p style="color:#ccc; font-size:0.95em; margin-top:15px; padding:0 10px;">${result.desc}</p>
+        <p style="margin-top:20px; font-style:italic; font-size:0.85em; color:var(--accent);">In Lak'ech. 我是你，你是我。</p>
     `;
-    
-    exportDiv.style.display = 'flex';
-    btn.textContent = "重啟新旅程";
-    btn.onclick = () => location.reload();
+    document.getElementById('modal-title').textContent = "🏁 旅程最終結算";
     modal.style.display = 'flex';
+    const btn = modal.querySelector('button');
+    btn.textContent = "重啟旅程";
+    btn.onclick = () => location.reload();
 }
 
 function closeModal() {
     document.getElementById('summary-modal').style.display = 'none';
     currentRound++;
     document.getElementById('round-num').textContent = currentRound;
-    document.getElementById('history-list').innerHTML = ''; 
-    document.getElementById('kin-number').focus();
-}
-
-function generateReportText() {
-    const fR = Math.max(0, colorScores.red), fW = Math.max(0, colorScores.white),
-          fB = Math.max(0, colorScores.blue), fY = Math.max(0, colorScores.yellow), fG = Math.max(0, colorScores.green);
-    const total = fR + fW + fB + fY + fG;
-    let text = `🌙 13月亮曆：333全量顯化旅程報告\n`;
-    text += `🌈 顯化總指數：${total}\n`;
-    text += `🔴紅:${fR} ⚪白:${fW} 🔵藍:${fB} 🟡黃:${fY} 🟢綠:${fG}\n\n`;
-    text += `📍 完整軌跡紀錄：\n`;
-    journeyLog.forEach(log => {
-        text += `[回${log.round}] ${log.action} KIN ${log.kin} (ID:${log.id})\n> ${log.text} (分數:${log.score})\n\n`;
-    });
-    text += `In Lak'ech. 我是你，你是我。`;
-    return text;
-}
-
-function copyToClipboard() {
-    const text = generateReportText();
-    const textArea = document.createElement("textarea");
-    textArea.value = text; document.body.appendChild(textArea);
-    textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea);
-    alert("報告文字已複製！");
-}
-
-function downloadReport() {
-    const text = generateReportText();
-    const blob = new Blob([text], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = window.URL.createObjectURL(blob);
-    a.download = `Tzolkin_Final_${new Date().getTime()}.txt`;
-    a.click();
+    document.getElementById('current-card-display').style.display = 'none';
 }
 </script>
 </body>
