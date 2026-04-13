@@ -546,6 +546,7 @@ function doMove(steps) {
     }, 400);
 }
 
+// --- 1. 卡片抽取核心：確保所有類型都有對應函數 ---
 function triggerDraw() {
     const type = getType(G.curK);
     const pool = masterCards.filter(m => m.color === type);
@@ -559,7 +560,10 @@ function triggerDraw() {
             <p>${card.text}</p>
             <div id="btn-box" style="margin-top:10px;"></div>
         </div>`;
+
     const box = document.getElementById('btn-box');
+    isActionLocked = false; // 抽卡時先確保解鎖
+
     if (card.rule === 'direct') {
         applyPoints(card.score, type);
         addHistory(card.id, G.curK, type, card.type, card.score, card.text);
@@ -568,100 +572,72 @@ function triggerDraw() {
         box.innerHTML = `<button class="btn-go" onclick="runSoul1()">🎲 判定靈魂分數</button>`;
     } else if (card.rule === 'power') {
         box.innerHTML = `<button class="btn-go" onclick="runPower1()">🎲 判定發揮力量</button>`;
-    } else if (card.rule === 'knowledge') {
-        box.innerHTML = `<button class="btn-go" onclick="runKnow()">🎲 判定知與行</button>`;
     } else {
-        box.innerHTML = `<button class="btn-go" onclick="runMani()">🎲 進行顯化判定</button>`;
+        // 關鍵：將知與行、顯化判定統一導向 runMani，徹底解決點不動的問題
+        box.innerHTML = `<button class="btn-go" onclick="runMani()">🎲 進行判定</button>`;
     }
 }
 
-// 1. 發揮力量判定 (紅卡/藍卡)
+// --- 2. 判定函數組：每一條路徑都強制解鎖 ---
 function runPower1() {
-    isActionLocked = false; // 強制解鎖
-    const box = document.getElementById('btn-box');
+    isActionLocked = false; 
     const r1 = Math.floor(Math.random() * 6) + 1;
-    
-    // 安全檢查：就算卡片資料壞了，也要讓遊戲繼續
-    const color = (G.activeCard && G.activeCard.color) ? G.activeCard.color : 'red';
-    const text = (G.activeCard && G.activeCard.text) ? G.activeCard.text : '發揮力量';
-
+    const box = document.getElementById('btn-box');
     if (r1 % 2 !== 0) {
-        applyPoints(5, color);
-        addHistory('Power', G.curK, color, '發揮力量(Yes)', 5, text);
-        if(box) box.innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：成功發揮力量！(+50分)</p>`;
+        applyPoints(5, G.activeCard.color);
+        addHistory('Power', G.curK, G.activeCard.color, '發揮力量(Yes)', 5, G.activeCard.text);
     } else {
-        if(box) box.innerHTML = `<p>🎲 擲出 ${r1}：No...需再擲一次</p><button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
+        box.innerHTML = `<p>🎲 擲出 ${r1}：需再擲一次</p><button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
     }
 }
 
 function runPower2() {
-    isActionLocked = false; // 強制解鎖
+    isActionLocked = false;
     const r2 = Math.floor(Math.random() * 6) + 1;
-    const color = (G.activeCard && G.activeCard.color) ? G.activeCard.color : 'red';
-    const text = (G.activeCard && G.activeCard.text) ? G.activeCard.text : '發揮力量';
-    
     let score = (r2 % 2 !== 0) ? -3 : -5;
-    applyPoints(score, color);
-    addHistory('Power', G.curK, color, '發揮力量(No:調整)', score, text);
-    const box = document.getElementById('btn-box');
-    if(box) box.innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p>`;
+    applyPoints(score, G.activeCard.color);
+    addHistory('Power', G.curK, G.activeCard.color, '發揮力量(No)', score, G.activeCard.text);
 }
 
-// 2. 靈魂拷問判定 (白卡)
 function runSoul1() {
     isActionLocked = false;
     G.tS = Math.floor(Math.random() * 6) + 1;
-    const box = document.getElementById('btn-box');
-    if(box) box.innerHTML = `<p>靈魂分數：${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 靈魂擲骰</button>`;
+    document.getElementById('btn-box').innerHTML = `<p>靈魂分數：${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 靈魂擲骰</button>`;
 }
 
 function runSoul2() {
     isActionLocked = false;
     const r2 = Math.floor(Math.random() * 6) + 1;
-    const color = (G.activeCard && G.activeCard.color) ? G.activeCard.color : 'white';
     let steps = G.tS * r2;
-    applyPoints(G.tS, color);
-    addHistory('Soul', G.curK, color, `靈魂拷問(${steps}步)`, G.tS, '');
+    applyPoints(G.tS, G.activeCard.color);
+    addHistory('Soul', G.curK, G.activeCard.color, `靈魂拷問(${steps}步)`, G.tS, '');
     doMove(steps);
 }
 
-// 3. 知與行 / 顯化判定 (黃、綠、金卡)
 function runMani() {
-    isActionLocked = false; // 這是修復「知與行」點不動的救命鑰匙
+    isActionLocked = false; // 強制解鎖開關
     const r = Math.floor(Math.random() * 6) + 1;
-    
-    // 防當機保護邏輯
-    const active = G.activeCard || { color: 'yellow', type: '判定', rule: 'normal', text: '' };
+    const active = G.activeCard || { color:'yellow', rule:'normal', type:'判定', text:'' };
     let score = (active.rule === 'magic') ? 10 : 5;
     let steps = r * score;
-    
     applyPoints(score, active.color);
-    addHistory(active.id || 'Mani', G.curK, active.color, `${active.type || '判定'}(${steps}步)`, score, active.text || '');
-    doMove(steps);
+    addHistory(active.id || 'Mani', G.curK, active.color, `${active.type || '判定'}(${steps}步)`, score, active.text);
+    if (steps > 0) doMove(steps);
 }
 
-// 4. 萬能解鎖與分數清理
+// --- 3. 最終解鎖與清理 ---
 function applyPoints(s, color) { 
-    // 1. 先把鎖打開 (不論加分成不成功，都一定要能擲下一把骰子)
-    isActionLocked = false; 
-    G.activeCard = null; 
-    
-    // 2. 執行加分 (加入安全檢查)
     if (G.scores && color && G.scores[color] !== undefined) {
         G.scores[color] += (s * 10); 
     }
-    
-    // 3. 更新畫面
+    isActionLocked = false; 
+    G.activeCard = null; 
     refresh(); 
-    
-    // 4. 延遲兩秒自動清空卡片顯示區，防止干擾下次操作
     setTimeout(() => {
         const area = document.getElementById('card-area');
         if(area && !G.activeCard) area.innerHTML = '<div style="text-align:center; color:#444; margin-top:40px;">準備好開啟這段共時了嗎？</div>';
-    }, 2000);
+    }, 1500);
 }
-
-
 // 1. 切換完整紀錄彈窗
 function toggleLog(show) {
     const modal = document.getElementById('log-modal');
