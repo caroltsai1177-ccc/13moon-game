@@ -609,34 +609,84 @@ function triggerDraw() {
     }
 }
 
-// 判定邏輯修正
+// --- 判定邏輯修正 (完全依照計分說明卡) ---
+
+// 1. 靈魂拷問：得分 = 第 1 擲；步數 = 第 1 擲 x 第 2 擲 (需位移)
 function runSoul1() {
-    const r1 = Math.floor(Math.random()*6)+1;
-    G.tS = r1;
-    document.getElementById('btn-box').innerHTML = `<p>靈魂分數: ${r1}</p><button class="btn-go" onclick="runSoul2()">🎲 判定位移步數</button>`;
+    const r1 = Math.floor(Math.random() * 6) + 1;
+    G.tS = r1; // 靈魂滿意分數
+    document.getElementById('btn-box').innerHTML = `
+        <p>靈魂滿意分數: ${r1}</p>
+        <button class="btn-go" onclick="runSoul2()">🎲 判定前進步數</button>`;
 }
+
 function runSoul2() {
-    const r2 = Math.floor(Math.random()*6)+1;
-    const s = G.tS * r2;
+    const r2 = Math.floor(Math.random() * 6) + 1;
+    const s = G.tS * r2; // 位移步數 = 滿意分數 x 第二次擲骰
     applyPoints(G.tS, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${s}步)`, G.tS);
-    doMove(s);
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `靈魂拷問(${s}步)`, G.tS);
+    doMove(s); // 執行位移
 }
 
-function runMani() {
-    const r = Math.floor(Math.random()*6)+1;
-    const isMagic = (G.activeCard.rule === 'magic');
-    const score = isMagic ? 10 : 5;
-    const s = r * (isMagic ? 10 : 5);
+// 2. 發揮力量 (Yes & No)：不位移
+function runPower1() {
+    const r1 = Math.floor(Math.random() * 6) + 1;
+    const isOdd = (r1 % 2 !== 0); // 奇數為 Yes
+    const box = document.getElementById('btn-box');
+    
+    if (isOdd) {
+        applyPoints(5, G.activeCard.color);
+        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(Yes)`, 5);
+        box.innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：Yes！獲得 50 分</p>`;
+    } else {
+        box.innerHTML = `
+            <p>🎲 擲出 ${r1}：No... 進入第二次判定</p>
+            <button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
+    }
+}
+
+function runPower2() {
+    const r2 = Math.floor(Math.random() * 6) + 1;
+    const isOdd = (r2 % 2 !== 0);
+    const score = isOdd ? -3 : -5; // 奇數 -3, 偶數 -5
     applyPoints(score, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${s}步)`, score);
-    doMove(s);
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(No)`, score);
+    document.getElementById('btn-box').innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p>`;
 }
 
+// 3. 知與行 (智慧三層次)：不位移
+function runKnow() {
+    const r = Math.floor(Math.random() * 6) + 1;
+    let score = 0, typeName = "";
+    
+    if (r >= 5) { score = 5; typeName = "實踐"; }
+    else if (r >= 3) { score = 3; typeName = "領悟"; }
+    else { score = 0; typeName = "知道"; }
+    
+    applyPoints(score, G.activeCard.color);
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `知與行(${typeName})`, score);
+    document.getElementById('btn-box').innerHTML = `<p>🎲 擲出 ${r}：屬【${typeName}】獲得 ${score*10} 分</p>`;
+}
+
+// 4. 成就/奇蹟顯化：固定得分 + 乘法位移
+function runMani() {
+    const r = Math.floor(Math.random() * 6) + 1;
+    const isMagic = (G.activeCard.rule === 'magic');
+    const score = isMagic ? 10 : 5;     // 奇蹟+10分，成就+5分
+    const steps = r * (isMagic ? 10 : 5); // 步數 = 骰子 x (10或5)
+    
+    applyPoints(score, G.activeCard.color);
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score);
+    document.getElementById('btn-box').innerHTML = `<p>🎲 擲出 ${r}：獲得 ${score*10} 分，位移 ${steps} 步！</p>`;
+    doMove(steps); // 執行位移
+}
+
+// 5. 分數套用
 function applyPoints(s, color) {
     G.scores[color] += (s * 10);
     refresh();
 }
+
 
 function checkNextRound() {
     if (G.round < 3) {
