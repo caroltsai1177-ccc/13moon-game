@@ -612,6 +612,7 @@ function runSoul2() {
     applyPoints(G.tS, G.activeCard.color);
     addHistory(G.activeCard.id, G.curK, G.activeCard.color, `靈魂拷問(${steps}步)`, G.tS, G.activeCard.text);
     doMove(steps);
+    isActionLocked = false;
 }
 
 function runMani() {
@@ -622,9 +623,16 @@ function runMani() {
     applyPoints(score, G.activeCard.color);
     addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score, G.activeCard.text);
     doMove(steps);
+    isActionLocked = false;
 }
 
-function applyPoints(s, color) { G.scores[color] += (s * 10); refresh(); }
+function applyPoints(s, color) { 
+    G.scores[color] += (s * 10); 
+    isActionLocked = false; // 關鍵：判定結束，變回綠燈
+    G.activeCard = null;    // 關鍵：清空卡片狀態，讓骰子知道可以下一動了
+    refresh(); 
+}
+
 
 // 1. 切換完整紀錄彈窗
 function toggleLog(show) {
