@@ -615,15 +615,28 @@ function runSoul2() {
 }
 
 function runMani() {
-    isActionLocked = false; // 強制解鎖開關
+    isActionLocked = false; 
+    if (!G.activeCard) return;
+    
     const r = Math.floor(Math.random() * 6) + 1;
-    const active = G.activeCard || { color:'yellow', rule:'normal', type:'判定', text:'' };
-    let score = (active.rule === 'magic') ? 10 : 5;
-    let steps = r * score;
-    applyPoints(score, active.color);
-    addHistory(active.id || 'Mani', G.curK, active.color, `${active.type || '判定'}(${steps}步)`, score, active.text);
-    if (steps > 0) doMove(steps);
+    const rule = G.activeCard.rule;
+    let score = (rule === 'magic') ? 10 : 5;
+    
+    // 核心修正：只有「成就顯化」(become) 和 「奇蹟顯化」(magic) 才需要額外走路
+    let shouldMove = (rule === 'become' || rule === 'magic');
+    
+    applyPoints(score, G.activeCard.color);
+
+    if (shouldMove) {
+        let steps = r * score;
+        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score, G.activeCard.text);
+        doMove(steps);
+    } else {
+        // 「知與行」(knowledge) 只判定加分，原地不動
+        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}`, score, G.activeCard.text);
+    }
 }
+
 
 // --- 3. 最終解鎖與清理 ---
 function applyPoints(s, color) { 
