@@ -588,31 +588,34 @@ function runPower1() {
     const r1 = Math.floor(Math.random() * 6) + 1;
     if (r1 % 2 !== 0) {
         applyPoints(5, G.activeCard.color);
-        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(Yes)`, 5, G.activeCard.text);
-        document.getElementById('btn-box').innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：Yes！+50 分</p>`;
+        addHistory(G.activeCard.id, G.curK, G.activeCard.color, '發揮力量(Yes)', 5, G.activeCard.text);
+        document.getElementById('btn-box').innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：成功發揮力量！(+50分)</p>`;
     } else {
+        // 這裡一定要用反引號 ` 才能讓按鈕生效
         document.getElementById('btn-box').innerHTML = `<p>🎲 擲出 ${r1}：No...需再擲一次</p><button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
     }
 }
+
 function runPower2() {
     const r2 = Math.floor(Math.random() * 6) + 1;
     let score = (r2 % 2 !== 0) ? -3 : -5;
     applyPoints(score, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(No:調整)`, score, G.activeCard.text);
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, '發揮力量(No:調整)', score, G.activeCard.text);
     document.getElementById('btn-box').innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p>`;
 }
 
 function runSoul1() {
     G.tS = Math.floor(Math.random() * 6) + 1;
-    document.getElementById('btn-box').innerHTML = `<p>靈魂分數: ${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 判定位移步數</button>`;
+    document.getElementById('btn-box').innerHTML = `<p>靈魂分數：${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 靈魂擲骰</button>`;
 }
+
 function runSoul2() {
     const r2 = Math.floor(Math.random() * 6) + 1;
     let steps = G.tS * r2;
     applyPoints(G.tS, G.activeCard.color);
     addHistory(G.activeCard.id, G.curK, G.activeCard.color, `靈魂拷問(${steps}步)`, G.tS, G.activeCard.text);
     doMove(steps);
-    isActionLocked = false;
+    isActionLocked = false; 
 }
 
 function runMani() {
@@ -623,13 +626,13 @@ function runMani() {
     applyPoints(score, G.activeCard.color);
     addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score, G.activeCard.text);
     doMove(steps);
-    isActionLocked = false;
+    isActionLocked = false; 
 }
 
 function applyPoints(s, color) { 
     G.scores[color] += (s * 10); 
-    isActionLocked = false; // 關鍵：判定結束，變回綠燈
-    G.activeCard = null;    // 關鍵：清空卡片狀態，讓骰子知道可以下一動了
+    isActionLocked = false; // 這裡就是解開擲骰子按鈕的鑰匙
+    G.activeCard = null;    // 清空卡片狀態
     refresh(); 
 }
 
