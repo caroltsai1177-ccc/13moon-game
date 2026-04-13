@@ -607,30 +607,76 @@ function runMani() {
 
 function applyPoints(s, color) { G.scores[color] += (s * 10); refresh(); }
 
-// 1. 先貼上這個：新功能（切換完整紀錄彈窗）
+// 1. 切換完整紀錄彈窗
 function toggleLog(show) {
-    document.getElementById('log-modal').style.display = show ? 'flex' : 'none';
+    const modal = document.getElementById('log-modal');
+    if (modal) modal.style.display = show ? 'flex' : 'none';
 }
 
-// 2. 再貼上這個：修正後的紀錄功能
+// 2. 修正後的紀錄功能 (包含 3 筆足跡與完整表格)
 let footprintData = [];
 function addHistory(id, kin, color, type, score, text = "") {
     const s = score * 10;
-    const cleanText = text.length > 20 ? text.substring(0,20) + "..." : text;
+    const cleanText = text.length > 20 ? text.substring(0, 20) + "..." : text;
     
     // 更新彈窗內的表格
-    const row = document.getElementById('log-body').insertRow(0);
-    row.innerHTML = `<td>${G.round}</td><td>${kin}</td><td>${type}</td><td style="text-align:left; color:#aaa;">${cleanText}</td><td style="color:${s>=0?'#1dd1a1':'#ee5253'}"><b>${s>0?'+':''}${s}</b></td>`;
+    const logBody = document.getElementById('log-body');
+    if (logBody) {
+        const row = logBody.insertRow(0);
+        row.innerHTML = `<td>${G.round}</td><td>${kin}</td><td>${type}</td><td style="text-align:left; color:#aaa;">${cleanText}</td><td style="color:${s >= 0 ? '#1dd1a1' : '#ee5253'}"><b>${s > 0 ? '+' : ''}${s}</b></td>`;
+    }
     
-    // 更新主畫面足跡
-    const prevK = G.logs.length > 0 ? G.logs[G.logs.length-1][1] : G.sK;
-    const footEntry = `<div class="foot-item">📍 KIN <b>${prevK}</b> ➔ <b>${kin}</b> (${s>=0?'+':''}${s}) | ${type}</div>`;
+    // 更新主畫面足跡 (利用反引號 ` 確保變數能顯示數字)
+    const prevK = G.logs.length > 0 ? G.logs[G.logs.length - 1][1] : G.sK;
+    const footEntry = `<div class="foot-item">📍 KIN <b>${prevK}</b> ➔ <b>${kin}</b> (${s >= 0 ? '+' : ''}${s}) | ${type}</div>`;
+    
     footprintData.unshift(footEntry);
-    if(footprintData.length > 3) footprintData.pop();
-    document.getElementById('feet-inner').innerHTML = footprintData.join('');
+    if (footprintData.length > 3) footprintData.pop();
+    const feetInner = document.getElementById('feet-inner');
+    if (feetInner) feetInner.innerHTML = footprintData.join('');
 
-        G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s]);
-} 
+    G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s]);
+}
+
+// 3. 回合結算邏輯 (之前被刪掉的部分)
+function checkNextRound() {
+    const r = G.scores;
+    const msg = `【第 ${G.round} 回合結算】\n紅:${r.red} | 白:${r.white} | 藍:${r.blue} | 黃:${r.yellow} | 綠:${r.green}\n是否進入下一階段？`;
+    setTimeout(() => {
+        if (confirm(msg)) {
+            if (G.round < 3) {
+                G.round++;
+                document.getElementById('setup-label').textContent = `第 ${G.round} 回合：設定旅程`;
+                document.getElementById('overlay').style.display = 'flex';
+            } else {
+                alert("旅程圓滿達成！");
+            }
+        }
+    }, 600);
+}
+
+// 4. 匯出 CSV 邏輯 (之前被刪掉的部分)
+function exportCSV() {
+    let csv = "\uFEFF回合,KIN,類型,內容,得分\n";
+    G.logs.forEach(l => csv += l.join(",") + "\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    a.download = `Journey_Result_Round${G.round}.csv`;
+    a.click();
+}
+
+// 5. 擲骰子前進邏輯 (之前被刪掉的部分)
+function startDice() {
+    if (G.moving) return;
+    const d = document.getElementById('dice-num');
+    d.textContent = "🎲 滾動中...";
+    setTimeout(() => {
+        const d1 = Math.floor(Math.random() * 6) + 1;
+        const d2 = Math.floor(Math.random() * 6) + 1;
+        d.textContent = `🎲 ${d1 + d2}`;
+        doMove(d1 + d2);
+    }, 600);
+}
 </script>
 </body>
 </html>
