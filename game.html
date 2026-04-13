@@ -3,103 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>13月亮：333全量顯化版 (自動適應螢幕版)</title>
+<title>13月亮：333全量顯化版 (自動適應螢幕 V3)</title>
 <style>
-/* 基礎樣式與強化的響應式佈局 */
+/* 核心版面：橫屏 Flex 佈局 */
 body { font-family: -apple-system, sans-serif; background: #0d0d1a; color: #fff; margin: 0; display: flex; height: 100vh; width: 100vw; overflow: hidden; }
 
-/* 初始彈窗設定 */
+/* 初始設定彈窗 */
 #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-.setup-box { background: #1a1a2e; padding: 25px; border-radius: 15px; border: 2px solid #667eea; text-align: center; max-width: 90%; }
-.setup-input { background: #0d0d1a; border: 1px solid #555; color: #fff; width: 70px; padding: 8px; border-radius: 5px; text-align: center; font-size: 1.2em; margin: 0 5px; }
+.setup-box { background: #1a1a2e; padding: 20px; border-radius: 12px; border: 2px solid #667eea; text-align: center; }
+.setup-input { background: #0d0d1a; border: 1px solid #555; color: #fff; width: 60px; padding: 8px; border-radius: 4px; text-align: center; margin: 0 5px; }
 
 #game-ui { display: none; width: 100%; height: 100%; flex-direction: row; }
 
-/* 左側：核心棋盤（目標是 100% 可視，不需捲動） */
-.board-side { flex: 1.4; padding: 10px; display: flex; flex-direction: column; border-right: 1px solid #333; box-sizing: border-box; }
-.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 8px; border-radius: 8px; margin-bottom: 8px; font-size: 1em; color: #1dd1a1; }
+/* 左側：狀態 -> 棋盤 -> 按鈕 (垂直排列) */
+.board-side { flex: 1.3; padding: 10px; display: flex; flex-direction: column; border-right: 1px solid #333; box-sizing: border-box; justify-content: space-between; }
+.status-bar { display: flex; justify-content: space-around; background: rgba(255,255,255,0.08); padding: 6px; border-radius: 6px; font-size: 0.9em; color: #1dd1a1; }
 
-/* 自動適應寬高的 13x20 矩陣 */
+/* 棋盤容器：確保在按鈕上方且不溢出 */
+.grid-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 10px 0; }
 .tzolkin-grid { 
     display: grid; 
     grid-template-columns: repeat(13, 1fr); 
-    gap: 1.5px; 
+    grid-template-rows: repeat(20, 1fr);
+    gap: 1px; 
     width: 100%; 
-    height: auto; 
-    max-height: 65vh; /* 限制高度確保下方控制區空間 */
-    margin: 0 auto;
+    height: 100%; 
+    max-height: 60vh; /* 嚴格限制高度防止推擠按鈕 */
 }
 .kin-cell { 
-    aspect-ratio: 1; 
-    border-radius: 1px; 
-    font-size: min(1.2vw, 1.2vh); /* 字體隨畫面縮放 */
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    color: #000; 
-    font-weight: bold; 
+    background: #333; border-radius: 1px; font-size: 0.7em; 
+    display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; 
 }
-.kin-red { background: #ee5253; } .kin-white { background: #f1f2f6; } .kin-blue { background: #2e86de; color: #fff; } .kin-yellow { background: #feca57; }
+.kin-red { background: #ee5253; } .kin-white { background: #f1f2f6; } 
+.kin-blue { background: #2e86de; color: #fff; } .kin-yellow { background: #feca57; }
 .kin-green { background: #1dd1a1; border: 1px solid #fff; color: #fff; }
-.kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.15); box-shadow: 0 0 10px #fff; border-radius: 50%; z-index: 10; border: 2px solid #ff00ff; }
+.kin-cell.current { background: #fff !important; color: #ff00ff !important; transform: scale(1.1); box-shadow: 0 0 8px #fff; border-radius: 50%; z-index: 10; border: 2px solid #ff00ff; }
 
-/* 右側：紀錄與卡牌區 */
-.info-side { flex: 1; padding: 15px; display: flex; flex-direction: column; background: #111125; overflow-y: auto; box-sizing: border-box; }
-.card-slot { min-height: 160px; margin-bottom: 15px; }
-.card { background: #252545; padding: 15px; border-radius: 10px; border-top: 6px solid #ccc; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-.card h3 { font-size: 1.2em; margin-bottom: 5px; }
-.card p { font-size: 1em; line-height: 1.4; color: #ddd; }
+/* 右側：卡牌與歷史紀錄 */
+.info-side { flex: 1; padding: 15px; display: flex; flex-direction: column; background: #111125; overflow-y: auto; }
+.card-slot { min-height: 150px; }
+.card { background: #252545; padding: 15px; border-radius: 10px; border-top: 6px solid #ccc; }
+.card h3 { font-size: 1.1em; margin: 0 0 5px 0; }
+.card p { font-size: 0.95em; color: #ddd; margin: 0; }
 
-/* 按鈕樣式 */
-.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px; border-radius: 25px; width: 100%; font-size: 1.2em; font-weight: bold; cursor: pointer; }
-.btn-primary:disabled { opacity: 0.4; }
-.btn-action { background: #1dd1a1; color: #000; padding: 10px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%; }
+/* 按鈕與骰子區 */
+.control-area { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
+.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px; border-radius: 20px; width: 100%; font-size: 1.1em; font-weight: bold; cursor: pointer; }
+.btn-action { background: #444; color: #fff; padding: 8px; border-radius: 4px; border: none; width: 100%; margin-top: 8px; cursor: pointer; font-size: 0.9em; }
 
-#history-table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 10px; }
-#history-table th { background: #252545; padding: 6px; border: 1px solid #444; }
-#history-table td { padding: 6px; border: 1px solid #444; text-align: center; }
-
-#dice-area { height: 50px; font-size: 2em; display: flex; align-items: center; justify-content: center; margin: 5px 0; font-weight: bold; }
+#dice-display { height: 40px; font-size: 1.8em; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -1px); } 100% { transform: translate(1px, 1px); } }
 .dice-rolling { animation: shake 0.1s infinite; color: #ffd43b; }
+
+#history-table { width: 100%; border-collapse: collapse; font-size: 0.75em; margin-top: 10px; }
+#history-table th, #history-table td { padding: 5px; border: 1px solid #444; text-align: center; }
 </style>
 </head>
 <body>
 
 <div id="overlay">
-    <div class="setup-box" id="setup-panel">
-        <h2 id="round-title">🌙 第 1 回合：設定旅程</h2>
-        <div style="margin:20px 0;">
-            起點 KIN <input type="number" id="kin-s" class="setup-input" value="1" min="1" max="260">
-            至 終點 KIN <input type="number" id="kin-e" class="setup-input" value="260" min="1" max="260">
+    <div class="setup-box">
+        <h2 id="setup-title">🌙 第 1 回合：旅程設定</h2>
+        <p>請輸入本局起迄 KIN：</p>
+        <div style="margin:15px 0;">
+            起點 <input type="number" id="kin-start" class="setup-input" value="1" min="1" max="260">
+            至 終點 <input type="number" id="kin-end" class="setup-input" value="260" min="1" max="260">
         </div>
-        <button class="btn-primary" onclick="confirmSetup()">確認啟程</button>
+        <button class="btn-primary" onclick="initRound()">確認啟程</button>
     </div>
 </div>
 
 <div id="game-ui">
     <div class="board-side">
         <div class="status-bar">
-            <div>回目: <span id="ui-round">1</span>/3</div>
-            <div>📍 當前 KIN: <span id="ui-kin">1</span></div>
-            <div>🏆 總指數: <span id="ui-total-score">0</span></div>
+            <div>回合: <span id="val-round">1</span>/3</div>
+            <div>📍 KIN: <span id="val-kin">1</span></div>
+            <div>🏆 分數: <span id="val-score">0</span></div>
         </div>
-        <div class="tzolkin-grid" id="main-grid"></div>
-        <div style="margin-top:10px; text-align:center;">
-            <div id="dice-area"></div>
-            <button class="btn-primary" id="roll-btn" onclick="handleRoll()">🎲 擲骰子前進</button>
-            <button class="btn-action" style="background:#444; color:#fff; margin-top:15px;" onclick="exportData()">📥 匯出 CSV 歷程</button>
+        
+        <div class="grid-container">
+            <div class="tzolkin-grid" id="game-board"></div>
+        </div>
+
+        <div class="control-area">
+            <div id="dice-display"></div>
+            <button class="btn-primary" id="roll-btn" onclick="onDiceRoll()">🎲 擲骰子前進</button>
+            <button class="btn-action" onclick="downloadCSV()">📥 匯出完整歷程</button>
         </div>
     </div>
+
     <div class="info-side">
-        <div class="card-slot">
-            <div id="card-wrap"></div>
-            <div id="card-btn-wrap"></div>
-        </div>
-        <div style="flex-grow:1; overflow-y:auto;">
-            <h4 style="border-bottom: 2px solid #667eea; padding-bottom:5px; margin:0 0 10px 0;">📊 同步歷程紀錄</h4>
+        <div class="card-slot" id="card-wrap"></div>
+        <div style="flex-grow:1; overflow-y:auto; margin-top:15px;">
+            <h4 style="border-bottom: 2px solid #667eea; margin:0 0 5px 0;">📊 共時歷程紀錄</h4>
             <table id="history-table">
-                <thead><tr><th>回</th><th>KIN</th><th>類型</th><th>分數</th></tr></thead>
+                <thead><tr><th>回</th><th>KIN</th><th>類型</th><th>得分</th></tr></thead>
                 <tbody id="history-body"></tbody>
             </table>
         </div>
@@ -456,189 +454,191 @@ const greenCards = [
     { id:'T13', color:'green', type:'靈魂拷問', text:'我如何喜悅的活在當下？', rule:'soul' }
 ];
 
-// --- 核心運作變數 ---
-const GREEN_KIN_MAP = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260];
+// --- 核心變數 ---
+const GREEN_KINS = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260];
 
-let state = {
+let game = {
     round: 1,
-    startKin: 1, endKin: 260, currentKin: 1,
-    moved: 0, totalToGoal: 0,
-    colorScores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 },
-    moving: false, card: null, logs: []
+    startK: 1, endK: 260, currentK: 1,
+    stepsMoved: 0, stepsNeeded: 0,
+    scores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 },
+    isMoving: false, card: null, logs: []
 };
 
-function getKinType(k) {
-    if (GREEN_KIN_MAP.includes(k)) return 'green';
+function fetchType(k) {
+    if (GREEN_KINS.includes(k)) return 'green';
     return ['red', 'white', 'blue', 'yellow'][((k - 1) % 20) % 4];
 }
 
-function confirmSetup() {
-    const s = parseInt(document.getElementById('kin-s').value);
-    const e = parseInt(document.getElementById('kin-e').value);
-    state.startKin = s;
-    state.endKin = e;
-    state.currentKin = s;
-    state.moved = 0;
-    state.totalToGoal = (e >= s) ? (e - s) : ((260 - s) + e);
+function initRound() {
+    const s = parseInt(document.getElementById('kin-start').value);
+    const e = parseInt(document.getElementById('kin-end').value);
+    game.startK = s; game.endK = e; game.currentK = s;
+    game.stepsMoved = 0;
+    game.stepsNeeded = (e >= s) ? (e - s) : ((260 - s) + e);
 
     document.getElementById('overlay').style.display = 'none';
     document.getElementById('game-ui').style.display = 'flex';
     
-    if(state.round === 1) buildBoard();
-    refreshUI();
+    if(game.round === 1) generateBoard();
+    refreshView();
 }
 
-function buildBoard() {
-    const grid = document.getElementById('main-grid');
-    grid.innerHTML = '';
+function generateBoard() {
+    const board = document.getElementById('game-board');
+    board.innerHTML = '';
     for (let row = 1; row <= 20; row++) {
         for (let col = 1; col <= 13; col++) {
             const k = (col - 1) * 20 + row;
             const cell = document.createElement('div');
-            cell.className = `kin-cell kin-${getKinType(k)}`;
-            cell.id = `kcell-${k}`;
+            cell.className = `kin-cell kin-${fetchType(k)}`;
+            cell.id = `kin-id-${k}`;
             cell.textContent = k;
-            grid.appendChild(cell);
+            board.appendChild(cell);
         }
     }
 }
 
-function refreshUI() {
+function refreshView() {
     document.querySelectorAll('.kin-cell').forEach(c => c.classList.remove('current'));
-    const curCell = document.getElementById(`kcell-${state.currentKin}`);
+    const curCell = document.getElementById(`kin-id-${game.currentK}`);
     if (curCell) curCell.classList.add('current');
     
-    document.getElementById('ui-kin').textContent = state.currentKin;
-    document.getElementById('ui-round').textContent = state.round;
+    document.getElementById('val-kin').textContent = game.currentK;
+    document.getElementById('val-round').textContent = game.round;
 
-    [span_0](start_span)// 分數結算：負分色塊計為 0[span_0](end_span)
-    let sum = 0;
-    Object.keys(state.colorScores).forEach(c => {
-        sum += Math.max(0, state.colorScores[c]);
-    });
-    document.getElementById('ui-total-score').textContent = sum;
+    let total = 0;
+    Object.keys(game.scores).forEach(c => total += Math.max(0, game.scores[c]));
+    document.getElementById('val-score').textContent = total;
 
-    if (state.moved >= state.totalToGoal && !state.moving) {
-        checkFinish();
+    if (game.stepsMoved >= game.stepsNeeded && !game.isMoving) {
+        processRoundEnd();
     }
 }
 
-// 核心修正：擲骰 -> 移動 -> 抽牌
-async function startMove(steps) {
-    state.moving = true;
+// 核心修正：移動動畫與抽牌順序
+async function runMovement(steps) {
+    game.isMoving = true;
     document.getElementById('roll-btn').disabled = true;
 
     for (let i = 0; i < steps; i++) {
-        if (state.moved >= state.totalToGoal) break;
-        state.moved++;
-        state.currentKin++;
-        if (state.currentKin > 260) state.currentKin = 1;
+        if (game.stepsMoved >= game.stepsNeeded) break;
+        game.stepsMoved++;
+        game.currentK++;
+        if (game.currentK > 260) game.currentK = 1;
         
-        refreshUI();
-        await new Promise(r => setTimeout(r, 450)); // 你要求的延遲時間
+        refreshView();
+        [span_2](start_span)// 450ms 延遲動畫[span_2](end_span)
+        await new Promise(r => setTimeout(r, 450));
     }
 
-    state.moving = false;
+    game.isMoving = false;
     document.getElementById('roll-btn').disabled = false;
     
-    // 移動完畢，必定抽牌
-    triggerDraw();
+    [span_3](start_span)// 移動「完成」後觸發抽牌[span_3](end_span)
+    performDraw();
 }
 
-function triggerDraw() {
-    const type = getKinType(state.currentKin);
+function performDraw() {
+    const type = fetchType(game.currentK);
     const pool = masterCards.filter(m => m.color === type);
     const card = pool[Math.floor(Math.random() * pool.length)];
-    state.card = card;
+    game.card = card;
 
-    document.getElementById('card-wrap').innerHTML = `
-        <div class="card ${type}"><small>ID: ${card.id}</small><h3>${card.type}</h3><p>${card.text}</p></div>`;
+    const wrap = document.getElementById('card-wrap');
+    wrap.innerHTML = `
+        <div class="card ${type}">
+            <small>ID: ${card.id}</small>
+            <h3>${card.type}</h3>
+            <p>${card.text}</p>
+            <div id="btn-area"></div>
+        </div>`;
     
-    const bWrap = document.getElementById('card-btn-wrap');
+    const btnArea = document.getElementById('btn-area');
     if (card.rule === 'direct') {
-        updateScore(card.score, type);
-        bWrap.innerHTML = `<p style="color:#1dd1a1">✅ 能量加載: ${card.score*10}</p>`;
-        saveLog(card.id, state.currentKin, type, card.type, card.score);
+        updateGameScore(card.score, type);
+        btnArea.innerHTML = `<p style="color:#1dd1a1; font-weight:bold; margin-top:10px;">✨ 能量結算中...</p>`;
+        recordLog(card.id, game.currentK, type, card.type, card.score);
     } else if (card.rule === 'soul') {
-        bWrap.innerHTML = `<button class="btn-action" onclick="soulStep1()">🎲 判定靈魂分數</button>`;
+        btnArea.innerHTML = `<button class="btn-action" onclick="soulP1()">🎲 判定靈魂分數</button>`;
     } else if (card.rule === 'power') {
-        bWrap.innerHTML = `<button class="btn-action" onclick="powerStep1()">🎲 判定發揮力量</button>`;
+        btnArea.innerHTML = `<button class="btn-action" onclick="powerP1()">🎲 判定發揮力量</button>`;
     } else if (card.rule === 'knowledge') {
-        bWrap.innerHTML = `<button class="btn-action" onclick="knowStep()">🎲 判定知與行</button>`;
+        btnArea.innerHTML = `<button class="btn-action" onclick="knowP()">🎲 判定知與行</button>`;
     } else {
-        bWrap.innerHTML = `<button class="btn-action" onclick="manifestStep()">🎲 進行顯化判定</button>`;
+        btnArea.innerHTML = `<button class="btn-action" onclick="maniP()">🎲 進行顯化判定</button>`;
     }
 }
 
-[span_1](start_span)// 綠色牌卡修正：二次擲骰[span_1](end_span)
-function soulStep1() {
+[span_4](start_span)// 綠色牌卡修正：二次擲骰邏輯[span_4](end_span)
+function soulP1() {
     const r1 = Math.floor(Math.random()*6)+1;
-    state.tmpScore = r1;
-    document.getElementById('card-btn-wrap').innerHTML = `<p>分數: ${r1}</p><button class="btn-action" onclick="soulStep2()">🎲 判定位移步數</button>`;
+    game.tmpS = r1;
+    document.getElementById('btn-area').innerHTML = `<p>靈魂分數: ${r1}</p><button class="btn-action" onclick="soulP2()">🎲 判定位移步數</button>`;
 }
-function soulStep2() {
+function soulP2() {
     const r2 = Math.floor(Math.random()*6)+1;
-    const steps = state.tmpScore * r2;
-    updateScore(state.tmpScore, state.card.color);
-    saveLog(state.card.id, state.currentKin, state.card.color, `${state.card.type}(位移${steps}步)`, state.tmpScore);
-    startMove(steps);
+    const s = game.tmpS * r2;
+    updateGameScore(game.tmpS, game.card.color);
+    recordLog(game.card.id, game.currentK, game.card.color, `${game.card.type}(位移${s}步)`, game.tmpS);
+    runMovement(s);
 }
 
-function manifestStep() {
+function maniP() {
     const r = Math.floor(Math.random()*6)+1;
-    const rule = state.card.rule; // magic or become
+    const rule = game.card.rule;
     const score = (rule === 'magic') ? 10 : 5;
-    const steps = r * (rule === 'magic' ? 10 : 5);
-    updateScore(score, state.card.color);
-    saveLog(state.card.id, state.currentKin, state.card.color, `${state.card.type}(位移${steps}步)`, score);
-    startMove(steps);
+    const s = r * (rule === 'magic' ? 10 : 5);
+    updateGameScore(score, game.card.color);
+    recordLog(game.card.id, game.currentK, game.card.color, `${game.card.type}(位移${s}步)`, score);
+    runMovement(s);
 }
 
-function updateScore(s, color) {
-    state.colorScores[color] += (s * 10);
-    refreshUI();
+function updateGameScore(s, color) {
+    game.scores[color] += (s * 10);
+    refreshView();
 }
 
-function checkFinish() {
-    if (state.round < 3) {
+function processRoundEnd() {
+    if (game.round < 3) {
         setTimeout(() => {
-            alert(`🚩 回合 ${state.round} 到達終點！`);
-            state.round++;
-            document.getElementById('round-title').textContent = `🌙 第 ${state.round} 回合：設定旅程`;
+            alert(`第 ${game.round} 回合抵達終點！`);
+            game.round++;
+            document.getElementById('setup-title').textContent = `🌙 第 ${game.round} 回合：旅程設定`;
             document.getElementById('overlay').style.display = 'flex';
         }, 600);
     } else {
-        alert("🏁 三回合旅程全數完成！");
+        alert("三回合旅程圓滿結束！");
     }
 }
 
-function saveLog(id, kin, color, type, score) {
+function recordLog(id, kin, color, type, score) {
     const body = document.getElementById('history-body');
     const row = body.insertRow(0);
     const s = score * 10;
-    row.innerHTML = `<td>${state.round}</td><td>${kin}</td><td>${type}</td><td style="color:${s>=0?'#1dd1a1':'#ee5253'}"><b>${s>0?'+':''}${s}</b></td>`;
-    state.logs.push([state.round, kin, type, s]);
+    row.innerHTML = `<td>${game.round}</td><td>${kin}</td><td>${type}</td><td style="color:${s>=0?'#1dd1a1':'#ee5253'}"><b>${s>0?'+':''}${s}</b></td>`;
+    game.logs.push([game.round, kin, type, s]);
 }
 
-function exportData() {
-    let csv = "\uFEFF回合,KIN,類型,分數\n";
-    state.logs.forEach(l => csv += l.join(",") + "\n");
+function downloadCSV() {
+    let csv = "\uFEFF回合,KIN,類型,得分\n";
+    game.logs.forEach(l => csv += l.join(",") + "\n");
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "Synchronic_Journey_Log.csv";
+    link.download = "13Moon_Journey_Log.csv";
     link.click();
 }
 
-function handleRoll() {
-    if(state.moving) return;
-    const res = document.getElementById('dice-area');
-    res.className = 'dice-rolling';
+function onDiceRoll() {
+    if(game.isMoving) return;
+    const disp = document.getElementById('dice-display');
+    disp.className = 'dice-rolling';
     setTimeout(() => {
         const d1 = Math.floor(Math.random()*6)+1, d2 = Math.floor(Math.random()*6)+1;
-        res.className = '';
-        res.textContent = `🎲 ${d1+d2}`;
-        startMove(d1+d2);
+        disp.className = '';
+        disp.textContent = `🎲 ${d1+d2}`;
+        runMovement(d1+d2);
     }, 600);
 }
 </script>
