@@ -628,45 +628,64 @@ function runSoul2() {
     doMove(s); // 執行位移
 }
 
-// 2. 發揮力量 (Yes & No)：不位移
+// 2. 發揮力量 (Yes & No) — 兩階段判定，完全移除 doMove
 function runPower1() {
     const r1 = Math.floor(Math.random() * 6) + 1;
-    const isOdd = (r1 % 2 !== 0); // 奇數為 Yes
+    const isOdd = r1 % 2 !== 0; 
     const box = document.getElementById('btn-box');
     
     if (isOdd) {
-        applyPoints(5, G.activeCard.color);
+        applyPoints(5, G.activeCard.color); // Yes: +50分
         addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(Yes)`, 5);
-        box.innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：Yes！獲得 50 分</p>`;
+        box.innerHTML = `
+            <p style="font-size:1.2em;">🎲 擲出 ${r1}：<b style="color:#1dd1a1;">Yes!</b></p>
+            <p style="color:#1dd1a1; font-weight:bold;">已校準共時頻率 (+50)</p>
+            <p style="color:#888; font-size:10px;">(此類型不進行位移)</p>`;
     } else {
         box.innerHTML = `
-            <p>🎲 擲出 ${r1}：No... 進入第二次判定</p>
+            <p style="font-size:1.2em;">🎲 擲出 ${r1}：<b style="color:#ee5253;">No...</b></p>
+            <p>需進行第二次判定以確定調整分數</p>
             <button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
     }
 }
 
 function runPower2() {
     const r2 = Math.floor(Math.random() * 6) + 1;
-    const isOdd = (r2 % 2 !== 0);
-    const score = isOdd ? -3 : -5; // 奇數 -3, 偶數 -5
+    const isOdd = r2 % 2 !== 0;
+    const score = isOdd ? -3 : -5; // 奇數-30, 偶數-50
+    
     applyPoints(score, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(No)`, score);
-    document.getElementById('btn-box').innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p>`;
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(No: 調整)`, score);
+    
+    document.getElementById('btn-box').innerHTML = `
+        <p style="font-size:1.2em;">🎲 第二次擲出 ${r2}：${isOdd ? '奇數' : '偶數'}</p>
+        <p style="color:#ee5253; font-weight:bold;">判定得分為 ${score * 10}</p>
+        <p style="color:#888; font-size:10px;">(此類型不進行位移)</p>`;
 }
 
-// 3. 知與行 (智慧三層次)：不位移
+// 3. 知與行 (Knowledge & Action) — 三層次判定，完全移除 doMove
 function runKnow() {
     const r = Math.floor(Math.random() * 6) + 1;
-    let score = 0, typeName = "";
+    let score = 0;
+    let typeName = "";
     
-    if (r >= 5) { score = 5; typeName = "實踐"; }
-    else if (r >= 3) { score = 3; typeName = "領悟"; }
-    else { score = 0; typeName = "知道"; }
+    if (r >= 5) { 
+        score = 5; typeName = "實踐"; 
+    } else if (r >= 3) { 
+        score = 3; typeName = "領悟"; 
+    } else { 
+        score = 0; typeName = "知道"; 
+    }
     
     applyPoints(score, G.activeCard.color);
     addHistory(G.activeCard.id, G.curK, G.activeCard.color, `知與行(${typeName})`, score);
-    document.getElementById('btn-box').innerHTML = `<p>🎲 擲出 ${r}：屬【${typeName}】獲得 ${score*10} 分</p>`;
+    
+    document.getElementById('btn-box').innerHTML = `
+        <p style="font-size:1.2em;">🎲 擲出 ${r}：屬【${typeName}】</p>
+        <p style="color:#1dd1a1; font-weight:bold;">獲得 ${score * 10} 分</p>
+        <p style="color:#888; font-size:10px;">(此類型不進行位移)</p>`;
 }
+
 
 // 4. 成就/奇蹟顯化：固定得分 + 乘法位移
 function runMani() {
