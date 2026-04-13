@@ -629,10 +629,8 @@ function addHistory(id, kin, color, type, score, text = "") {
     if(footprintData.length > 3) footprintData.pop();
     document.getElementById('feet-inner').innerHTML = footprintData.join('');
 
-    G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s]);
-}
-    } // 這是 addHistory 的結束括號
+        G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s]);
+} 
 </script>
 </body>
 </html>
-
