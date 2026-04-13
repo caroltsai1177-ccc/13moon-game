@@ -15,75 +15,31 @@ body { font-family: sans-serif; background: #0d0d1a; color: #fff; margin: 0; dis
 
 #game-ui { display: none; width: 100%; height: 100%; flex-direction: row; }
 
-/* 左側：棋盤與控制區 (佔 60% 寬度) */
-.board-column { 
-    flex: 1.4; 
-    display: flex; 
-    flex-direction: column; 
-    height: 100vh; 
-    border-right: 1px solid #333; 
-    box-sizing: border-box; 
-    background: #0d0d1a;
-}
-
-/* 狀態列 */
+/* 左側：棋盤與控制區 */
+.board-column { flex: 1.4; display: flex; flex-direction: column; height: 100vh; border-right: 1px solid #333; box-sizing: border-box; background: #0d0d1a; }
 .top-status { height: 40px; display: flex; justify-content: space-around; align-items: center; background: rgba(255,255,255,0.05); font-size: 0.85em; color: #1dd1a1; flex-shrink: 0; }
 
-/* 棋盤容器：強制根據剩餘高度收縮 */
-.grid-container { 
-    flex-grow: 1; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    min-height: 0; /* 防止棋盤撐開父容器 */
-    padding: 10px;
-    position: relative;
-}
-.tzolkin-grid { 
-    display: grid; 
-    grid-template-columns: repeat(13, 1fr); 
-    grid-template-rows: repeat(20, 1fr);
-    gap: 1.5px; 
-    width: 100%; 
-    height: 100%; 
-    max-height: 100%; /* 強制適應容器高度 */
-}
-.kin-cell { 
-    background: #222; border-radius: 1px; font-size: 8px; 
-    display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; 
-}
-.kin-red { background: #ee5253; } .kin-white { background: #f1f2f6; } 
-.kin-blue { background: #2e86de; color: #fff; } .kin-yellow { background: #feca57; }
-.kin-green { background: #1dd1a1; border: 1px solid #fff; color: #fff; }
+/* 棋盤容器修正：縮小格位以騰出空間 */
+.grid-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; min-height: 0; padding: 5px; position: relative; }
+.tzolkin-grid { display: grid; grid-template-columns: repeat(13, 1fr); grid-template-rows: repeat(20, 1fr); gap: 1px; width: 98%; height: 95%; }
+.kin-cell { background: #222; border-radius: 1px; font-size: 6.5px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; aspect-ratio: 1/1; }
+.kin-red { background: #ee5253; } .kin-white { background: #f1f2f6; } .kin-blue { background: #2e86de; color: #fff; } .kin-yellow { background: #feca57; } .kin-green { background: #1dd1a1; border: 1px solid #fff; color: #fff; }
 
-/* 水晶柱：亮點特效 */
-.kin-cell.active { 
-    background: #fff !important; color: #ff00ff !important; 
-    transform: scale(1.15); box-shadow: 0 0 12px #fff; 
-    border-radius: 50%; z-index: 50; border: 2px solid #ff00ff; 
-}
+.kin-cell.active { background: #fff !important; color: #ff00ff !important; transform: scale(1.15); box-shadow: 0 0 12px #fff; border-radius: 50%; z-index: 50; border: 2px solid #ff00ff; }
 
-/* 底部操作區：絕對不被遮擋 */
-.bottom-ctrl { 
-    height: 130px; 
-    flex-shrink: 0; 
-    background: #111125; 
-    padding: 10px; 
-    border-top: 1px solid #444; 
-    z-index: 100;
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center;
-}
-.btn-go { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 14px; border-radius: 25px; width: 100%; font-size: 1.2em; font-weight: bold; cursor: pointer; }
+.bottom-ctrl { height: 110px; flex-shrink: 0; background: #111125; padding: 8px; border-top: 1px solid #444; z-index: 100; display: flex; flex-direction: column; justify-content: center; }
+.btn-go { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px; border-radius: 25px; width: 100%; font-size: 1.1em; font-weight: bold; cursor: pointer; }
 .btn-go:disabled { opacity: 0.3; cursor: not-allowed; }
+#dice-num { height: 35px; font-size: 2em; text-align: center; font-weight: bold; color: #ffd43b; }
 
-#dice-num { height: 40px; font-size: 2.2em; text-align: center; font-weight: bold; color: #ffd43b; }
+/* 右側：紀錄區 - 增加表格可見度 */
+.info-column { flex: 1.1; display: flex; flex-direction: column; background: #0a0a15; padding: 10px; overflow-y: auto; }
+.card-display { min-height: 140px; margin-bottom: 8px; }
+.card { background: #252545; padding: 15px; border-radius: 10px; border-top: 6px solid #ccc; font-size: 0.9em; box-shadow: 0 5px 15px #000; }
 
-/* 右側：紀錄與卡牌區 (佔 40% 寬度) */
-.info-column { flex: 1; display: flex; flex-direction: column; background: #0a0a15; padding: 12px; overflow-y: auto; }
-.card-display { min-height: 150px; margin-bottom: 10px; }
-.card { background: #252545; padding: 15px; border-radius: 10px; border-top: 6px solid #ccc; font-size: 0.95em; box-shadow: 0 5px 15px #000; }
+#log-table { width: 100%; border-collapse: collapse; font-size: 10px; text-align: center; color: #eee; }
+#log-table th { background: #222; color: #764ba2; padding: 4px; border-bottom: 1px solid #333; }
+#log-table td { padding: 4px; border-bottom: 1px solid #222; }
 
 @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 .rolling { animation: pulse 0.1s infinite; }
@@ -493,7 +449,7 @@ const G_KINS = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,1
 
 let G = {
     round: 1, sK: 1, eK: 260, curK: 1,
-    moved: 0, total: 0,
+    moved: 0, total: 0, tS: 0,
     scores: { red: 0, white: 0, blue: 0, yellow: 0, green: 0 },
     moving: false, activeCard: null, logs: [],
     moveTimer: null
@@ -509,12 +465,9 @@ function setupAndStart() {
     G.eK = parseInt(document.getElementById('k-end').value) || 260;
     G.curK = G.sK;
     G.moved = 0;
-    // 計算該局目標總步數
     G.total = (G.eK >= G.sK) ? (G.eK - G.sK) : ((260 - G.sK) + G.eK);
-
     document.getElementById('overlay').style.display = 'none';
     document.getElementById('game-ui').style.display = 'flex';
-    
     if(G.round === 1) buildBoard();
     refresh();
 }
@@ -535,32 +488,25 @@ function buildBoard() {
 }
 
 function refresh() {
-    // 高效更新位置，避免 querySelectorAll
     const old = document.querySelector('.kin-cell.active');
     if (old) old.classList.remove('active');
     const target = document.getElementById(`k-${G.curK}`);
     if (target) target.classList.add('active');
-    
     document.getElementById('ui-k').textContent = G.curK;
     document.getElementById('ui-r').textContent = G.round;
-
     let s = 0;
     Object.keys(G.scores).forEach(c => s += Math.max(0, G.scores[c]));
     document.getElementById('ui-s').textContent = s;
-
     if (G.moved >= G.total && !G.moving) {
         checkNextRound();
     }
 }
 
-// 核心修正：穩定版移動計時器
 function doMove(steps) {
     if (G.moving) return;
     G.moving = true;
     document.getElementById('roll-btn').disabled = true;
-    
     let stepsLeft = steps;
-    
     G.moveTimer = setInterval(() => {
         if (stepsLeft <= 0 || G.moved >= G.total) {
             clearInterval(G.moveTimer);
@@ -569,13 +515,12 @@ function doMove(steps) {
             triggerDraw();
             return;
         }
-        
         G.moved++;
         G.curK++;
         if (G.curK > 260) G.curK = 1;
         stepsLeft--;
         refresh();
-    }, 400); // 你要求的 400-450ms 穩定動畫
+    }, 400);
 }
 
 function triggerDraw() {
@@ -583,7 +528,6 @@ function triggerDraw() {
     const pool = masterCards.filter(m => m.color === type);
     const card = pool[Math.floor(Math.random() * pool.length)];
     G.activeCard = card;
-
     const area = document.getElementById('card-area');
     area.innerHTML = `
         <div class="card ${type}">
@@ -592,12 +536,12 @@ function triggerDraw() {
             <p>${card.text}</p>
             <div id="btn-box" style="margin-top:10px;"></div>
         </div>`;
-    
     const box = document.getElementById('btn-box');
     if (card.rule === 'direct') {
         applyPoints(card.score, type);
-        box.innerHTML = `<p style="color:#1dd1a1; font-weight:bold;">已校準共時頻率 (+${card.score*10})</p>`;
-        addHistory(card.id, G.curK, type, card.type, card.score);
+        addHistory(card.id, G.curK, type, card.type, card.score, card.text);
+        let color = card.score > 0 ? "#1dd1a1" : "#ee5253";
+        box.innerHTML = `<p style="color:${color}; font-weight:bold;">自動判定：${card.score > 0 ? '+' : ''}${card.score*10} 分</p><p style="color:#888; font-size:10px;">(此類型不位移)</p>`;
     } else if (card.rule === 'soul') {
         box.innerHTML = `<button class="btn-go" onclick="runSoul1()">🎲 判定靈魂分數</button>`;
     } else if (card.rule === 'power') {
@@ -609,132 +553,92 @@ function triggerDraw() {
     }
 }
 
-// --- 判定邏輯修正 (完全依照計分說明卡) ---
-
-// 1. 靈魂拷問：得分 = 第 1 擲；步數 = 第 1 擲 x 第 2 擲 (需位移)
-function runSoul1() {
-    const r1 = Math.floor(Math.random() * 6) + 1;
-    G.tS = r1; // 靈魂滿意分數
-    document.getElementById('btn-box').innerHTML = `
-        <p>靈魂滿意分數: ${r1}</p>
-        <button class="btn-go" onclick="runSoul2()">🎲 判定前進步數</button>`;
+function runKnow() {
+    const r = Math.floor(Math.random() * 6) + 1;
+    let score = (r >= 5) ? 5 : (r >= 3 ? 3 : 0);
+    let label = (r >= 5) ? "實踐" : (r >= 3 ? "領悟" : "知道");
+    applyPoints(score, G.activeCard.color);
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `知與行(${label})`, score, G.activeCard.text);
+    document.getElementById('btn-box').innerHTML = `<p>🎲 擲出 ${r}：屬【${label}】獲得 ${score*10} 分</p><p style="color:#888; font-size:10px;">(此類型不位移)</p>`;
 }
 
-function runSoul2() {
-    const r2 = Math.floor(Math.random() * 6) + 1;
-    const s = G.tS * r2; // 位移步數 = 滿意分數 x 第二次擲骰
-    applyPoints(G.tS, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `靈魂拷問(${s}步)`, G.tS);
-    doMove(s); // 執行位移
-}
-
-// 2. 發揮力量 (Yes & No) — 兩階段判定，完全移除 doMove
 function runPower1() {
     const r1 = Math.floor(Math.random() * 6) + 1;
     const isOdd = r1 % 2 !== 0; 
     const box = document.getElementById('btn-box');
-    
     if (isOdd) {
-        applyPoints(5, G.activeCard.color); // Yes: +50分
-        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(Yes)`, 5);
-        box.innerHTML = `
-            <p style="font-size:1.2em;">🎲 擲出 ${r1}：<b style="color:#1dd1a1;">Yes!</b></p>
-            <p style="color:#1dd1a1; font-weight:bold;">已校準共時頻率 (+50)</p>
-            <p style="color:#888; font-size:10px;">(此類型不進行位移)</p>`;
+        applyPoints(5, G.activeCard.color);
+        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(Yes)`, 5, G.activeCard.text);
+        box.innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：Yes！獲得 50 分</p><p style="color:#888; font-size:10px;">(此類型不位移)</p>`;
     } else {
-        box.innerHTML = `
-            <p style="font-size:1.2em;">🎲 擲出 ${r1}：<b style="color:#ee5253;">No...</b></p>
-            <p>需進行第二次判定以確定調整分數</p>
-            <button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
+        box.innerHTML = `<p>🎲 擲出 ${r1}：No... 進入第二次判定</p><button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
     }
 }
-
 function runPower2() {
     const r2 = Math.floor(Math.random() * 6) + 1;
-    const isOdd = r2 % 2 !== 0;
-    const score = isOdd ? -3 : -5; // 奇數-30, 偶數-50
-    
+    const score = (r2 % 2 !== 0) ? -3 : -5;
     applyPoints(score, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(No: 調整)`, score);
-    
-    document.getElementById('btn-box').innerHTML = `
-        <p style="font-size:1.2em;">🎲 第二次擲出 ${r2}：${isOdd ? '奇數' : '偶數'}</p>
-        <p style="color:#ee5253; font-weight:bold;">判定得分為 ${score * 10}</p>
-        <p style="color:#888; font-size:10px;">(此類型不進行位移)</p>`;
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `發揮力量(No)`, score, G.activeCard.text);
+    document.getElementById('btn-box').innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p><p style="color:#888; font-size:10px;">(此類型不位移)</p>`;
 }
 
-// 3. 知與行 (Knowledge & Action) — 三層次判定，完全移除 doMove
-function runKnow() {
-    const r = Math.floor(Math.random() * 6) + 1;
-    let score = 0;
-    let typeName = "";
-    
-    if (r >= 5) { 
-        score = 5; typeName = "實踐"; 
-    } else if (r >= 3) { 
-        score = 3; typeName = "領悟"; 
-    } else { 
-        score = 0; typeName = "知道"; 
-    }
-    
-    applyPoints(score, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `知與行(${typeName})`, score);
-    
-    document.getElementById('btn-box').innerHTML = `
-        <p style="font-size:1.2em;">🎲 擲出 ${r}：屬【${typeName}】</p>
-        <p style="color:#1dd1a1; font-weight:bold;">獲得 ${score * 10} 分</p>
-        <p style="color:#888; font-size:10px;">(此類型不進行位移)</p>`;
+function runSoul1() {
+    G.tS = Math.floor(Math.random() * 6) + 1;
+    document.getElementById('btn-box').innerHTML = `<p>靈魂分數: ${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 判定位移步數</button>`;
+}
+function runSoul2() {
+    const r2 = Math.floor(Math.random() * 6) + 1;
+    const steps = G.tS * r2;
+    applyPoints(G.tS, G.activeCard.color);
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `靈魂拷問(${steps}步)`, G.tS, G.activeCard.text);
+    doMove(steps);
 }
 
-
-// 4. 成就/奇蹟顯化：固定得分 + 乘法位移
 function runMani() {
     const r = Math.floor(Math.random() * 6) + 1;
     const isMagic = (G.activeCard.rule === 'magic');
-    const score = isMagic ? 10 : 5;     // 奇蹟+10分，成就+5分
-    const steps = r * (isMagic ? 10 : 5); // 步數 = 骰子 x (10或5)
-    
+    const score = isMagic ? 10 : 5;
+    const steps = r * score;
     applyPoints(score, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score);
-    document.getElementById('btn-box').innerHTML = `<p>🎲 擲出 ${r}：獲得 ${score*10} 分，位移 ${steps} 步！</p>`;
-    doMove(steps); // 執行位移
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score, G.activeCard.text);
+    doMove(steps);
 }
 
-// 5. 分數套用
 function applyPoints(s, color) {
     G.scores[color] += (s * 10);
     refresh();
 }
 
-
-function checkNextRound() {
-    if (G.round < 3) {
-        setTimeout(() => {
-            alert(`第 ${G.round} 回合達成！`);
-            G.round++;
-            document.getElementById('setup-label').textContent = `第 ${G.round} 回合：設定旅程`;
-            document.getElementById('overlay').style.display = 'flex';
-        }, 500);
-    } else {
-        alert("恭喜！三回合旅程圓滿達成。");
-    }
-}
-
-function addHistory(id, kin, color, type, score) {
+function addHistory(id, kin, color, type, score, text = "") {
     const body = document.getElementById('log-body');
     const row = body.insertRow(0);
     const s = score * 10;
-    row.innerHTML = `<td>${G.round}</td><td>${kin}</td><td>${type}</td><td style="color:${s>=0?'#1dd1a1':'#ee5253'}"><b>${s>0?'+':''}${s}</b></td>`;
-    G.logs.push([G.round, kin, type, s]);
+    const shortText = text.length > 20 ? text.substring(0, 20) + "..." : text;
+    row.innerHTML = `<td>${G.round}</td><td>${kin}</td><td>${type}</td><td style="text-align:left; color:#aaa; font-size:9px;" title="${text}">${shortText}</td><td style="color:${s>=0?'#1dd1a1':'#ee5253'}"><b>${s>0?'+':''}${s}</b></td>`;
+    G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s]);
+}
+
+function checkNextRound() {
+    const report = `【第 ${G.round} 回合旅程結算】\n--------------------------\n🔴 紅色: ${G.scores.red}\n⚪ 白色: ${G.scores.white}\n🔵 藍色: ${G.scores.blue}\n🟡 黃色: ${G.scores.yellow}\n🟢 綠色: ${G.scores.green}\n--------------------------\n是否匯出歷程紀錄 CSV 並進入下一階段？`;
+    setTimeout(() => {
+        if (confirm(report)) exportCSV();
+        if (G.round < 3) {
+            G.round++;
+            document.getElementById('setup-label').textContent = `第 ${G.round} 回合：設定旅程`;
+            document.getElementById('overlay').style.display = 'flex';
+        } else {
+            alert("恭喜圓滿達成三回合共時旅程！");
+        }
+    }, 600);
 }
 
 function exportCSV() {
-    let csv = "\uFEFF回合,KIN,類型,得分\n";
+    let csv = "\uFEFF回合,KIN,類型,內容,得分\n";
     G.logs.forEach(l => csv += l.join(",") + "\n");
     const b = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const u = URL.createObjectURL(b);
     const a = document.createElement("a");
-    a.href = u; a.download = "Journey_Result.csv"; a.click();
+    a.href = u; a.download = `Journey_Result_Round${G.round}.csv`; a.click();
 }
 
 function startDice() {
@@ -748,49 +652,6 @@ function startDice() {
         doMove(d1+d2);
     }, 600);
 }
-
-// 沿用之前的判定函數 (Power, Knowledge)...
-function runMani() {
-    const r = Math.floor(Math.random() * 6) + 1;
-    const isMagic = (G.activeCard.rule === 'magic');
-    const score = isMagic ? 10 : 5;
-    const s = r * (isMagic ? 10 : 5);
-    applyPoints(score, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${s}步)`, score);
-    doMove(s);
-}
-
-// 在這裡補上缺失的判定函式
-function runPower1() {
-    const r1 = Math.floor(Math.random() * 6) + 1;
-    G.tS = r1;
-    document.getElementById('btn-box').innerHTML = `
-        <p>力量判定值: ${r1}</p>
-        <button class="btn-go" onclick="runPower2()">🎲 判定位移步數</button>`;
-}
-
-function runPower2() {
-    const r2 = Math.floor(Math.random() * 6) + 1;
-    const s = G.tS + r2; 
-    applyPoints(G.tS, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${s}步)`, G.tS);
-    doMove(s);
-}
-
-function runKnow() {
-    const r = Math.floor(Math.random() * 6) + 1;
-    const score = G.activeCard.score; 
-    applyPoints(score, G.activeCard.color);
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(前進${r}步)`, score);
-    doMove(r);
-}
-
-function applyPoints(s, color) { 
-    G.scores[color] += (s * 10);
-    refresh();
-}
-
 </script>
 </body>
 </html>
-
