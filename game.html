@@ -575,9 +575,9 @@ function triggerDraw() {
     }
 }
 
-// 1. 發揮力量 (紅卡/藍卡判定)
+// 1. 發揮力量判定 (紅卡/藍卡)
 function runPower1() {
-    isActionLocked = false; // 關鍵：點擊瞬間立刻解鎖
+    isActionLocked = false; // 強制解鎖：確保點擊絕對有效
     const r1 = Math.floor(Math.random() * 6) + 1;
     const box = document.getElementById('btn-box');
     if (r1 % 2 !== 0) {
@@ -590,7 +590,7 @@ function runPower1() {
 }
 
 function runPower2() {
-    isActionLocked = false; // 第二次擲骰也要解鎖
+    isActionLocked = false; // 解鎖：讓第二次擲骰能順利跑完
     const r2 = Math.floor(Math.random() * 6) + 1;
     let score = (r2 % 2 !== 0) ? -3 : -5;
     applyPoints(score, G.activeCard.color);
@@ -599,9 +599,9 @@ function runPower2() {
     if(box) box.innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p>`;
 }
 
-// 2. 靈魂拷問 (白卡判定)
+// 2. 靈魂拷問判定 (白卡)
 function runSoul1() {
-    isActionLocked = false;
+    isActionLocked = false; 
     G.tS = Math.floor(Math.random() * 6) + 1;
     const box = document.getElementById('btn-box');
     if(box) box.innerHTML = `<p>靈魂分數：${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 靈魂擲骰</button>`;
@@ -618,7 +618,7 @@ function runSoul2() {
 
 // 3. 知與行 / 顯化判定 (黃卡/綠卡/金卡共通)
 function runMani() {
-    isActionLocked = false; // 這是修復「知與行」和「顯化」點不動的唯一鑰匙
+    isActionLocked = false; // 修復關鍵：點擊「顯化判定」或「知與行」時強制把紅燈變綠燈
     const r = Math.floor(Math.random() * 6) + 1;
     let isMagic = (G.activeCard && G.activeCard.rule === 'magic');
     let score = isMagic ? 10 : 5;
@@ -628,11 +628,11 @@ function runMani() {
     doMove(steps);
 }
 
-// 4. 萬能加分與總解鎖
+// 4. 萬能解鎖鑰匙：只要加完分，一定熄滅紅燈
 function applyPoints(s, color) { 
     if (G.scores[color] !== undefined) G.scores[color] += (s * 10); 
-    G.activeCard = null;    // 狀態歸零
-    isActionLocked = false; // 雙重保險：按鈕恢復紫色可點擊
+    G.activeCard = null;    // 讓系統知道卡片結束了
+    isActionLocked = false; // 恢復綠燈，讓主畫面擲骰子按鈕變回紫色
     refresh(); 
 }
 
