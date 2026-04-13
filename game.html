@@ -578,54 +578,62 @@ function triggerDraw() {
     }
 }
 
-// --- 2. 判定函數組：每一條路徑都強制解鎖 ---
+// 1. 發揮力量判定 (修正順序：先紀錄再清空)
 function runPower1() {
     isActionLocked = false; 
+    if (!G.activeCard) return;
     const r1 = Math.floor(Math.random() * 6) + 1;
     const box = document.getElementById('btn-box');
+    
     if (r1 % 2 !== 0) {
+        // 先寫紀錄 (這時 G.activeCard 還在)
+        addHistory(G.activeCard.id, G.curK, G.activeCard.color, '發揮力量(成功)', 5, G.activeCard.text);
+        // 紀錄寫完才執行 applyPoints (這會清空卡片)
         applyPoints(5, G.activeCard.color);
-        addHistory('Power', G.curK, G.activeCard.color, '發揮力量(Yes)', 5, G.activeCard.text);
+        if(box) box.innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：成功！(+50分)</p>`;
     } else {
-        box.innerHTML = `<p>🎲 擲出 ${r1}：需再擲一次</p><button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
+        if(box) box.innerHTML = `<p>🎲 擲出 ${r1}：需再擲一次</p><button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
     }
 }
 
 function runPower2() {
     isActionLocked = false;
+    if (!G.activeCard) return;
     const r2 = Math.floor(Math.random() * 6) + 1;
     let score = (r2 % 2 !== 0) ? -3 : -5;
+    
+    // 關鍵順序：先寫歷史紀錄
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, '發揮力量(調整)', score, G.activeCard.text);
+    // 最後才結算並清空
     applyPoints(score, G.activeCard.color);
-    addHistory('Power', G.curK, G.activeCard.color, '發揮力量(No)', score, G.activeCard.text);
+    
+    const box = document.getElementById('btn-box');
+    if(box) box.innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p>`;
 }
 
-function runSoul1() {
-    isActionLocked = false;
-    G.tS = Math.floor(Math.random() * 6) + 1;
-    document.getElementById('btn-box').innerHTML = `<p>靈魂分數：${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 靈魂擲骰</button>`;
-}
-
-function runSoul2() {
-    isActionLocked = false;
-    const r2 = Math.floor(Math.random() * 6) + 1;
-    let steps = G.tS * r2;
-    applyPoints(G.tS, G.activeCard.color);
-    addHistory('Soul', G.curK, G.activeCard.color, `靈魂拷問(${steps}步)`, G.tS, '');
-    doMove(steps);
-}
-
+// 2. 知與行 / 顯化判定 (解決亂跑問題)
 function runMani() {
-    isActionLocked = false; 
+    isActionLocked = false;
     if (!G.activeCard) return;
     
     const r = Math.floor(Math.random() * 6) + 1;
     const rule = G.activeCard.rule;
     let score = (rule === 'magic') ? 10 : 5;
     
-    // 核心修正：只有「成就顯化」(become) 和 「奇蹟顯化」(magic) 才需要額外走路
+    // 判斷：只有顯化(become)和奇蹟(magic)才走路，知與行(knowledge)原地不動
     let shouldMove = (rule === 'become' || rule === 'magic');
-    
-    applyPoints(score, G.activeCard.color);
+
+    if (shouldMove) {
+        let steps = r * score;
+        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score, G.activeCard.text);
+        applyPoints(score, G.activeCard.color);
+        doMove(steps); [span_4](start_span)// 只有顯化才觸發位移[span_4](end_span)
+    } else {
+        // 知與行：寫紀錄、加分，但不呼叫 doMove
+        addHistory(G.activeCard.id, G.curK, G.activeCard.color, G.activeCard.type, score, G.activeCard.text);
+        applyPoints(score, G.activeCard.color);
+    }
+}
 
     if (shouldMove) {
         let steps = r * score;
