@@ -472,6 +472,12 @@ const greenCards = [
 const masterCards = [...redCards, ...whiteCards, ...blueCards, ...yellowCards, ...greenCards];
 const G_KINS = [1,20,22,39,43,50,51,58,64,69,72,77,85,88,93,96,106,107,108,109,110,111,112,113,114,115,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,146,147,148,149,150,151,152,153,154,155,165,168,173,176,184,189,192,197,203,210,211,218,222,239,241,260];
 
+// --- 1. 基礎狀態與印記定義 (這段不能少，少了第二次擲骰會卡死) ---
+const SEALS = [
+    "黃太陽", "紅龍", "白風", "藍夜", "黃種子", "紅蛇", "白世界橋", "藍手", "黃星星", "紅月", 
+    "白狗", "藍猴", "黃人", "紅天行者", "白巫師", "藍鷹", "黃戰士", "紅地球", "白鏡", "藍風暴"
+];
+
 let G = {
     round: 1, sK: 1, eK: 260, curK: 1,
     moved: 0, total: 0, tS: 0,
@@ -480,16 +486,56 @@ let G = {
     moveTimer: null
 };
 
+function getSealName(kin) { return SEALS[kin % 20]; }
+
 function getType(k) {
     if (G_KINS.includes(k)) return 'green';
     return ['red', 'white', 'blue', 'yellow'][((k - 1) % 20) % 4];
 }
 
+// --- 2. 核心結算邏輯 ---
+function applyPoints(s, color) { 
+    if (G.scores && color && G.scores[color] !== undefined) {
+        G.scores[color] += (s * 10);
+    }
+    isActionLocked = false; 
+    G.activeCard = null; 
+    refresh();
+}
+
+function addHistory(id, kin, color, type, score, text = "") {
+    const s = score * 10;
+    const cleanText = text.length > 20 ? text.substring(0, 20) + "..." : text;
+    const imprint = getSealName(kin); // 呼叫印記工具
+    const colorMap = { red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', yellow: '#feca57', green: '#1dd1a1' };
+    const displayColor = colorMap[color] || '#fff';
+
+    // 存入顏色資訊供結算報表使用
+    G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s, color]);
+
+    // 更新紀錄彈窗
+    const logBody = document.getElementById('log-body');
+    if (logBody) {
+        const row = logBody.insertRow(0);
+        row.innerHTML = `<td>${G.round}</td><td>${kin}</td><td style="color:#ffd43b; font-weight:bold;">${imprint}</td><td style="color:${displayColor}">${type}</td><td style="text-align:left; color:#aaa;">${cleanText}</td><td style="color:${s >= 0 ? '#1dd1a1' : '#ee5253'}"><b>${s > 0 ? '+' : ''}${s}</b></td>`;
+    }
+
+    // 更新足跡
+    const feetInner = document.getElementById('feet-inner');
+    if (feetInner) {
+        const footEntry = `<div class="foot-item">📍 KIN <b>${kin}</b> | <span style="color:${displayColor}">${imprint}</span> (${s >= 0 ? '+' : ''}${s})</div>`;
+        if(!window.footprintData) window.footprintData = [];
+        window.footprintData.unshift(footEntry);
+        if (window.footprintData.length > 3) window.footprintData.pop();
+        feetInner.innerHTML = window.footprintData.join('');
+    }
+}
+
+// --- 3. 遊戲流程核心 ---
 function setupAndStart() {
     G.sK = parseInt(document.getElementById('k-start').value) || 1;
     G.eK = parseInt(document.getElementById('k-end').value) || 260;
-    G.curK = G.sK;
-    G.moved = 0;
+    G.curK = G.sK; G.moved = 0;
     G.total = (G.eK >= G.sK) ? (G.eK - G.sK) : ((260 - G.sK) + G.eK);
     document.getElementById('overlay').style.display = 'none';
     document.getElementById('game-ui').style.display = 'flex';
@@ -525,6 +571,19 @@ function refresh() {
     if (G.moved >= G.total && !G.moving) checkNextRound();
 }
 
+function startDice() {
+    if (G.moving || isActionLocked || G.activeCard) return;
+    isActionLocked = true;
+    const d = document.getElementById('dice-num');
+    if (d) d.textContent = "🎲 滾動中...";
+    setTimeout(() => {
+        const d1 = Math.floor(Math.random() * 6) + 1;
+        const d2 = Math.floor(Math.random() * 6) + 1;
+        if (d) d.textContent = `🎲 ${d1 + d2}`;
+        doMove(d1 + d2);
+    }, 600);
+}
+
 function doMove(steps) {
     if (G.moving) return;
     G.moving = true;
@@ -538,32 +597,23 @@ function doMove(steps) {
             triggerDraw();
             return;
         }
-        G.moved++;
-        G.curK++;
+        G.moved++; G.curK++;
         if (G.curK > 260) G.curK = 1;
         stepsLeft--;
         refresh();
     }, 400);
 }
 
-// --- 1. 卡片抽取核心 (入口邏輯校對) ---
+// --- 4. 判定功能組 (修復第二次擲骰卡死的問題) ---
 function triggerDraw() {
     const type = getType(G.curK);
     const pool = masterCards.filter(m => m.color === type);
     const card = pool[Math.floor(Math.random() * pool.length)];
     G.activeCard = card;
     const area = document.getElementById('card-area');
-    area.innerHTML = `
-        <div class="card ${type}">
-            <small>ID: ${card.id}</small>
-            <h3>${card.type}</h3>
-            <p>${card.text}</p>
-            <div id="btn-box" style="margin-top:10px;"></div>
-        </div>`;
-    
+    area.innerHTML = `<div class="card ${type}"><small>ID: ${card.id}</small><h3>${card.type}</h3><p>${card.text}</p><div id="btn-box" style="margin-top:10px;"></div></div>`;
     isActionLocked = false; 
     const box = document.getElementById('btn-box');
-
     if (card.rule === 'direct') {
         addHistory(card.id, G.curK, type, card.type, card.score, card.text);
         applyPoints(card.score, type);
@@ -579,10 +629,8 @@ function triggerDraw() {
     }
 }
 
-// --- 2. 判定函數組 (嚴格執行：紀錄 -> 結算 -> 動作) ---
 function runPower1() {
-    isActionLocked = false; 
-    if (!G.activeCard) return;
+    isActionLocked = false; if (!G.activeCard) return;
     const r1 = Math.floor(Math.random() * 6) + 1;
     if (r1 % 2 !== 0) {
         addHistory('Power', G.curK, G.activeCard.color, '發揮力量(成功)', 5, G.activeCard.text);
@@ -594,8 +642,7 @@ function runPower1() {
 }
 
 function runPower2() {
-    isActionLocked = false;
-    if (!G.activeCard) return;
+    isActionLocked = false; if (!G.activeCard) return;
     const r2 = Math.floor(Math.random() * 6) + 1;
     let score = (r2 % 2 !== 0) ? -3 : -5;
     addHistory('Power', G.curK, G.activeCard.color, '發揮力量(調整)', score, G.activeCard.text);
@@ -604,8 +651,7 @@ function runPower2() {
 }
 
 function runKnow() {
-    isActionLocked = false;
-    if (!G.activeCard) return;
+    isActionLocked = false; if (!G.activeCard) return;
     const r = Math.floor(Math.random() * 6) + 1;
     let s = (r >= 5) ? 5 : (r >= 3 ? 3 : 0);
     let label = (r >= 5) ? "實踐" : (r >= 3 ? "領悟" : "知道");
@@ -615,14 +661,12 @@ function runKnow() {
 }
 
 function runSoul1() {
-    isActionLocked = false;
-    G.tS = Math.floor(Math.random() * 6) + 1;
+    isActionLocked = false; G.tS = Math.floor(Math.random() * 6) + 1;
     document.getElementById('btn-box').innerHTML = `<p>靈魂分數：${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 靈魂擲骰</button>`;
 }
 
 function runSoul2() {
-    isActionLocked = false;
-    if (!G.activeCard) return;
+    isActionLocked = false; if (!G.activeCard) return;
     const r2 = Math.floor(Math.random() * 6) + 1;
     let steps = G.tS * r2;
     addHistory('Soul', G.curK, G.activeCard.color, `靈魂拷問(${steps}步)`, G.tS, G.activeCard.text);
@@ -631,13 +675,11 @@ function runSoul2() {
 }
 
 function runMani() {
-    isActionLocked = false; 
-    if (!G.activeCard) return;
+    isActionLocked = false; if (!G.activeCard) return;
     const r = Math.floor(Math.random() * 6) + 1;
     const rule = G.activeCard.rule;
     let score = (rule === 'magic') ? 10 : 5;
     let shouldMove = (rule === 'become' || rule === 'magic');
-
     if (shouldMove) {
         let steps = r * score;
         addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score, G.activeCard.text);
@@ -649,116 +691,32 @@ function runMani() {
     }
 }
 
-// --- 3. 最終解鎖與清空 ---
-function applyPoints(s, color) { 
-    if (G.scores && color && G.scores[color] !== undefined) {
-        G.scores[color] += (s * 10); 
-    }
-    isActionLocked = false; 
-    G.activeCard = null; // 放在最後，確保 addHistory 已經抓完資料
-    refresh(); 
-}
-
-// 1. 切換完整紀錄彈窗
+// --- 5. 介面彈窗與匯出 ---
 function toggleLog(show) {
     const modal = document.getElementById('log-modal');
     if (!modal) return;
     modal.style.display = show ? 'flex' : 'none';
-
     if (show) {
-        // A. 初始化分類與總分 (負分不計入總分)
         let catScores = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
         let totalScore = 0;
-        
-        const colorMap = {
-            red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', 
-            yellow: '#feca57', green: '#1dd1a1'
-        };
-
-        // B. 計算各顏色總分 (從 G.logs 第 6 個欄位抓取顏色標記)
+        const colorMap = { red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', yellow: '#feca57', green: '#1dd1a1' };
         G.logs.forEach(log => {
-            const score = log[4];
-            const color = log[5] || 'white';
-            if (score > 0) {
-                catScores[color] += score;
-                totalScore += score;
-            }
+            const score = log[4]; const color = log[5] || 'white';
+            if (score > 0) { catScores[color] += score; totalScore += score; }
         });
-
-        // C. 生成最上方的分數統計區 HTML
-        const summaryHtml = `
-            <div class="summary-area" style="background:#1a1a2e; padding:12px; border-radius:8px; margin-bottom:15px; font-size:13px; border:1px solid #444; line-height:1.6;">
-                <div style="display:flex; justify-content:space-around; flex-wrap:wrap; margin-bottom:8px;">
-                    <span style="color:${colorMap.red}">🔴紅: ${catScores.red}</span>
-                    <span style="color:${colorMap.white}">⚪白: ${catScores.white}</span>
-                    <span style="color:${colorMap.blue}">🔵藍: ${catScores.blue}</span>
-                    <span style="color:${colorMap.yellow}">🟡黃: ${catScores.yellow}</span>
-                    <span style="color:${colorMap.green}">🟢綠: ${catScores.green}</span>
-                </div>
-                <div style="text-align:center; font-size:18px; font-weight:bold; color:#ffd43b; border-top:1px solid #333; padding-top:8px;">
-                    🏆 旅程總積分：${totalScore}
-                </div>
-            </div>
-        `;
-
-        // D. 注入彈窗 (確保統計區插在表格最前方)
+        const summaryHtml = `<div class="summary-area" style="background:#1a1a2e; padding:12px; border-radius:8px; margin-bottom:15px; font-size:13px; border:1px solid #444; line-height:1.6;"><div style="display:flex; justify-content:space-around; flex-wrap:wrap; margin-bottom:8px;"><span style="color:${colorMap.red}">🔴紅: ${catScores.red}</span><span style="color:${colorMap.white}">⚪白: ${catScores.white}</span><span style="color:${colorMap.blue}">🔵藍: ${catScores.blue}</span><span style="color:${colorMap.yellow}">🟡黃: ${catScores.yellow}</span><span style="color:${colorMap.green}">🟢綠: ${catScores.green}</span></div><div style="text-align:center; font-size:18px; font-weight:bold; color:#ffd43b; border-top:1px solid #333; padding-top:8px;">🏆 旅程總積分：${totalScore}</div></div>`;
         const modalBody = modal.querySelector('.modal-body');
         if (modalBody) {
-            // 移除舊的統計區，避免重複堆疊
             const oldSummary = modalBody.querySelector('.summary-area');
             if (oldSummary) oldSummary.remove();
-            
             const summaryDiv = document.createElement('div');
+            summaryDiv.className = "summary-area";
             summaryDiv.innerHTML = summaryHtml;
-            modalBody.insertBefore(summaryDiv.firstChild, modalBody.firstChild);
+            modalBody.insertBefore(summaryDiv, modalBody.firstChild);
         }
     }
 }
 
-
-// 2. 修正後的紀錄功能 (包含 3 筆足跡與完整表格)
-let footprintData = [];
-function addHistory(id, kin, color, type, score, text = "") {
-    const s = score * 10;
-    const cleanText = text.length > 20 ? text.substring(0, 20) + "..." : text;
-    const imprint = getSealName(kin); // 呼叫我們剛才定義的印記工具
-
-    // A. 建立顏色表，讓文字變色
-    const colorMap = {
-        red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', 
-        yellow: '#feca57', green: '#1dd1a1'
-    };
-    const displayColor = colorMap[color] || '#fff';
-
-    // B. 更新「完整紀錄」彈窗的內容 (加入印記、套用顏色)
-    const logBody = document.getElementById('log-body');
-    if (logBody) {
-        const row = logBody.insertRow(0);
-        row.innerHTML = `
-            <td>${G.round}</td>
-            <td>${kin}</td>
-            <td style="color:#ffd43b; font-weight:bold;">${imprint}</td>
-            <td style="color:${displayColor}">${type}</td>
-            <td style="text-align:left; color:#aaa;">${cleanText}</td>
-            <td style="color:${s >= 0 ? '#1dd1a1' : '#ee5253'}"><b>${s > 0 ? '+' : ''}${s}</b></td>
-        `;
-    }
-
-    // C. 更新「主畫面下方」足跡
-    const feetInner = document.getElementById('feet-inner');
-    if (feetInner) {
-        const footEntry = `<div class="foot-item">📍 KIN <b>${kin}</b> | <span style="color:${displayColor}">${imprint}</span> (${s >= 0 ? '+' : ''}${s})</div>`;
-        if(!window.footprintData) window.footprintData = [];
-        window.footprintData.unshift(footEntry);
-        if (window.footprintData.length > 3) window.footprintData.pop();
-        feetInner.innerHTML = window.footprintData.join('');
-    }
-
-    // D. 存入資料：多存一個 color，這是為了最後報告的分類統計
-    G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s, color]);
-}
-
-// 3. 回合結算邏輯 (之前被刪掉的部分)
 function checkNextRound() {
     const r = G.scores;
     const msg = `【第 ${G.round} 回合結算】\n紅:${r.red} | 白:${r.white} | 藍:${r.blue} | 黃:${r.yellow} | 綠:${r.green}\n是否進入下一階段？`;
@@ -768,39 +726,19 @@ function checkNextRound() {
                 G.round++;
                 document.getElementById('setup-label').textContent = `第 ${G.round} 回合：設定旅程`;
                 document.getElementById('overlay').style.display = 'flex';
-            } else {
-                alert("旅程圓滿達成！");
-            }
+            } else { alert("旅程圓滿達成！"); }
         }
     }, 600);
 }
 
-// 4. 匯出 CSV 邏輯 (之前被刪掉的部分)
 function exportCSV() {
     let csv = "\uFEFF回合,KIN,類型,內容,得分\n";
     G.logs.forEach(l => csv += l.join(",") + "\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-    a.download = `Journey_Result_Round${G.round}.csv`;
-    a.click();
+    a.download = `Journey_Result_Round${G.round}.csv`; a.click();
 }
 
-// 5. 擲骰子前進邏輯 (已加入互鎖功能，防止連發)
-function startDice() {
-    // 互鎖：如果正在移動、按鈕被鎖定、或是有卡片顯示中，一律不准點擊
-    if (G.moving || isActionLocked || G.activeCard) return; 
-    
-    isActionLocked = true; // 開啟鎖定
-    const d = document.getElementById('dice-num');
-    if (d) d.textContent = "🎲 滾動中...";
-    
-    setTimeout(() => {
-        const d1 = Math.floor(Math.random() * 6) + 1;
-        const d2 = Math.floor(Math.random() * 6) + 1;
-        if (d) d.textContent = `🎲 ${d1 + d2}`; // 注意：這裡要用反引號 ` 才能顯示數字
-        doMove(d1 + d2);
-    }, 600);
-}
 </script>
 </body>
 </html>
