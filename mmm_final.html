@@ -2,11 +2,10 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>短線雷達 Ultimate</title>
+<title>短線雷達</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body { margin:0; font-family:Arial; background:#0f172a; color:white;}
-h2 { padding:15px; margin:0;}
 .container { padding:10px;}
 .card {
   background:#1e293b;
@@ -16,14 +15,9 @@ h2 { padding:15px; margin:0;}
 }
 .up { color:#ff6b6b;}
 .down { color:#4ade80;}
-.tag {
-  display:inline-block;
-  padding:4px 10px;
-  border-radius:6px;
-  font-size:12px;
-}
+.tag { padding:4px 10px; border-radius:6px; font-size:12px;}
 .good { background:#16a34a;}
-.warn { background:#dc2626;}
+warn { background:#dc2626;}
 .wait { background:#eab308;}
 button {
   padding:12px;
@@ -33,105 +27,76 @@ button {
   color:white;
   font-size:16px;
   border-radius:8px;
-  margin-bottom:10px;
 }
-.small { font-size:12px; opacity:0.7;}
 </style>
 </head>
 
 <body>
 
-<h2>📊 短線雷達 Ultimate</h2>
-
 <div class="container">
-<button onclick="loadStocks()">🔄 更新市場機會</button>
+<h2>📊 短線雷達</h2>
+<button onclick="loadStocks()">🔄 更新</button>
 <div id="list">載入中...</div>
-<p class="small">策略：20~40元｜短線2~3天價差模型</p>
 </div>
 
 <script>
 async function loadStocks(){
 
-document.getElementById("list").innerHTML = "抓取市場資料中...";
+document.getElementById("list").innerHTML = "抓資料中...";
 
 try{
 
-// 抓熱門成交股（近似市場主流）
-const res = await fetch("https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_2330.tw|tse_2317.tw|tse_2454.tw|tse_2603.tw|tse_2609.tw|tse_2610.tw|tse_2618.tw|tse_2344.tw|tse_2408.tw|tse_3037.tw|tse_2371.tw|tse_2382.tw|tse_2353.tw|tse_2324.tw");
+// 用 proxy 避開限制
+const api = "https://api.allorigins.win/raw?url=";
+const target = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_2344.tw|tse_2408.tw|tse_2610.tw|tse_2618.tw|tse_2609.tw|tse_2603.tw";
+
+const res = await fetch(api + encodeURIComponent(target));
 const data = await res.json();
-const stocks = data.msgArray;
 
-let result = [];
+let html = "";
 
-stocks.forEach(s => {
+data.msgArray.forEach(s => {
 
 let price = parseFloat(s.z);
 let prev = parseFloat(s.y);
 
 if(!price || !prev) return;
 
-let change = price - prev;
-let percent = (change / prev) * 100;
+let percent = ((price - prev) / prev * 100).toFixed(2);
 
-// 篩選條件
 if(price >= 20 && price <= 40){
 
-let score = 0;
-
-// 打分邏輯（核心）
-if(percent >= 3 && percent <= 6) score += 3;
-if(percent > 1 && percent < 3) score += 1;
-if(percent > 6) score -= 2;
-
-result.push({
-name: s.n,
-price: price,
-percent: percent.toFixed(2),
-volume: s.v,
-score: score
-});
-
-}
-
-});
-
-// 排序（最適合的在前面）
-result.sort((a,b)=>b.score - a.score);
-
-let html = "";
-
-result.forEach(s => {
-
 let tag = "";
-let tagClass = "";
+let cls = "";
 
-if(s.score >= 3){
-  tag = "🔥 可觀察（等回檔）";
-  tagClass = "good";
-}else if(s.score >=1){
-  tag = "🟡 溫和（可留意）";
-  tagClass = "wait";
+if(percent >= 3 && percent <= 6){
+  tag = "🔥 可觀察";
+  cls = "good";
+}else if(percent > 6){
+  tag = "⚠️ 過熱";
+  cls = "warn";
 }else{
-  tag = "⚠️ 過熱 / 不追";
-  tagClass = "warn";
+  tag = "🟡 等發動";
+  cls = "wait";
 }
 
 html += `
 <div class="card">
-<h3>${s.name}</h3>
-<p>💰 ${s.price} 元</p>
-<p class="${s.percent>0?'up':'down'}">📈 ${s.percent}%</p>
-<p>📊 成交量：${s.volume}</p>
-<p class="tag ${tagClass}">${tag}</p>
+<h3>${s.n}</h3>
+<p>💰 ${price}</p>
+<p class="${percent>0?'up':'down'}">📈 ${percent}%</p>
+<p class="tag ${cls}">${tag}</p>
 </div>
 `;
 
+}
+
 });
 
-document.getElementById("list").innerHTML = html || "今天沒有符合條件的股票";
+document.getElementById("list").innerHTML = html || "今天沒有符合條件";
 
 }catch(e){
-document.getElementById("list").innerHTML = "資料讀取失敗";
+document.getElementById("list").innerHTML = "資料抓不到（可能API暫時不穩）";
 }
 
 }
