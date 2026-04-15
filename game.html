@@ -546,7 +546,7 @@ function doMove(steps) {
     }, 400);
 }
 
-// --- 1. 卡片抽取核心：確保所有類型都有對應函數 ---
+// --- 1. 卡片抽取核心 (入口邏輯校對) ---
 function triggerDraw() {
     const type = getType(G.curK);
     const pool = masterCards.filter(m => m.color === type);
@@ -560,39 +560,36 @@ function triggerDraw() {
             <p>${card.text}</p>
             <div id="btn-box" style="margin-top:10px;"></div>
         </div>`;
-
+    
+    isActionLocked = false; 
     const box = document.getElementById('btn-box');
-    isActionLocked = false; // 抽卡時先確保解鎖
 
     if (card.rule === 'direct') {
-        applyPoints(card.score, type);
         addHistory(card.id, G.curK, type, card.type, card.score, card.text);
+        applyPoints(card.score, type);
         box.innerHTML = `<p style="color:${card.score>0?'#1dd1a1':'#ee5253'}; font-weight:bold;">自動判定：${card.score>0?'+':''}${card.score*10}</p>`;
     } else if (card.rule === 'soul') {
         box.innerHTML = `<button class="btn-go" onclick="runSoul1()">🎲 判定靈魂分數</button>`;
     } else if (card.rule === 'power') {
         box.innerHTML = `<button class="btn-go" onclick="runPower1()">🎲 判定發揮力量</button>`;
+    } else if (card.rule === 'knowledge') {
+        box.innerHTML = `<button class="btn-go" onclick="runKnow()">🎲 判定知與行</button>`;
     } else {
-        // 關鍵：將知與行、顯化判定統一導向 runMani，徹底解決點不動的問題
-        box.innerHTML = `<button class="btn-go" onclick="runMani()">🎲 進行判定</button>`;
+        box.innerHTML = `<button class="btn-go" onclick="runMani()">🎲 進行顯化判定</button>`;
     }
 }
 
-// 1. 發揮力量判定 (修正順序：先紀錄再清空)
+// --- 2. 判定函數組 (嚴格執行：紀錄 -> 結算 -> 動作) ---
 function runPower1() {
     isActionLocked = false; 
     if (!G.activeCard) return;
     const r1 = Math.floor(Math.random() * 6) + 1;
-    const box = document.getElementById('btn-box');
-    
     if (r1 % 2 !== 0) {
-        // 先寫紀錄 (這時 G.activeCard 還在)
-        addHistory(G.activeCard.id, G.curK, G.activeCard.color, '發揮力量(成功)', 5, G.activeCard.text);
-        // 紀錄寫完才執行 applyPoints (這會清空卡片)
+        addHistory('Power', G.curK, G.activeCard.color, '發揮力量(成功)', 5, G.activeCard.text);
         applyPoints(5, G.activeCard.color);
-        if(box) box.innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：成功！(+50分)</p>`;
+        document.getElementById('btn-box').innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r1}：成功！(+50分)</p>`;
     } else {
-        if(box) box.innerHTML = `<p>🎲 擲出 ${r1}：需再擲一次</p><button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
+        document.getElementById('btn-box').innerHTML = `<p>🎲 擲出 ${r1}：需再擲一次</p><button class="btn-go" onclick="runPower2()">🎲 第二次擲骰</button>`;
     }
 }
 
@@ -601,64 +598,67 @@ function runPower2() {
     if (!G.activeCard) return;
     const r2 = Math.floor(Math.random() * 6) + 1;
     let score = (r2 % 2 !== 0) ? -3 : -5;
-    
-    // 關鍵順序：先寫歷史紀錄
-    addHistory(G.activeCard.id, G.curK, G.activeCard.color, '發揮力量(調整)', score, G.activeCard.text);
-    // 最後才結算並清空
+    addHistory('Power', G.curK, G.activeCard.color, '發揮力量(調整)', score, G.activeCard.text);
     applyPoints(score, G.activeCard.color);
-    
-    const box = document.getElementById('btn-box');
-    if(box) box.innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p>`;
+    document.getElementById('btn-box').innerHTML = `<p style="color:#ee5253;">🎲 擲出 ${r2}：判定為 ${score*10} 分</p>`;
 }
 
-// 2. 知與行 / 顯化判定 (解決亂跑問題)
-function runMani() {
+function runKnow() {
     isActionLocked = false;
     if (!G.activeCard) return;
-    
+    const r = Math.floor(Math.random() * 6) + 1;
+    let s = (r >= 5) ? 5 : (r >= 3 ? 3 : 0);
+    let label = (r >= 5) ? "實踐" : (r >= 3 ? "領悟" : "知道");
+    addHistory(G.activeCard.id, G.curK, G.activeCard.color, `知與行(${label})`, s, G.activeCard.text);
+    applyPoints(s, G.activeCard.color);
+    document.getElementById('btn-box').innerHTML = `<p style="color:#1dd1a1;">🎲 擲出 ${r}（${label}）：獲得 ${s*10} 分</p>`;
+}
+
+function runSoul1() {
+    isActionLocked = false;
+    G.tS = Math.floor(Math.random() * 6) + 1;
+    document.getElementById('btn-box').innerHTML = `<p>靈魂分數：${G.tS}</p><button class="btn-go" onclick="runSoul2()">🎲 靈魂擲骰</button>`;
+}
+
+function runSoul2() {
+    isActionLocked = false;
+    if (!G.activeCard) return;
+    const r2 = Math.floor(Math.random() * 6) + 1;
+    let steps = G.tS * r2;
+    addHistory('Soul', G.curK, G.activeCard.color, `靈魂拷問(${steps}步)`, G.tS, G.activeCard.text);
+    applyPoints(G.tS, G.activeCard.color);
+    setTimeout(() => doMove(steps), 500);
+}
+
+function runMani() {
+    isActionLocked = false; 
+    if (!G.activeCard) return;
     const r = Math.floor(Math.random() * 6) + 1;
     const rule = G.activeCard.rule;
     let score = (rule === 'magic') ? 10 : 5;
-    
-    // 判斷：只有顯化(become)和奇蹟(magic)才走路，知與行(knowledge)原地不動
     let shouldMove = (rule === 'become' || rule === 'magic');
 
     if (shouldMove) {
         let steps = r * score;
         addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score, G.activeCard.text);
         applyPoints(score, G.activeCard.color);
-        doMove(steps); [span_4](start_span)// 只有顯化才觸發位移[span_4](end_span)
+        setTimeout(() => doMove(steps), 500);
     } else {
-        // 知與行：寫紀錄、加分，但不呼叫 doMove
         addHistory(G.activeCard.id, G.curK, G.activeCard.color, G.activeCard.type, score, G.activeCard.text);
         applyPoints(score, G.activeCard.color);
     }
 }
 
-    if (shouldMove) {
-        let steps = r * score;
-        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}(${steps}步)`, score, G.activeCard.text);
-        doMove(steps);
-    } else {
-        // 「知與行」(knowledge) 只判定加分，原地不動
-        addHistory(G.activeCard.id, G.curK, G.activeCard.color, `${G.activeCard.type}`, score, G.activeCard.text);
-    }
-}
-
-
-// --- 3. 最終解鎖與清理 ---
+// --- 3. 最終解鎖與清空 ---
 function applyPoints(s, color) { 
     if (G.scores && color && G.scores[color] !== undefined) {
         G.scores[color] += (s * 10); 
     }
     isActionLocked = false; 
-    G.activeCard = null; 
+    G.activeCard = null; // 放在最後，確保 addHistory 已經抓完資料
     refresh(); 
-    setTimeout(() => {
-        const area = document.getElementById('card-area');
-        if(area && !G.activeCard) area.innerHTML = '<div style="text-align:center; color:#444; margin-top:40px;">準備好開啟這段共時了嗎？</div>';
-    }, 1500);
 }
+
 // 1. 切換完整紀錄彈窗
 function toggleLog(show) {
     const modal = document.getElementById('log-modal');
