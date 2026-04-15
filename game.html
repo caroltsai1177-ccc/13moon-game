@@ -662,32 +662,100 @@ function applyPoints(s, color) {
 // 1. 切換完整紀錄彈窗
 function toggleLog(show) {
     const modal = document.getElementById('log-modal');
-    if (modal) modal.style.display = show ? 'flex' : 'none';
+    if (!modal) return;
+    modal.style.display = show ? 'flex' : 'none';
+
+    if (show) {
+        // A. 初始化分類與總分 (負分不計入總分)
+        let catScores = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
+        let totalScore = 0;
+        
+        const colorMap = {
+            red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', 
+            yellow: '#feca57', green: '#1dd1a1'
+        };
+
+        // B. 計算各顏色總分 (從 G.logs 第 6 個欄位抓取顏色標記)
+        G.logs.forEach(log => {
+            const score = log[4];
+            const color = log[5] || 'white';
+            if (score > 0) {
+                catScores[color] += score;
+                totalScore += score;
+            }
+        });
+
+        // C. 生成最上方的分數統計區 HTML
+        const summaryHtml = `
+            <div class="summary-area" style="background:#1a1a2e; padding:12px; border-radius:8px; margin-bottom:15px; font-size:13px; border:1px solid #444; line-height:1.6;">
+                <div style="display:flex; justify-content:space-around; flex-wrap:wrap; margin-bottom:8px;">
+                    <span style="color:${colorMap.red}">🔴紅: ${catScores.red}</span>
+                    <span style="color:${colorMap.white}">⚪白: ${catScores.white}</span>
+                    <span style="color:${colorMap.blue}">🔵藍: ${catScores.blue}</span>
+                    <span style="color:${colorMap.yellow}">🟡黃: ${catScores.yellow}</span>
+                    <span style="color:${colorMap.green}">🟢綠: ${catScores.green}</span>
+                </div>
+                <div style="text-align:center; font-size:18px; font-weight:bold; color:#ffd43b; border-top:1px solid #333; padding-top:8px;">
+                    🏆 旅程總積分：${totalScore}
+                </div>
+            </div>
+        `;
+
+        // D. 注入彈窗 (確保統計區插在表格最前方)
+        const modalBody = modal.querySelector('.modal-body');
+        if (modalBody) {
+            // 移除舊的統計區，避免重複堆疊
+            const oldSummary = modalBody.querySelector('.summary-area');
+            if (oldSummary) oldSummary.remove();
+            
+            const summaryDiv = document.createElement('div');
+            summaryDiv.innerHTML = summaryHtml;
+            modalBody.insertBefore(summaryDiv.firstChild, modalBody.firstChild);
+        }
+    }
 }
+
 
 // 2. 修正後的紀錄功能 (包含 3 筆足跡與完整表格)
 let footprintData = [];
 function addHistory(id, kin, color, type, score, text = "") {
     const s = score * 10;
     const cleanText = text.length > 20 ? text.substring(0, 20) + "..." : text;
-    
-    // 更新彈窗內的表格
+    const imprint = getSealName(kin); // 呼叫我們剛才定義的印記工具
+
+    // A. 建立顏色表，讓文字變色
+    const colorMap = {
+        red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', 
+        yellow: '#feca57', green: '#1dd1a1'
+    };
+    const displayColor = colorMap[color] || '#fff';
+
+    // B. 更新「完整紀錄」彈窗的內容 (加入印記、套用顏色)
     const logBody = document.getElementById('log-body');
     if (logBody) {
         const row = logBody.insertRow(0);
-        row.innerHTML = `<td>${G.round}</td><td>${kin}</td><td>${type}</td><td style="text-align:left; color:#aaa;">${cleanText}</td><td style="color:${s >= 0 ? '#1dd1a1' : '#ee5253'}"><b>${s > 0 ? '+' : ''}${s}</b></td>`;
+        row.innerHTML = `
+            <td>${G.round}</td>
+            <td>${kin}</td>
+            <td style="color:#ffd43b; font-weight:bold;">${imprint}</td>
+            <td style="color:${displayColor}">${type}</td>
+            <td style="text-align:left; color:#aaa;">${cleanText}</td>
+            <td style="color:${s >= 0 ? '#1dd1a1' : '#ee5253'}"><b>${s > 0 ? '+' : ''}${s}</b></td>
+        `;
     }
-    
-    // 更新主畫面足跡 (利用反引號 ` 確保變數能顯示數字)
-    const prevK = G.logs.length > 0 ? G.logs[G.logs.length - 1][1] : G.sK;
-    const footEntry = `<div class="foot-item">📍 KIN <b>${prevK}</b> ➔ <b>${kin}</b> (${s >= 0 ? '+' : ''}${s}) | ${type}</div>`;
-    
-    footprintData.unshift(footEntry);
-    if (footprintData.length > 3) footprintData.pop();
-    const feetInner = document.getElementById('feet-inner');
-    if (feetInner) feetInner.innerHTML = footprintData.join('');
 
-    G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s]);
+    // C. 更新「主畫面下方」足跡
+    const feetInner = document.getElementById('feet-inner');
+    if (feetInner) {
+        const footEntry = `<div class="foot-item">📍 KIN <b>${kin}</b> | <span style="color:${displayColor}">${imprint}</span> (${s >= 0 ? '+' : ''}${s})</div>`;
+        if(!window.footprintData) window.footprintData = [];
+        window.footprintData.unshift(footEntry);
+        if (window.footprintData.length > 3) window.footprintData.pop();
+        feetInner.innerHTML = window.footprintData.join('');
+    }
+
+    // D. 存入資料：多存一個 color，這是為了最後報告的分類統計
+    G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s, color]);
 }
 
 // 3. 回合結算邏輯 (之前被刪掉的部分)
