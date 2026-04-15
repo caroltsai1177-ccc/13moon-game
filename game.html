@@ -737,14 +737,23 @@ function toggleLog(show) {
         else if (totalScore >= 450) level = { name: "發展階段", title: "定向•茁壯", desc: "方向明確，漸趨健全有力" };
         else if (totalScore >= 250) level = { name: "初生階段", title: "萌芽•破土", desc: "蘊含可能性與期待" };
 
-        // 3. 生成報表 HTML (左側能量柱 + 右側明細)
+               // 3. 生成報表 HTML (左側能量柱 + 右側明細)
         const summaryHtml = `
             <div style="background:#1a1a2e; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #444; text-align:center;">
-                <div style="color:#ffd43b; font-size:14px; font-weight:bold;">🏆 旅程總積分：${totalScore}</div>
-                <div style="color:#eee; margin-top:5px; font-size:12px;"><b>【${level.name}】${level.title}</b></div>
+                <div style="color:#ffd43b; font-size:16px; font-weight:bold; margin-bottom:8px;">🏆 旅程總積分：${totalScore}</div>
+                
+                <div style="display:flex; justify-content:space-around; flex-wrap:wrap; margin-bottom:10px; font-size:12px; border-top:1px solid #333; border-bottom:1px solid #333; padding:10px 0;">
+                    <span style="color:${colorMap.red}">🔴紅: ${catScores.red}</span>
+                    <span style="color:${colorMap.white}">⚪白: ${catScores.white}</span>
+                    <span style="color:${colorMap.blue}">🔵藍: ${catScores.blue}</span>
+                    <span style="color:${colorMap.yellow}">🟡黃: ${catScores.yellow}</span>
+                    <span style="color:${colorMap.green}">🟢綠: ${catScores.green}</span>
+                </div>
+
+                <div style="color:#eee; font-size:13px;"><b>【${level.name}】${level.title}</b></div>
                 <div style="color:#aaa; font-size:11px; font-style:italic;">"${level.desc}"</div>
             </div>
-            
+
             <div style="display:flex; gap:12px; align-items:flex-start;">
                 <div style="width:28px; height:320px; background:#111; border:1px solid #333; position:relative; border-radius:4px; display:flex; flex-direction:column-reverse; overflow:hidden; flex-shrink:0;">
                     <div style="height:${(catScores.green/1000)*100}%; background:${colorMap.green}; width:100%;"></div>
