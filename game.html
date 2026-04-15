@@ -505,25 +505,21 @@ function applyPoints(s, color) {
 
 function addHistory(id, kin, color, type, score, text = "") {
     const s = score * 10;
-    const cleanText = text.length > 20 ? text.substring(0, 20) + "..." : text;
-    const imprint = getSealName(kin); // 呼叫印記工具
-    const colorMap = { red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', yellow: '#feca57', green: '#1dd1a1' };
-    const displayColor = colorMap[color] || '#fff';
-
-    // 存入顏色資訊供結算報表使用
+    // A. 存入資料庫：多存一個 color 標記，為了最後報告的分類統計與變色
+    // 結構：[回合, KIN, 類型, 內容, 分數, 卡片顏色]
     G.logs.push([G.round, kin, type, text.replace(/,/g, "，"), s, color]);
-
-    // 更新紀錄彈窗
-    const logBody = document.getElementById('log-body');
-    if (logBody) {
-        const row = logBody.insertRow(0);
-        row.innerHTML = `<td>${G.round}</td><td>${kin}</td><td style="color:#ffd43b; font-weight:bold;">${imprint}</td><td style="color:${displayColor}">${type}</td><td style="text-align:left; color:#aaa;">${cleanText}</td><td style="color:${s >= 0 ? '#1dd1a1' : '#ee5253'}"><b>${s > 0 ? '+' : ''}${s}</b></td>`;
-    }
-
-    // 更新足跡
+    
+    // B. 更新主畫面足跡 (主畫面下方顯示的印記要顯示「本質」的顏色)
     const feetInner = document.getElementById('feet-inner');
     if (feetInner) {
-        const footEntry = `<div class="foot-item">📍 KIN <b>${kin}</b> | <span style="color:${displayColor}">${imprint}</span> (${s >= 0 ? '+' : ''}${s})</div>`;
+        const imprint = getSealName(kin);
+        const colorMap = { red:'#ee5253', white:'#f1f2f6', blue:'#2e86de', yellow:'#feca57', green:'#1dd1a1' };
+        
+        // 關鍵修正：這裡抓的是印記的本質顏色 (例如：不論卡片顏色，藍夜永遠顯示藍色)
+        const intrinsicColor = colorMap[getType(kin)];
+        
+        const footEntry = `<div class="foot-item">📍 KIN <b>${kin}</b> | <span style="color:${intrinsicColor}; font-weight:bold;">${imprint}</span> (${s >= 0 ? '+' : ''}${s})</div>`;
+        
         if(!window.footprintData) window.footprintData = [];
         window.footprintData.unshift(footEntry);
         if (window.footprintData.length > 3) window.footprintData.pop();
@@ -696,26 +692,80 @@ function toggleLog(show) {
     const modal = document.getElementById('log-modal');
     if (!modal) return;
     modal.style.display = show ? 'flex' : 'none';
+
     if (show) {
         let catScores = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
         let totalScore = 0;
-        const colorMap = { red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', yellow: '#feca57', green: '#1dd1a1' };
+        let tableRows = "";
+        
+        const colorMap = {
+            red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', 
+            yellow: '#feca57', green: '#1dd1a1'
+        };
+
+        // 遍歷所有紀錄，處理變色與排列
         G.logs.forEach(log => {
-            const score = log[4]; const color = log[5] || 'white';
-            if (score > 0) { catScores[color] += score; totalScore += score; }
+            const [r, kin, type, text, score, cardColor] = log;
+            const sealName = getSealName(kin);
+            
+            // 抓取印記的本質顏色 (藍夜永遠是藍)
+            const sealIntrinsicColor = colorMap[getType(kin)]; 
+            // 抓取卡片的能量顏色 (成就顯化跟隨卡片)
+            const cardEnergyColor = colorMap[cardColor] || '#fff';
+
+            if (score > 0) {
+                catScores[cardColor] += score;
+                totalScore += score;
+            }
+
+            tableRows += `
+                <tr style="border-bottom: 1px solid #222;">
+                    <td>${r}</td>
+                    <td>
+                        <div style="font-size: 13px; color:#fff;">${kin}</div>
+                        <div style="color:${sealIntrinsicColor}; font-weight:bold; font-size:11px;">${sealName}</div>
+                    </td>
+                    <td style="color:${cardEnergyColor}; font-weight:bold;">${type}</td>
+                    <td style="text-align:left; color:#aaa; font-size:11px; line-height:1.4;">${text}</td>
+                    <td style="color:${score >= 0 ? '#1dd1a1' : '#ee5253'}"><b>${score > 0 ? '+' : ''}${score}</b></td>
+                </tr>`;
         });
-        const summaryHtml = `<div class="summary-area" style="background:#1a1a2e; padding:12px; border-radius:8px; margin-bottom:15px; font-size:13px; border:1px solid #444; line-height:1.6;"><div style="display:flex; justify-content:space-around; flex-wrap:wrap; margin-bottom:8px;"><span style="color:${colorMap.red}">🔴紅: ${catScores.red}</span><span style="color:${colorMap.white}">⚪白: ${catScores.white}</span><span style="color:${colorMap.blue}">🔵藍: ${catScores.blue}</span><span style="color:${colorMap.yellow}">🟡黃: ${catScores.yellow}</span><span style="color:${colorMap.green}">🟢綠: ${catScores.green}</span></div><div style="text-align:center; font-size:18px; font-weight:bold; color:#ffd43b; border-top:1px solid #333; padding-top:8px;">🏆 旅程總積分：${totalScore}</div></div>`;
+
+        const summaryHtml = `
+            <div class="summary-area" style="background:#1a1a2e; padding:12px; border-radius:8px; margin-bottom:15px; font-size:12px; border:1px solid #444;">
+                <div style="display:flex; justify-content:space-around; flex-wrap:wrap; margin-bottom:8px;">
+                    <span style="color:${colorMap.red}">🔴紅: ${catScores.red}</span>
+                    <span style="color:${colorMap.white}">⚪白: ${catScores.white}</span>
+                    <span style="color:${colorMap.blue}">🔵藍: ${catScores.blue}</span>
+                    <span style="color:${colorMap.yellow}">🟡黃: ${catScores.yellow}</span>
+                    <span style="color:${colorMap.green}">🟢綠: ${catScores.green}</span>
+                </div>
+                <div style="text-align:center; font-size:18px; font-weight:bold; color:#ffd43b; border-top:1px solid #333; padding-top:8px;">
+                    🏆 旅程總積分：${totalScore}
+                </div>
+            </div>
+        `;
+
         const modalBody = modal.querySelector('.modal-body');
         if (modalBody) {
-            const oldSummary = modalBody.querySelector('.summary-area');
-            if (oldSummary) oldSummary.remove();
-            const summaryDiv = document.createElement('div');
-            summaryDiv.className = "summary-area";
-            summaryDiv.innerHTML = summaryHtml;
-            modalBody.insertBefore(summaryDiv, modalBody.firstChild);
+            // 重新渲染整個彈窗內容，徹底修復錯位
+            modalBody.innerHTML = summaryHtml + `
+                <table id="log-table" style="width:100%; border-collapse:collapse; text-align:center;">
+                    <thead>
+                        <tr style="color:#764ba2; border-bottom:2px solid #333; font-size:12px;">
+                            <th style="width:10%; padding:8px;">回</th>
+                            <th style="width:20%;">KIN/印記</th>
+                            <th style="width:20%;">類型</th>
+                            <th style="width:38%;">卡片內容</th>
+                            <th style="width:12%;">得分</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-body">${tableRows}</tbody>
+                </table>`;
         }
     }
 }
+
 
 function checkNextRound() {
     const r = G.scores;
