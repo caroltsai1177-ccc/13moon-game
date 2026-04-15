@@ -503,6 +503,11 @@ function applyPoints(s, color) {
     refresh();
 }
 
+// 取得印記本質顏色 (不論是否在綠色 GAP 格子)
+function getIntrinsicColor(k) {
+    return ['red', 'white', 'blue', 'yellow'][((k - 1) % 20) % 4];
+}
+
 function addHistory(id, kin, color, type, score, text = "") {
     const s = score * 10;
     // A. 存入資料庫：多存一個 color 標記，為了最後報告的分類統計與變色
@@ -694,24 +699,18 @@ function toggleLog(show) {
     modal.style.display = show ? 'flex' : 'none';
 
     if (show) {
-        let catScores = { red: 0, white: 0, blue: 0, yellow: 0, green: 0 };
+        // A. 初始化：堆疊順序為 綠 -> 紅 -> 白 -> 藍 -> 黃
+        let catScores = { green: 0, red: 0, white: 0, blue: 0, yellow: 0 };
         let totalScore = 0;
         let tableRows = "";
-        
-        const colorMap = {
-            red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', 
-            yellow: '#feca57', green: '#1dd1a1'
-        };
+        const colorMap = { red: '#ee5253', white: '#f1f2f6', blue: '#2e86de', yellow: '#feca57', green: '#1dd1a1' };
 
-        // 遍歷所有紀錄，處理變色與排列
+        // 1. 計算分類分數與生成表格行
         G.logs.forEach(log => {
             const [r, kin, type, text, score, cardColor] = log;
             const sealName = getSealName(kin);
-            
-            // 抓取印記的本質顏色 (藍夜永遠是藍)
-            const sealIntrinsicColor = colorMap[getType(kin)]; 
-            // 抓取卡片的能量顏色 (成就顯化跟隨卡片)
-            const cardEnergyColor = colorMap[cardColor] || '#fff';
+            const sealColor = colorMap[getIntrinsicColor(kin)]; // 印記本質色
+            const energyColor = colorMap[cardColor] || '#fff';   // 卡片能量色
 
             if (score > 0) {
                 catScores[cardColor] += score;
@@ -720,51 +719,65 @@ function toggleLog(show) {
 
             tableRows += `
                 <tr style="border-bottom: 1px solid #222;">
-                    <td>${r}</td>
+                    <td style="font-size:10px;">${r}</td>
                     <td>
-                        <div style="font-size: 13px; color:#fff;">${kin}</div>
-                        <div style="color:${sealIntrinsicColor}; font-weight:bold; font-size:11px;">${sealName}</div>
+                        <div style="font-size:12px; color:#fff;">${kin}</div>
+                        <div style="color:${sealColor}; font-weight:bold; font-size:10px;">${sealName}</div>
                     </td>
-                    <td style="color:${cardEnergyColor}; font-weight:bold;">${type}</td>
-                    <td style="text-align:left; color:#aaa; font-size:11px; line-height:1.4;">${text}</td>
-                    <td style="color:${score >= 0 ? '#1dd1a1' : '#ee5253'}"><b>${score > 0 ? '+' : ''}${score}</b></td>
+                    <td style="color:${energyColor}; font-weight:bold; font-size:10px;">${type}</td>
+                    <td style="text-align:left; color:#aaa; font-size:10px; line-height:1.2;">${text}</td>
+                    <td style="color:${score >= 0 ? '#1dd1a1' : '#ee5253'}; font-size:11px;"><b>${score > 0 ? '+' : ''}${score}</b></td>
                 </tr>`;
         });
 
+        // 2. 判定意識頻率等級 (依照 1000 分比例尺)
+        let level = { name: "基礎階段", title: "孕育•沃土", desc: "高維度頻率能量" };
+        if (totalScore >= 850) level = { name: "鼎盛階段", title: "繁盛•成蔭", desc: "為他人帶來庇蔭與影響力" };
+        else if (totalScore >= 650) level = { name: "成熟階段", title: "穩固•堅韌", desc: "歷經淬鍊，厚實堅韌" };
+        else if (totalScore >= 450) level = { name: "發展階段", title: "定向•茁壯", desc: "方向明確，漸趨健全有力" };
+        else if (totalScore >= 250) level = { name: "初生階段", title: "萌芽•破土", desc: "蘊含可能性與期待" };
+
+        // 3. 生成報表 HTML (左側能量柱 + 右側明細)
         const summaryHtml = `
-            <div class="summary-area" style="background:#1a1a2e; padding:12px; border-radius:8px; margin-bottom:15px; font-size:12px; border:1px solid #444;">
-                <div style="display:flex; justify-content:space-around; flex-wrap:wrap; margin-bottom:8px;">
-                    <span style="color:${colorMap.red}">🔴紅: ${catScores.red}</span>
-                    <span style="color:${colorMap.white}">⚪白: ${catScores.white}</span>
-                    <span style="color:${colorMap.blue}">🔵藍: ${catScores.blue}</span>
-                    <span style="color:${colorMap.yellow}">🟡黃: ${catScores.yellow}</span>
-                    <span style="color:${colorMap.green}">🟢綠: ${catScores.green}</span>
+            <div style="background:#1a1a2e; padding:12px; border-radius:8px; margin-bottom:15px; border:1px solid #444; text-align:center;">
+                <div style="color:#ffd43b; font-size:14px; font-weight:bold;">🏆 旅程總積分：${totalScore}</div>
+                <div style="color:#eee; margin-top:5px; font-size:12px;"><b>【${level.name}】${level.title}</b></div>
+                <div style="color:#aaa; font-size:11px; font-style:italic;">"${level.desc}"</div>
+            </div>
+            
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:28px; height:320px; background:#111; border:1px solid #333; position:relative; border-radius:4px; display:flex; flex-direction:column-reverse; overflow:hidden; flex-shrink:0;">
+                    <div style="height:${(catScores.green/1000)*100}%; background:${colorMap.green}; width:100%;"></div>
+                    <div style="height:${(catScores.red/1000)*100}%; background:${colorMap.red}; width:100%;"></div>
+                    <div style="height:${(catScores.white/1000)*100}%; background:${colorMap.white}; width:100%;"></div>
+                    <div style="height:${(catScores.blue/1000)*100}%; background:${colorMap.blue}; width:100%;"></div>
+                    <div style="height:${(catScores.yellow/1000)*100}%; background:${colorMap.yellow}; width:100%;"></div>
+                    <div style="position:absolute; bottom:25%; left:0; width:100%; border-top:1px dashed rgba(255,255,255,0.15);"></div>
+                    <div style="position:absolute; bottom:45%; left:0; width:100%; border-top:1px dashed rgba(255,255,255,0.15);"></div>
+                    <div style="position:absolute; bottom:65%; left:0; width:100%; border-top:1px dashed rgba(255,255,255,0.15);"></div>
+                    <div style="position:absolute; bottom:85%; left:0; width:100%; border-top:1px dashed rgba(255,255,255,0.15);"></div>
                 </div>
-                <div style="text-align:center; font-size:18px; font-weight:bold; color:#ffd43b; border-top:1px solid #333; padding-top:8px;">
-                    🏆 旅程總積分：${totalScore}
+
+                <div style="flex:1; overflow-x:auto;">
+                    <table style="width:100%; border-collapse:collapse; text-align:center;">
+                        <thead>
+                            <tr style="color:#764ba2; border-bottom:2px solid #333; font-size:11px;">
+                                <th style="width:8%;">回</th><th style="width:20%;">KIN/印記</th><th style="width:18%;">類型</th><th style="width:42%;">內容</th><th style="width:12%;">分</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-body">${tableRows}</tbody>
+                    </table>
                 </div>
             </div>
         `;
 
         const modalBody = modal.querySelector('.modal-body');
         if (modalBody) {
-            // 重新渲染整個彈窗內容，徹底修復錯位
-            modalBody.innerHTML = summaryHtml + `
-                <table id="log-table" style="width:100%; border-collapse:collapse; text-align:center;">
-                    <thead>
-                        <tr style="color:#764ba2; border-bottom:2px solid #333; font-size:12px;">
-                            <th style="width:10%; padding:8px;">回</th>
-                            <th style="width:20%;">KIN/印記</th>
-                            <th style="width:20%;">類型</th>
-                            <th style="width:38%;">卡片內容</th>
-                            <th style="width:12%;">得分</th>
-                        </tr>
-                    </thead>
-                    <tbody id="log-body">${tableRows}</tbody>
-                </table>`;
+            modalBody.innerHTML = summaryHtml;
         }
     }
 }
+
 
 
 function checkNextRound() {
